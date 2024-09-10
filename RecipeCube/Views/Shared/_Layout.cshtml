@@ -7,44 +7,83 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RecipeCube.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bootstrap-responsive.min.css" />
+    <link rel="stylesheet" href="~/css/fullcalendar.css" />
+    <link rel="stylesheet" href="~/css/matrix-style.css" />
+    <link rel="stylesheet" href="~/css/matrix-media.css" />
+    <link href="~/lib/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RecipeCube</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <!--Header-part-->
+    <div id="header">
+        <h1><a href="dashboard.html">食譜魔方</a></h1>
+    </div>
+    <!--close-Header-part-->
+    <!--sidebar-menu-->
+    <div id="sidebar">
+        <ul>
+            <li class="active"><a href=""><i class="icon icon-home"></i> <span>總覽</span></a></li>
+            <li><a href=""><i class="icon icon-user"></i> <span>使用者</span></a></li>
+            <li><a href=""><i class="icon icon-group"></i> <span>群組</span></a></li>
+            <li><a href=""><i class="icon icon-heart"></i> <span>使用者偏好食材</span></a></li>
+            <li><a href=""><i class="icon icon-cut"></i> <span>使用者不可食用食材</span></a></li>
+            <li><a href=""><i class="icon icon-th"></i> <span>庫存</span></a></li>
+            <li><a href=""><i class="icon icon-reorder"></i> <span>庫存管理紀錄</span></a></li>
+            <li><a href=""><i class="icon icon-food"></i> <span>食材</span></a> </li>
+            <li><a href=""><i class="icon icon-folder-open"></i> <span>食譜</span></a> </li>
+            <li><a href=""><i class="icon icon-comment"></i> <span>食材食譜關聯</span></a> </li>
+            <li><a href=""><i class="icon icon-tasks"></i> <span>商品</span></a></li>
+            <li><a href=""><i class="icon icon-check"></i> <span>訂單</span></a></li>
+            <li><a href=""><i class="icon icon-pencil"></i> <span>訂單明細</span></a></li>
+        </ul>
+    </div>
+    <!--sidebar-menu-->
+    <!--main-container-part-->
+    <div id="content">
+        <!--breadcrumbs-->
+        <div id="content-header">
+            <div id="breadcrumb"> <a href="index.html" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a></div>
             @RenderBody()
-        </main>
+        </div>
+        <!--End-breadcrumbs-->
+        <div class="container-fluid">
+           
+        </div>
+    </div>
+    <!--end-main-container-part-->
+    <!--Footer-part-->
+
+    <div class="row-fluid">
+        <div id="footer" class="span12"> 2013 &copy; Matrix Admin. Brought to you by <a href="http://themedesigner.in">Themedesigner.in</a> </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - RecipeCube - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <!--end-Footer-part-->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/excanvas.min.js"></script>
+    <script src="~/js/jquery.ui.custom.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/jquery.flot.min.js"></script>
+    <script src="~/js/jquery.flot.resize.min.js"></script>
+    <script src="~/js/jquery.peity.min.js"></script>
+    <script src="~/js/fullcalendar.min.js"></script>
+    <script src="~/js/matrix.js"></script>
+    <script src="~/js/matrix.dashboard.js"></script>
+    <script src="~/js/matrix.interface.js"></script>
+    <script src="~/js/matrix.chat.js"></script>
+    <script src="~/js/jquery.validate.js"></script>
+    <script src="~/js/matrix.form_validation.js"></script>
+    <script src="~/js/jquery.wizard.js"></script>
+    <script src="~/js/jquery.uniform.js"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/matrix.popover.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/matrix.tables.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
