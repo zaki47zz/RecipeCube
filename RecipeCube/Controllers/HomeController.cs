@@ -1,6 +1,7 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using RecipeCube.Models;
-using System.Diagnostics;
+using RecipeCube.ViewModels;
 
 namespace RecipeCube.Controllers
 {
@@ -26,7 +27,12 @@ namespace RecipeCube.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(
+                new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                }
+            );
         }
     }
 }
