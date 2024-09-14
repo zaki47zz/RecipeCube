@@ -20373,7 +20373,7 @@ svg.text-dark .color-background {
 }
 
 .blur.blur-rounded {
-  border-radius: 40px;
+  border-radius: 1rem;
 }
 
 .blur.blur-light {
