@@ -5,7 +5,7 @@ namespace RecipeCube.Models;
 
 public partial class Order
 {
-    public long? OrderId { get; set; }
+    public long OrderId { get; set; }
 
     public int? UserId { get; set; }
 

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<RecipeCube.Models.Order>
+
+@section Styles {
+    <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+
+    <style>
+        .table th, .table td {
+            text-align: center !important; /* 強制所有表格內容置中 */
+        }
+    </style>
+}
+
+@{
+    ViewData["Title"] = "訂單檢視";
+}
+
+<h1>訂單檢視</h1>
+
+<p class="mt-1">
+    <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新訂單</a>
+</p>
+<div class="mt-1">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TotalAmount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalAmount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.OrderId">修改訂單</a> |
+                        @* <a asp-action="Details" asp-route-id="@item.OrderId">查看訂單明細</a>  *@
+                        <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index">查看訂單明細</a>
+                        @* <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a> *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(".sidenav .nav-item a").removeClass("active");
+        $("#order a").addClass("active");
+
+        @* 套用datatabes套件 *@
+            new DataTable("table", {
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                    paginate: {
+                        first: "«",   // 保持圖示化
+                        previous: "‹", // 保持圖示化
+                        next: "›",    // 保持圖示化
+                        last: "»"     // 保持圖示化
+                    },
+                }
+            })
+
+
+    </script>
+}
