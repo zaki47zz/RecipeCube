@@ -1,0 +1,130 @@
+﻿@model IEnumerable<RecipeCube.Models.Recipe>
+
+@{
+    ViewData["Title"] = "食譜檢視";
+}
+
+@section Styles {
+    <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
+}
+
+<h1>食譜檢視</h1>
+
+<p class="mt-1">
+    <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white"> 加入新食譜</a></button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.RecipeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCustom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Restriction)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WestEast)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DetailedCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Steps)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Seasoning)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Visibility)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Photo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RecipeId">編輯</a> <br />
+                <a asp-action="Details" asp-route-id="@item.RecipeId">查看詳細</a> <br />
+                <a asp-action="Delete" asp-route-id="@item.RecipeId">刪除</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RecipeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCustom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Restriction)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WestEast)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DetailedCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Steps)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Seasoning)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Visibility)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Photo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script src="/lib/datatables/datatables.min.js"></script>
+    <script>
+        @* 改變navbar *@
+            $(".sidenav .nav-item a").removeClass("active");
+        $("#recipe a").addClass("active");
+
+        @* 套用datatabes套件 *@
+            new DataTable("table", {
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                    paginate: {
+                        first: "«",   // 保持圖示化
+                        previous: "‹", // 保持圖示化
+                        next: "›",    // 保持圖示化
+                        last: "»"     // 保持圖示化
+                    },
+                }
+            })
+    </script>
+
+}

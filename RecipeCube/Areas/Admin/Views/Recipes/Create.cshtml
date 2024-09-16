@@ -1,0 +1,95 @@
+﻿@model RecipeCube.Models.Recipe
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Recipe</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RecipeName" class="control-label"></label>
+                <input asp-for="RecipeName" class="form-control" />
+                <span asp-validation-for="RecipeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <input asp-for="UserId" class="form-control" />
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IsCustom" class="control-label"></label>
+                <input asp-for="IsCustom" class="form-control" />
+                <span asp-validation-for="IsCustom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Restriction" class="control-label"></label>
+                <input asp-for="Restriction" class="form-control" />
+                <span asp-validation-for="Restriction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WestEast" class="control-label"></label>
+                <input asp-for="WestEast" class="form-control" />
+                <span asp-validation-for="WestEast" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Category" class="control-label"></label>
+                <input asp-for="Category" class="form-control" />
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DetailedCategory" class="control-label"></label>
+                <input asp-for="DetailedCategory" class="form-control" />
+                <span asp-validation-for="DetailedCategory" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Steps" class="control-label"></label>
+                <input asp-for="Steps" class="form-control" />
+                <span asp-validation-for="Steps" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Seasoning" class="control-label"></label>
+                <input asp-for="Seasoning" class="form-control" />
+                <span asp-validation-for="Seasoning" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Visibility" class="control-label"></label>
+                <input asp-for="Visibility" class="form-control" />
+                <span asp-validation-for="Visibility" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Photo" class="control-label"></label>
+                <input asp-for="Photo" class="form-control" />
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        @* 改變navbar *@
+            $(".sidenav .nav-item a").removeClass("active");
+        $("#recipe a").addClass("active");
+    </script>
+
+}
