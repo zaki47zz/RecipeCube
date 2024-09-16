@@ -17,7 +17,7 @@
     <link href="/css/nucleo-icons.css" rel="stylesheet" />
     <link href="/css/nucleo-svg.css" rel="stylesheet" />
     <!-- Font Awesome 圖標 -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
     <!-- CSS -->
     <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
@@ -408,9 +408,25 @@
                 $(this).addClass("active");
                 $('#dynamic-content').html('<div>Loading...</div>');
                 let parentId = $(this).parent().attr('id');
+                // 定義每個ID對應的Controller的名稱
                 if (parentId != 'Home') {
+                    let controller = '';
+                    switch (parentId){
+                        case 'User': controller = 'Users'; break;
+                        case 'Group': controller = 'Groups'; break;
+                        case 'PreferedFood': controller = ''; break;
+                        case 'ExclusiveFood': controller = ''; break;
+                        case 'Inventory': controller = 'Inventories'; break;
+                        case 'Pantry': controller = ''; break;
+                        case 'Ingredient': controller = 'Ingredients'; break;
+                        case 'IngredientRecipe': controller = ''; break;
+                        case 'Recipe': controller = 'Recipes'; break;
+                        case 'Product': controller = 'Products'; break;
+                        case 'Order': controller = 'Orders'; break;
+                        case 'OrderItem': controller = ''; break;
+                    }
                     $.ajax({
-                        url: `/Admin/${parentId}s/${parentId}IndexPartial`,
+                        url: `/Admin/${controller}/${parentId}IndexPartial`,
                         type: 'GET',
                         success: function (data) {
                             $('#dynamic-content').html(data); // 加載 Partial View
@@ -461,7 +477,6 @@
                         error: function (xhr, status, error) {
                             alert("Error: " + error);
                         }
-
                     });
                 }
             });
