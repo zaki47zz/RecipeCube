@@ -20,10 +20,33 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/OrderItems
+
         public async Task<IActionResult> Index()
         {
             return View(await _context.OrderItems.ToListAsync());
-        }
+    }
+
+    //public async Task<IActionResult> Index(long? orderId)
+    //{
+    //    if (orderId == null)
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    var orderItems = await _context.OrderItems
+    //        .Where(oi => oi.OrderId == orderId)
+    //        .ToListAsync();
+
+    //    if (orderItems == null || !orderItems.Any())
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    // 傳遞訂單 ID 到視圖
+    //    ViewBag.OrderId = orderId;
+
+    //    return View(orderItems);
+//}
 
         // GET: Admin/OrderItems/Details/5
         public async Task<IActionResult> Details(int? id)

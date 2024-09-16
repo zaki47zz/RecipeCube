@@ -1,8 +1,7 @@
-﻿@model IEnumerable<RecipeCube.Models.Order>
+﻿@model IEnumerable<RecipeCube.Models.OrderItem>
 
 @section Styles {
     <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
-
     <style>
         .table th, .table td {
             text-align: center !important; /* 強制所有表格內容置中 */
@@ -11,29 +10,29 @@
 }
 
 @{
-    ViewData["Title"] = "訂單檢視";
+    ViewData["Title"] = "訂單明細";
 }
 
-<h1>訂單檢視</h1>
+<h1>訂單明細</h1>
 
-<p class="mt-1">
-    <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新訂單</a>
+<p>
+    <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新細項</a>
 </p>
-<div class="mt-1">
+<div class="card-body">
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.UserId)
+                    @Html.DisplayNameFor(model => model.OrderId)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.OrderTime)
+                    @Html.DisplayNameFor(model => model.ProductId)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TotalAmount)
+                    @Html.DisplayNameFor(model => model.Quantity)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Status)
+                    @Html.DisplayNameFor(model => model.Price)
                 </th>
                 <th></th>
             </tr>
@@ -43,34 +42,33 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.UserId)
+                        @Html.DisplayFor(modelItem => item.OrderId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.OrderTime)
+                        @Html.DisplayFor(modelItem => item.ProductId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.TotalAmount)
+                        @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Status)
+                        @Html.DisplayFor(modelItem => item.Price)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.OrderId">修改訂單</a> |
-                        @* <a asp-action="Details" asp-route-id="@item.OrderId">查看訂單明細</a>  *@
-                        <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index">查看訂單明細</a>
-                        @* <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a> *@
+                        <a asp-action="Edit" asp-route-id="@item.OrderItemId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.OrderItemId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.OrderItemId">Delete</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-</div>
 
+</div>
 @section Scripts {
     <script src="~/lib/datatables/datatables.min.js"></script>
     <script>
         $(".sidenav .nav-item a").removeClass("active");
-        $("#order a").addClass("active");
+        $("#order_item a").addClass("active");
 
         @* 套用datatabes套件 *@
             new DataTable("table", {
@@ -84,7 +82,5 @@
                     },
                 }
             })
-
-
     </script>
 }

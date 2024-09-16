@@ -25,7 +25,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(await _context.Orders.ToListAsync());
         }
 
-        // GET: Admin/Orders/Details/5
+        //GET: Admin/Orders/Details/5
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null)
@@ -42,6 +42,8 @@ namespace RecipeCube.Areas.Admin.Controllers
 
             return View(order);
         }
+
+
 
         // GET: Admin/Orders/Create
         public IActionResult Create()

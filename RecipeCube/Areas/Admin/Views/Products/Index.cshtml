@@ -4,7 +4,9 @@
     <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
 
     <style>
-
+        .table th, .table td {
+            text-align: center !important; /* 強制所有表格內容置中 */
+        }
     </style>
 }
 
@@ -42,10 +44,10 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody >
             @foreach (var item in Model)
             {
-                <tr>
+                <tr >
                     <td>
                         @Html.DisplayFor(modelItem => item.ProductName)
                     </td>

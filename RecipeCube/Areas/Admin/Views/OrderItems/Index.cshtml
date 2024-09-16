@@ -3,7 +3,9 @@
 @section Styles {
     <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
     <style>
-
+        .table th, .table td {
+            text-align: center !important; /* 強制所有表格內容置中 */
+        }
     </style>
 }
 
@@ -17,7 +19,7 @@
     <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新細項</a>
 </p>
 <div class="card-body">
-<table class="table">
+<table class="table" id="table_orderItem">
     <thead>
         <tr>
             <th>
@@ -80,5 +82,9 @@
                     },
                 }
             })
+
+        // 自動填入orderId進搜索框
+    
+
     </script>
 }
