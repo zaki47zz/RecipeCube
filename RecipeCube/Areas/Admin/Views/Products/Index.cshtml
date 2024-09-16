@@ -1,72 +1,99 @@
 ﻿@model IEnumerable<RecipeCube.Models.Product>
 
+@section Styles {
+    <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+
+    <style>
+
+    </style>
+}
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "商品檢視";
 }
 
-<h1>Index</h1>
+<h1>商品檢視</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
+<p class="mt-1">
+    <button type="button" class="btn bg-gradient-info"><a asp-action="Create">加入新商品</a></button>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IngredientId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stock)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Photo)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IngredientId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Photo)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card-body">
+    <table class="table table-hover w-100">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IngredientId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Stock)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Photo)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IngredientId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Stock)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Photo)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ProductId">修改</a> |
+                        <a asp-action="Details" asp-route-id="@item.ProductId">查看細項</a> 
+                        @* <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a> *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
 
 @section Scripts {
+    <script src="~/lib/datatables/datatables.min.js"></script>
     <script>
         $(".sidenav .nav-item a").removeClass("active");
         $("#product a").addClass("active");
+
+        @* 套用datatabes套件 *@
+        new DataTable("table", {
+            language: {
+                url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                paginate: {
+                    first: "«",   // 保持圖示化
+                    previous: "‹", // 保持圖示化
+                    next: "›",    // 保持圖示化
+                    last: "»"     // 保持圖示化
+                },
+            }
+        })
     </script>
 }
