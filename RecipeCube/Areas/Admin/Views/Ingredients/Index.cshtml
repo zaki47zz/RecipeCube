@@ -13,6 +13,8 @@
 <p class="mt-1">
     <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white">加入新食材</a></button>
 </p>
+
+
 <div class="card-body">
     <table id="table" class="table table-hover w-100">
         <thead>
@@ -54,7 +56,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Gram)
                     </td>
-                    <td>
+                    <td class="text-center">
                         <a asp-action="Edit" asp-route-id="@item.IngredientId">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.IngredientId">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.IngredientId">Delete</a>
@@ -74,6 +76,38 @@
 
         @* 套用datatabes套件 *@
             new DataTable("table", {
+                initComplete: function () {
+                    var column = this.api().column(1); // 指定要篩選的列，1就是第二列
+
+                    // 創建 label 跟 select 元素
+                    //label
+                    let label = document.createElement('label');
+                    label.innerHTML = '類別:'
+                    label.classList.add('ms-5');
+                    //select
+                    let select = document.createElement('select');
+                    select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+                    select.add(new Option('')); // 添加空選項
+
+                    // 監聽用戶選擇變化
+                    select.addEventListener('change', function () {
+                        column
+                            .search(this.value) // 使用選擇的值進行搜索
+                            .draw(); // 重新繪製表格
+                    });
+
+                    $("div.dt-length").css('white-space','nowrap'); //讓父元素不要換行
+                    $("div.dt-length label").after(label, select); //把 label 跟 select 元素加進去
+
+                    // 使用該列的唯一值來填充選項
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function (d, j) {
+                            select.add(new Option(d)); // 為每個唯一值添加選項到 select裡面
+                        });
+                },
                 language: {
                     url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
                     paginate: {
@@ -82,8 +116,11 @@
                         next: "›",    // 保持圖示化
                         last: "»"     // 保持圖示化
                     },
-                }
-            })
+                },
+            });
+
+
+        
     </script>
 
 }
