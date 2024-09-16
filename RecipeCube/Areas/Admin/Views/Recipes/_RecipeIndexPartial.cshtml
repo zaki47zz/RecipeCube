@@ -37,7 +37,7 @@
         {
             <tr>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.RecipeId">編輯</a> <br />
+                    <button type="button" class="edit btn bg-gradient-info" data-bs-toggle="modal" data-bs-target="#editRecipeModal" data-id="@item.RecipeId">編輯</button> <br/>
                     <a asp-action="Details" asp-route-id="@item.RecipeId">詳細</a> <br />
                     <a asp-action="Delete" asp-route-id="@item.RecipeId">刪除</a>
                 </td>
@@ -63,3 +63,24 @@
         }
     </tbody>
 </table>
+
+<!-- Modal -->
+<div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeLabel">編輯食譜</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 在這裡動態載入編輯的表單 -->
+                <p>載入中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+
+}

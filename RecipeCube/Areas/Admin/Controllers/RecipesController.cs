@@ -73,19 +73,15 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/Recipes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> RecipeEditPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var recipe = await _context.Recipes.FindAsync(id);
             if (recipe == null)
             {
                 return NotFound();
             }
-            return View(recipe);
+            return PartialView("_RecipeEditPartial", recipe);  // 確保這裡的 "_RecipeEditPartial" 部分視圖存在
         }
 
         // POST: Admin/Recipes/Edit/5

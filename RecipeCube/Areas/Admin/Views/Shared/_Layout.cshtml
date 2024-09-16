@@ -391,18 +391,65 @@
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
     <!-- 連結View內script -->
-    @await RenderSectionAsync("Scripts", required: false)
     <script>
         $(document).ready(function () {
-            //sidebar的卷軸生成
-            var win = navigator.platform.indexOf('Win') > -1;
+            alert('Script loaded successfully!');  // 在主頁面測試這個
+            // sidebar 的卷軸生成
+            var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
                 var options = {
                     damping: '0.5'
                 }
                 Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
             }
+
+            // 初始化 DataTable，傳入需要篩選的列的索引
+            function initializeDataTableWithFilter(columnIndex) {
+                new DataTable("table", {
+                    initComplete: function () {
+                        if (columnIndex !== null) {  // 如果需要篩選
+                            var column = this.api().column(columnIndex); // 動態指定要篩選的列
+
+                            // 創建 label 跟 select 元素
+                            let label = document.createElement('label');
+                            label.innerHTML = '篩選:';
+                            label.classList.add('ms-5');
+
+                            let select = document.createElement('select');
+                            select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+                            select.add(new Option('')); // 添加空選項
+
+                            // 監聽用戶選擇變化
+                            select.addEventListener('change', function () {
+                                column
+                                    .search(this.value)
+                                    .draw();
+                            });
+
+                            // 調整樣式讓元素不換行
+                            $("div.dt-length").css('white-space', 'nowrap');
+                            $("div.dt-length label").after(label, select);
+
+                            // 使用該列的唯一值來填充選項
+                            column.data().unique().sort().each(function (d, j) {
+                                select.add(new Option(d));
+                            });
+                        }
+                    },
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                        paginate: {
+                            first: "«",   // 保持圖示化
+                            previous: "‹", // 保持圖示化
+                            next: "›",    // 保持圖示化
+                            last: "»"     // 保持圖示化
+                        },
+                    },
+                });
+            }
+
             // 當點擊側邊欄時，載入局部檢視
+            // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
             $("ul.navbar-nav .nav-link").on('click', function (e) {
                 $("ul.navbar-nav .nav-link").removeClass("active");
                 $(this).addClass("active");
@@ -430,49 +477,14 @@
                         type: 'GET',
                         success: function (data) {
                             $('#dynamic-content').html(data); // 加載 Partial View
-                            new DataTable("table", {
-                                initComplete: function () {
-                                    var column = this.api().column(1); // 指定要篩選的列，1就是第二列
-
-                                    // 創建 label 跟 select 元素
-                                    //label
-                                    let label = document.createElement('label');
-                                    label.innerHTML = '類別:'
-                                    label.classList.add('ms-5');
-                                    //select
-                                    let select = document.createElement('select');
-                                    select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
-                                    select.add(new Option('')); // 添加空選項
-
-                                    // 監聽用戶選擇變化
-                                    select.addEventListener('change', function () {
-                                        column
-                                            .search(this.value) // 使用選擇的值進行搜索
-                                            .draw(); // 重新繪製表格
-                                    });
-
-                                    $("div.dt-length").css('white-space', 'nowrap'); //讓父元素不要換行
-                                    $("div.dt-length label").after(label, select); //把 label 跟 select 元素加進去
-
-                                    // 使用該列的唯一值來填充選項
-                                    column
-                                        .data()
-                                        .unique()
-                                        .sort()
-                                        .each(function (d, j) {
-                                            select.add(new Option(d)); // 為每個唯一值添加選項到 select裡面
-                                        });
-                                },
-                                language: {
-                                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-                                    paginate: {
-                                        first: "«",   // 保持圖示化
-                                        previous: "‹", // 保持圖示化
-                                        next: "›",    // 保持圖示化
-                                        last: "»"     // 保持圖示化
-                                    },
-                                },
-                            });
+                            // 根據不同的分頁傳入不同的列索引
+                            if (parentId === "Ingredient") {
+                                initializeDataTableWithFilter(1); // Ingredient 頁面篩選第2列
+                            } else if (parentId === "Recipe") {
+                                initializeDataTableWithFilter(3); // Recipe 頁面篩選第4列
+                            } else {
+                                initializeDataTableWithFilter(null); // 其他頁面不啟用篩選功能
+                            }
                         },
                         error: function (xhr, status, error) {
                             alert("Error: " + error);
@@ -480,8 +492,25 @@
                     });
                 }
             });
+            $(document).on('click', '.edit', function () {
+                let recipeId = $(this).data('id');
+                alert('Recipe ID: ' + recipeId);
+
+                $.ajax({
+                    url: '@Url.Action("RecipeEditPartial", "Recipes", new { area = "Admin" })' + '/' + recipeId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#editRecipeModal .modal-body').html(data);
+                        $('#editRecipeModal').modal('show');
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法載入編輯表單');
+                    }
+                });
+            });
+
         });
     </script>
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
