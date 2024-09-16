@@ -1,0 +1,26 @@
+{
+    // 每行的最大字元數，超過這個字數將自動換行
+    "printWidth": 80,
+
+    // 是否使用 Tab 字元來縮排，false 代表使用空格
+    "useTabs": true,
+
+    // 如果不使用 Tab，則指定每個縮排的空格數量
+    "tabWidth": 4,
+
+    // 行結尾的方式，"auto" 會根據不同的操作系統自動設置
+    "endOfLine": "auto",
+
+    // 在物件的花括號內添加空格 { foo: bar }
+    "bracketSpacing": true,
+
+    // 在最後一個屬性後面加上逗號
+    "trailingComma": "all",
+
+    // 在文件最後添加換行符號
+    "insertFinalNewline": true,
+
+    // JSON 字符串屬性名是否保留原樣，即不強制轉為雙引號
+    "quoteProps": "as-needed",
+
+}

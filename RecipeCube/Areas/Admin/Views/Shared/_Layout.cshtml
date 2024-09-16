@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="/img/icon_small.png" asp-append-version="true">
     <link rel="icon" type="image/png" href="/img/favicon.ico" asp-append-version="true">
     <title>
-        食譜魔方
+        @ViewData["Title"] - 食譜魔方
     </title>
     <!--     字型跟圖標     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,7 +179,7 @@
                     </a>
                 </li>
                 <li id="ingredient" class="nav-item">
-                    <a class="nav-link  " href="">
+                    <a class="nav-link  " asp-area="Admin" asp-controller="Ingredients" asp-action="Index">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>食材</title>

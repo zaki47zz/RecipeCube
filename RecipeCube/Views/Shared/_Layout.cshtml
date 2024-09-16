@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="~/img/icon_small.png" asp-append-version="true">
     <link rel="icon" type="image/png" href="~/img/favicon.ico" asp-append-version="true">
     <title>
-        食譜魔方
+        @ViewData["Title"] - 食譜魔方
     </title>
     <!--     字型跟圖標     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,7 +136,7 @@
             <div class="row card">
                 @RenderBody()
             </div>
-            <!-- End Main content -->
+        <!-- End Main content -->
 
             <footer class="footer pt-3  ">
                 <div class="container-fluid">

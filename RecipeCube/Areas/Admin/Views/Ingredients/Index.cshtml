@@ -1,0 +1,89 @@
+﻿@model IEnumerable<RecipeCube.Models.Ingredient>
+
+@{
+    ViewData["Title"] = "食材檢視";
+}
+
+@section Styles {
+    <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
+}
+
+<h1>食材檢視</h1>
+
+<p class="mt-1">
+    <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white">加入新食材</a></button>
+</p>
+<div class="card-body">
+    <table id="table" class="table table-hover w-100">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.IngredientName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpireDay)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Gram)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.IngredientName)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.Category)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExpireDay)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.Unit)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Gram)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.IngredientId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.IngredientId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.IngredientId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="/lib/datatables/datatables.min.js"></script>
+    <script>
+        @* 改變navbar *@
+            $(".sidenav .nav-item a").removeClass("active");
+        $("#ingredient a").addClass("active");
+
+        @* 套用datatabes套件 *@
+            new DataTable("table", {
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                    paginate: {
+                        first: "«",   // 保持圖示化
+                        previous: "‹", // 保持圖示化
+                        next: "›",    // 保持圖示化
+                        last: "»"     // 保持圖示化
+                    },
+                }
+            })
+    </script>
+
+}
