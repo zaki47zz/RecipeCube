@@ -391,9 +391,9 @@
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
     <!-- 連結View內script -->
-    @await RenderSectionAsync("Scripts", required: false)
     <script>
         $(document).ready(function () {
+            alert('Script loaded successfully!');  // 在主頁面測試這個
             // sidebar 的卷軸生成
             var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -449,6 +449,7 @@
             }
 
             // 當點擊側邊欄時，載入局部檢視
+            // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
             $("ul.navbar-nav .nav-link").on('click', function (e) {
                 $("ul.navbar-nav .nav-link").removeClass("active");
                 $(this).addClass("active");
@@ -475,9 +476,25 @@
                     });
                 }
             });
+            $(document).on('click', '.edit', function () {
+                let recipeId = $(this).data('id');
+                alert('Recipe ID: ' + recipeId);
+
+                $.ajax({
+                    url: '@Url.Action("RecipeEditPartial", "Recipes", new { area = "Admin" })' + '/' + recipeId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#editRecipeModal .modal-body').html(data);
+                        $('#editRecipeModal').modal('show');
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法載入編輯表單');
+                    }
+                });
+            });
+
         });
-
     </script>
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
