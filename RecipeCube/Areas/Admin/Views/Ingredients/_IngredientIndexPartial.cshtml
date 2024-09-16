@@ -1,0 +1,64 @@
+﻿@model IEnumerable<RecipeCube.Models.Ingredient>
+
+@{
+    ViewData["Title"] = "食材檢視";
+}
+
+<h1>食材檢視</h1>
+
+<p class="mt-1">
+    <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white">加入新食材</a></button>
+</p>
+
+
+<div class="card-body">
+    <table id="table" class="table table-hover w-100">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.IngredientName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpireDay)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Unit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Gram)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.IngredientName)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.Category)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExpireDay)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.Unit)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Gram)
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@item.IngredientId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.IngredientId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.IngredientId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -4,7 +4,6 @@
 }
 
 @section Styles {
-    <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
     <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
 }
 
@@ -13,7 +12,7 @@
 <p class="mt-1">
     <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white"> 加入新食譜</a></button>
 </p>
-<table id="example" class="display" style="width:100%">
+<table id="table" class="table table-hover w-100">
     <thead>
         <tr>
             <th>動作</th>
@@ -68,25 +67,3 @@
         }
     </tbody>
 </table>
-
-
-
-@section Scripts {
-    <script src="/lib/datatables/datatables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // 確保頁面完全加載後初始化 DataTables
-            $('#example').DataTable({
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-                    paginate: {
-                        first: "«",
-                        previous: "‹",
-                        next: "›",
-                        last: "»"
-                    }
-                }
-            });
-        });
-    </script>
-}
