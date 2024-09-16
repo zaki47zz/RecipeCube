@@ -20,10 +20,17 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/Recipes
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    return View(await _context.Recipes.ToListAsync());
+        //}
+
+        public async Task<IActionResult> RecipeIndexPartial()
         {
-            return View(await _context.Recipes.ToListAsync());
+            var recipes = await _context.Recipes.ToListAsync();
+            return PartialView("_RecipeIndexPartial", recipes);
         }
+
 
         // GET: Admin/Recipes/Details/5
         public async Task<IActionResult> Details(int? id)

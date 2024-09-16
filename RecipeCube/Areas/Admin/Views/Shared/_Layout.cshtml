@@ -21,6 +21,7 @@
     <!-- CSS -->
     <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
+    <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
     <!-- 連結View內style -->
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -219,7 +220,7 @@
                     </a>
                 </li>
                 <li id="recipe" class="nav-item">
-                    <a class="nav-link  " asp-area="Admin" asp-controller="Recipes" asp-action="Index">
+                    <a class="nav-link  " href="#" id="load-recipes">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>食譜</title>
@@ -351,7 +352,9 @@
         <!-- Main content -->
         <div class="container-fluid py-4">
             <div class="row card">
-                @RenderBody()
+                <div id="dynamic-content">
+            @RenderBody() <!-- 預設渲染整頁內容 -->
+                </div>
             </div>
             <!-- End Main content -->
 
@@ -385,6 +388,7 @@
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+    <script src="/lib/datatables/datatables.min.js"></script>
     <!-- sidebar的卷軸生成 -->
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -399,6 +403,39 @@
     <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
     <!-- 連結View內script -->
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            // 當點擊側邊欄時，載入局部檢視
+            $('#load-recipes').on('click', function (e) {
+                $(".sidenav .nav-item a").removeClass("active");
+                $("#recipe a").addClass("active");
+                $('#dynamic-content').html('<div>Loading...</div>');
+                // alert("測試局部檢視");
+                e.preventDefault();
+                $.ajax({
+                    url: '/Admin/Recipes/RecipeIndexPartial',
+                    type: 'GET',
+                    success: function (data) {
+                        $('#dynamic-content').html(data); // 加載 Partial View
+                        $('#example').DataTable({  // 在局部檢視加載後初始化 DataTables
+                            language: {
+                                url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                                paginate: {
+                                    first: "«",
+                                    previous: "‹",
+                                    next: "›",
+                                    last: "»"
+                                }
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error: " + error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
