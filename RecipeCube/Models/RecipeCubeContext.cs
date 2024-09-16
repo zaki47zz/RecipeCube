@@ -6,10 +6,14 @@ namespace RecipeCube.Models;
 
 public partial class RecipeCubeContext : DbContext
 {
-    public RecipeCubeContext() { }
+    public RecipeCubeContext()
+    {
+    }
 
     public RecipeCubeContext(DbContextOptions<RecipeCubeContext> options)
-        : base(options) { }
+        : base(options)
+    {
+    }
 
     public virtual DbSet<ExclusiveIngredient> ExclusiveIngredients { get; set; }
 
@@ -35,9 +39,9 @@ public partial class RecipeCubeContext : DbContext
 
     public virtual DbSet<UserGroup> UserGroups { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=RecipeCube;TrustServerCertificate=True;Integrated Security=true");
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=RecipeCube;TrustServerCertificate=True;Integrated Security=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,16 +57,25 @@ public partial class RecipeCubeContext : DbContext
         modelBuilder.Entity<Ingredient>(entity =>
         {
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity.Property(e => e.Category).HasMaxLength(100).HasColumnName("category");
+            entity.Property(e => e.Category)
+                .HasMaxLength(100)
+                .HasColumnName("category");
             entity.Property(e => e.ExpireDay).HasColumnName("expire_day");
-            entity.Property(e => e.Gram).HasColumnType("decimal(10, 2)").HasColumnName("gram");
-            entity
-                .Property(e => e.IngredientName)
+            entity.Property(e => e.Gram)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("gram");
+            entity.Property(e => e.IngredientName)
                 .HasMaxLength(255)
                 .HasColumnName("ingredient_name");
-            entity.Property(e => e.Photo).HasMaxLength(255).HasColumnName("photo");
-            entity.Property(e => e.Synonym).HasMaxLength(255).HasColumnName("synonym");
-            entity.Property(e => e.Unit).HasMaxLength(10).HasColumnName("unit");
+            entity.Property(e => e.Photo)
+                .HasMaxLength(255)
+                .HasColumnName("photo");
+            entity.Property(e => e.Synonym)
+                .HasMaxLength(255)
+                .HasColumnName("synonym");
+            entity.Property(e => e.Unit)
+                .HasMaxLength(10)
+                .HasColumnName("unit");
         });
 
         modelBuilder.Entity<Inventory>(entity =>
@@ -74,8 +87,7 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.GroupId).HasColumnName("group_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
             entity.Property(e => e.IsExpiring).HasColumnName("is_expiring");
-            entity
-                .Property(e => e.Quantity)
+            entity.Property(e => e.Quantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("quantity");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -84,9 +96,11 @@ public partial class RecipeCubeContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasNoKey();
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__46596229A34EEA39");
 
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.OrderId)
+                .ValueGeneratedNever()
+                .HasColumnName("order_id");
             entity.Property(e => e.OrderTime).HasColumnName("order_time");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
@@ -111,12 +125,13 @@ public partial class RecipeCubeContext : DbContext
             entity.ToTable("Pantry_Management");
 
             entity.Property(e => e.PantryId).HasColumnName("pantry_id");
-            entity.Property(e => e.Action).HasMaxLength(50).HasColumnName("action");
+            entity.Property(e => e.Action)
+                .HasMaxLength(50)
+                .HasColumnName("action");
             entity.Property(e => e.GroupId).HasColumnName("group_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
             entity.Property(e => e.OutOfStock).HasColumnName("out_of_stock");
-            entity
-                .Property(e => e.Quantity)
+            entity.Property(e => e.Quantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("quantity");
             entity.Property(e => e.Time).HasColumnName("time");
@@ -138,9 +153,13 @@ public partial class RecipeCubeContext : DbContext
         {
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity.Property(e => e.Photo).HasMaxLength(255).HasColumnName("photo");
+            entity.Property(e => e.Photo)
+                .HasMaxLength(255)
+                .HasColumnName("photo");
             entity.Property(e => e.Price).HasColumnName("price");
-            entity.Property(e => e.ProductName).HasMaxLength(255).HasColumnName("product_name");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(255)
+                .HasColumnName("product_name");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Stock).HasColumnName("stock");
         });
@@ -148,16 +167,23 @@ public partial class RecipeCubeContext : DbContext
         modelBuilder.Entity<Recipe>(entity =>
         {
             entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
-            entity.Property(e => e.Category).HasMaxLength(10).HasColumnName("category");
-            entity
-                .Property(e => e.DetailedCategory)
+            entity.Property(e => e.Category)
+                .HasMaxLength(10)
+                .HasColumnName("category");
+            entity.Property(e => e.DetailedCategory)
                 .HasMaxLength(255)
                 .HasColumnName("detailed_category");
             entity.Property(e => e.IsCustom).HasColumnName("is_custom");
-            entity.Property(e => e.Photo).HasMaxLength(255).HasColumnName("photo");
-            entity.Property(e => e.RecipeName).HasMaxLength(255).HasColumnName("recipe_name");
+            entity.Property(e => e.Photo)
+                .HasMaxLength(255)
+                .HasColumnName("photo");
+            entity.Property(e => e.RecipeName)
+                .HasMaxLength(255)
+                .HasColumnName("recipe_name");
             entity.Property(e => e.Restriction).HasColumnName("restriction");
-            entity.Property(e => e.Seasoning).HasMaxLength(255).HasColumnName("seasoning");
+            entity.Property(e => e.Seasoning)
+                .HasMaxLength(255)
+                .HasColumnName("seasoning");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Steps).HasColumnName("steps");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -171,8 +197,7 @@ public partial class RecipeCubeContext : DbContext
 
             entity.Property(e => e.RecipeIngredientId).HasColumnName("recipe_ingredient_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity
-                .Property(e => e.Quantity)
+            entity.Property(e => e.Quantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("quantity");
             entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
@@ -182,18 +207,25 @@ public partial class RecipeCubeContext : DbContext
         {
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.DietaryRestrictions).HasColumnName("dietary_restrictions");
-            entity.Property(e => e.Email).HasMaxLength(255).IsUnicode(false).HasColumnName("email");
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("email");
             entity.Property(e => e.ExclusiveChecked).HasColumnName("exclusive_checked");
             entity.Property(e => e.GroupId).HasColumnName("group_id");
-            entity
-                .Property(e => e.Password)
+            entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("password");
-            entity.Property(e => e.Phone).HasMaxLength(20).IsUnicode(false).HasColumnName("phone");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("phone");
             entity.Property(e => e.PreferredChecked).HasColumnName("preferred_checked");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Username).HasMaxLength(255).HasColumnName("username");
+            entity.Property(e => e.Username)
+                .HasMaxLength(255)
+                .HasColumnName("username");
         });
 
         modelBuilder.Entity<UserGroup>(entity =>
@@ -205,7 +237,9 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.GroupId).HasColumnName("group_id");
             entity.Property(e => e.GroupAdmin).HasColumnName("group_admin");
             entity.Property(e => e.GroupInvite).HasColumnName("group_invite");
-            entity.Property(e => e.GroupName).HasMaxLength(255).HasColumnName("group_name");
+            entity.Property(e => e.GroupName)
+                .HasMaxLength(255)
+                .HasColumnName("group_name");
         });
         modelBuilder.HasSequence<int>("InventoryIDSeq");
 
