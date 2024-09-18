@@ -551,20 +551,20 @@
             });
 
             // 載入詳細資訊的 AJAX 調用
-            $(document).on('click', '.view', function () {
+            $(document).on('click', '.detail', function () {
                 let id = $(this).data('id');
                 loadModalData(`/Admin/${controller}/DetailsPartial/` + id, '#detailsModal');
             });
 
             // 從詳細資訊open editModal
             $(document).on('click', '#openeditModal', function () {
-                let recipeId = $(this).data('id');
+                let id = $(this).data('id');
                 $('#detailsModal').modal('hide');
-                loadModalData(`/Admin/${controller}/EditPartial/` + recipeId, '#editModal');
+                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal');
             });
 
             // CreateModal
-            $(document).on('click', '#openCreateModal', function () {
+            $(document).on('click', '.create', function () {
                 loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal');
             });
 
