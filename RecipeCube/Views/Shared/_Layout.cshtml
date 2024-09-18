@@ -62,7 +62,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link  " asp-area="Admin" asp-controller="Home" asp-action="Index">
+                    @* <a class="nav-link  " asp-area="Admin" asp-controller="Home" asp-action="Index"> *@
+                    <a class="nav-link  " asp-area="Home" asp-controller="Home" asp-action="Index">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                             <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <title>settings</title>
@@ -79,7 +80,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <span class="nav-link-text ms-1">後台管理</span>
+                        <span class="nav-link-text ms-1">訪客頁面</span>
                     </a>
                 </li>
             </ul>
@@ -107,6 +108,7 @@
                     </div>
                     <ul class="navbar-nav  justify-content-end">
                         <li class="nav-item d-flex align-items-center">
+                            @* 註冊&登入  *@
                                 <partial name="_LoginPartial" />
                         </li>
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center">

@@ -70,7 +70,7 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
             /// </summary>
             [Required]
             [EmailAddress]
-            [Display(Name = "New email")]
+            [Display(Name = "New Email")]
             public string NewEmail { get; set; }
         }
 

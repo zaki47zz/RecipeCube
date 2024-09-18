@@ -104,7 +104,8 @@ namespace RecipeCube.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            // 登入成功後要跳轉的頁面
+            returnUrl ??= Url.Content("~/Admin");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
