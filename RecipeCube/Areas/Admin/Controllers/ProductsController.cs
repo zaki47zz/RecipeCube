@@ -30,10 +30,10 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(await _context.Products.ToListAsync());
         }
 
-        // 圖片
+        // Get: /Products/GetPhoto/1
         //public async Task<FileResult> GetPhoto(int id)
         //{
-
+        //    Product c = await _context.Products.FindAsync(id);
         //}
 
         // GET: Admin/Products/Details/5
