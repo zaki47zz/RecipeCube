@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using RecipeCube.Data;
+using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Identity.Pages.Account
 {
@@ -101,11 +102,9 @@ namespace RecipeCube.Areas.Identity.Pages.Account
 
             ReturnUrl = returnUrl;
         }
-
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            // 登入成功後要跳轉的頁面
-            returnUrl ??= Url.Content("~/Admin");
+            returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -117,6 +116,14 @@ namespace RecipeCube.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // 檢查該使用者是否具有 Admin 角色
+                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    if (await _signInManager.UserManager.IsInRoleAsync(user, "Admin")) 
+                    {
+                        // 如果使用者角色是 Admin，則重新導向到 /Admin 頁面
+                        returnUrl = Url.Content("~/Admin");
+                    }
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

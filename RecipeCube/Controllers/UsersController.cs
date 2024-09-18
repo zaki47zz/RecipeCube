@@ -396,6 +396,28 @@ namespace RecipeCube.Controllers
             }
             return Ok("已成功建立使用者");
         }
+
+        public async Task<IActionResult> CreateAdminRoleAndUser()
+        {
+            // 確保 RoleManager 被注入
+            var roleManger = HttpContext.RequestServices.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // 創建 "Admin" 角色
+            if (!await roleManger.RoleExistsAsync("Admin"))
+            {
+                await roleManger.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            // 找到要設為 Admin 的使用者
+            var user = await _userManager.FindByEmailAsync("admin@example.com");
+
+            // 將使用者加入 "Admin" 角色
+            if (user != null && !await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+            return Ok("Admin腳色已成功新增");
+        }
     }
 
 }
