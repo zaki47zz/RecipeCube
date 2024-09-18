@@ -26,3 +26,18 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.card-body {
+    font-family: "Chocolate Classical Sans", system-ui !important;
+    font-weight: 400;
+    font-style: normal;
+
+}
+
+.card-body .table th, .card-body .table td {
+    text-align: center !important; /* 強制所有表格內容置中 */
+}
+
+.modal .w-100, .modal label {
+    font-size: large !important;
+}

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RecipeCube.Models;
+﻿namespace RecipeCube.Models;
 
 public partial class UserGroup
 {

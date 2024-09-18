@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Models;
 
@@ -27,27 +22,44 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/Ingredients/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
+        //    var ingredient = await _context.Ingredients
+        //        .FirstOrDefaultAsync(m => m.IngredientId == id);
+        //    if (ingredient == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(ingredient);
+        //}
+
+        public async Task<IActionResult> DetailsPartial(int id)
+        {
             var ingredient = await _context.Ingredients
                 .FirstOrDefaultAsync(m => m.IngredientId == id);
+
             if (ingredient == null)
             {
                 return NotFound();
             }
 
-            return View(ingredient);
+            return PartialView("_DetailsPartial", ingredient);
         }
 
         // GET: Admin/Ingredients/Create
-        public IActionResult Create()
+        public IActionResult CreatePartial()
         {
-            return View();
+            var categories = _context.Ingredients.Select(c => c.Category).Distinct().ToList(); //抓資料庫中的categories
+
+            // 利用 Viewbag 傳遞 categories 到 View
+            ViewBag.Categories = categories;
+            return PartialView("_CreatePartial");
         }
 
         // POST: Admin/Ingredients/Create

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Admin.Controllers
-{ 
+{
     [Area("Admin")]
     public class OrderItemsController : Controller
     {
@@ -34,7 +29,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(await _context.OrderItems.ToListAsync());
         }
 
-        
+
 
 
         // GET: Admin/OrderItems/Details/5

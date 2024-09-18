@@ -4,7 +4,7 @@
 <h1>食材檢視</h1>
 
 <p class="mt-1">
-    <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white">加入新食材</a></button>
+    <button type="button" class="create btn bg-gradient-info">加入新食材</button>
 </p>
 
 
@@ -50,9 +50,8 @@
                         @Html.DisplayFor(modelItem => item.Gram)
                     </td>
                     <td class="text-center">
-                        <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.IngredientId">編輯</button> |
-                        <a asp-action="Details" asp-route-id="@item.IngredientId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IngredientId">Delete</a>
+                        <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.IngredientId">編輯</button>
+                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.IngredientId">詳細</button> <br />
                     </td>
                 </tr>
             }
@@ -60,16 +59,45 @@
     </table>
 </div>
 
-<!-- Modal -->
+<!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable"> <!-- 加modal-dialog-scrollable -->
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
             </div>
             <div class="modal-body">
-                <!-- 在這裡動態載入編輯的表單 -->
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">新增食材</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
                 <p>Loading...</p>
             </div>
         </div>
