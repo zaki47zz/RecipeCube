@@ -1,53 +1,49 @@
 ﻿@model RecipeCube.Models.Ingredient
 
-@{
-    ViewData["Title"] = "新增食材";
-}
 
-<h3>新增食材</h3>
-<hr />
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
         <div class="w-100">
-            <form asp-action="Create">
+            <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="IngredientId" />
                 <div class="form-group">
-                    <label asp-for="IngredientName" class="control-label" style="font-size: large;">食材名稱</label>
+                    <label asp-for="IngredientName" class="control-label">食材名稱</label>
                     <input asp-for="IngredientName" class="form-control" />
                     <span asp-validation-for="IngredientName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Category" class="control-label" style="font-size: large;">類別</label>
+                    <label asp-for="Category" class="control-label">類別</label>
                     <input asp-for="Category" class="form-control" />
                     <span asp-validation-for="Category" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Synonym" class="control-label" style="font-size: large;">別稱</label>
+                    <label asp-for="Synonym" class="control-label">別稱</label>
                     <input asp-for="Synonym" class="form-control" />
                     <span asp-validation-for="Synonym" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="ExpireDay" class="control-label" style="font-size: large;">預設過期天數</label>
+                    <label asp-for="ExpireDay" class="control-label">預設過期天數</label>
                     <input asp-for="ExpireDay" class="form-control" />
                     <span asp-validation-for="ExpireDay" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Unit" class="control-label" style="font-size: large;">單位</label>
+                    <label asp-for="Unit" class="control-label">單位</label>
                     <input asp-for="Unit" class="form-control" />
                     <span asp-validation-for="Unit" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Gram" class="control-label" style="font-size: large;">克數</label>
+                    <label asp-for="Gram" class="control-label">克數</label>
                     <input asp-for="Gram" class="form-control" />
                     <span asp-validation-for="Gram" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Photo" class="control-label" style="font-size: large;">照片</label>
+                    <label asp-for="Photo" class="control-label">照片</label>
                     <input asp-for="Photo" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="新增" class="btn btn-info" />
+                    <input type="submit" value="儲存" class="btn btn-info" />
                     <a asp-action="Index" class="btn btn-secondary">回到列表</a>
                 </div>
             </form>
@@ -56,11 +52,6 @@
 </div>
 
 @section Scripts {
-    <script>
-        @* 改變navbar *@
-            $(".sidenav .nav-item a").removeClass("active");
-        $("#ingredient a").addClass("active");
-    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

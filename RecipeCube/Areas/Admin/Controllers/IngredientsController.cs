@@ -66,20 +66,32 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(ingredient);
         }
 
-        // GET: Admin/Ingredients/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //// GET: Admin/Ingredients/Edit/5
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
+        //    var ingredient = await _context.Ingredients.FindAsync(id);
+        //    if (ingredient == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(ingredient);
+        //}
+
+        // GET: Admin/Ingredients/Edit/5
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(int id)
+        {
             var ingredient = await _context.Ingredients.FindAsync(id);
             if (ingredient == null)
             {
                 return NotFound();
             }
-            return View(ingredient);
+            return PartialView("_EditPartial", ingredient);
         }
 
         // POST: Admin/Ingredients/Edit/5

@@ -1,0 +1,152 @@
+﻿@model RecipeCube.Models.Recipe
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <form id="createForm" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="RecipeName" class="control-label"></label>
+                    <input asp-for="RecipeName" class="form-control" />
+                    <span asp-validation-for="RecipeName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="UserId" class="control-label"></label>
+                    <input asp-for="UserId" class="form-control" />
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+
+                <!-- 布林值欄位改為下拉選單 -->
+                <div class="form-group">
+                    <label asp-for="IsCustom" class="control-label"></label>
+                    <select asp-for="IsCustom" class="form-control">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                    <span asp-validation-for="IsCustom" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Restriction" class="control-label"></label>
+                    <select asp-for="Restriction" class="form-control">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                    <span asp-validation-for="Restriction" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="WestEast" class="control-label"></label>
+                    <select asp-for="WestEast" class="form-control">
+                        <option value="true">西餐</option>
+                        <option value="false">中餐</option>
+                    </select>
+                    <span asp-validation-for="WestEast" class="text-danger"></span>
+                </div>
+
+                <!-- Category 下拉選單 -->
+                <div class="form-group">
+                    <label asp-for="Category" class="control-label"></label>
+                    <select asp-for="Category" class="form-control" id="categorySelect">
+                        <option value="主餐">主餐</option>
+                        <option value="副餐">副餐</option>
+                        <option value="湯品">湯品</option>
+                        <option value="甜點">甜點</option>
+                    </select>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+
+                <!-- DetailedCategory 下拉選單 -->
+                <div class="form-group">
+                    <label asp-for="DetailedCategory" class="control-label"></label>
+                    <select asp-for="DetailedCategory" class="form-control" id="detailedCategorySelect">
+                        <!-- 這裡的選項會根據 Category 動態更新 -->
+                    </select>
+                    <span asp-validation-for="DetailedCategory" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Steps" class="control-label"></label>
+                    <textarea asp-for="Steps" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Steps" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Seasoning" class="control-label"></label>
+                    <input asp-for="Seasoning" class="form-control" />
+                    <span asp-validation-for="Seasoning" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Visibility" class="control-label"></label>
+                    <select asp-for="Visibility" class="form-control">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                    <span asp-validation-for="Visibility" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Photo" class="control-label"></label>
+                    <input asp-for="Photo" class="form-control" />
+                    <span asp-validation-for="Photo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" class="form-control">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="新增" class="btn btn-info" />
+                    <a href="javascript:void(0)" class="btn btn-secondary" id="closeModal">返回</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- 在局部檢視內包含腳本 -->
+<script>
+    function initCreateForm() {
+        alert("我來自局部檢視");
+        // 初始化表單驗證功能
+        $.validator.unobtrusive.parse('#createForm');
+
+        var categoryOptions = {
+            "主餐": ["麵食", "飯食", "粥", "排餐", "鹹派", "火鍋", "焗烤"],
+            "副餐": ["肉類料理", "青菜料理", "海鮮料理"],
+            "湯品": ["不分"],
+            "甜點": ["甜", "鹹"]
+        };
+
+        $('#categorySelect').change(function () {
+            var category = $(this).val();
+            var detailedCategorySelect = $('#detailedCategorySelect');
+
+            detailedCategorySelect.empty();
+
+            if (categoryOptions[category]) {
+                categoryOptions[category].forEach(function (option) {
+                    detailedCategorySelect.append(new Option(option, option));
+                });
+            }
+        });
+
+        // 初始載入時觸發 change 事件
+        $('#categorySelect').trigger('change');
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

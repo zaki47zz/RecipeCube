@@ -13,28 +13,26 @@
             <p class="mb-0">輸入Email與密碼登入</p>
         </div>
         <div class="card-body">
-            <section>
-                <form role="form" id="account" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                        <label asp-for="Input.Email" class="form-label">Email</label>
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="密碼" />
-                        <label asp-for="Input.Password" class="form-label">密碼</label>
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
-                    </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        <label asp-for="Input.RememberMe" class="form-check-label">記住密碼</label>
-                    </div>
-                    <div class="text-center">
-                        <button id="login-submit" type="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">登入</button>
-                    </div>
-                </form>
-            </section>
+            <form role="form" id="account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label asp-for="Input.Email" class="form-label">Email</label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="密碼" />
+                    <label asp-for="Input.Password" class="form-label">密碼</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label asp-for="Input.RememberMe" class="form-check-label">記住密碼</label>
+                </div>
+                <div class="text-center">
+                    <button id="login-submit" type="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">登入</button>
+                </div>
+            </form>
         </div>
         <div class="card-footer text-center pt-0 px-lg-2 px-1">
             <p class="mb-4 text-sm mx-auto">

@@ -1,15 +1,10 @@
-﻿@model IEnumerable<RecipeCube.Models.Inventory>
+﻿@model IEnumerable<RecipeCube.Models.PantryManagement>
 
 @{
-    ViewData["Title"] = "庫存檢視";
+    ViewData["Title"] = "庫存歷史異動";
 }
 
-<h1>庫存檢視</h1>
-
-<p class="mt-1">
-    <button type="button" class="btn bg-gradient-info"><a asp-action="Create" class="text-white">加入新庫存</a></button>
-</p>
-
+<h1>庫存歷史異動</h1>
 
 <div class="card-body">
     <table id="table" class="table table-hover w-100">
@@ -28,13 +23,13 @@
                     @Html.DisplayNameFor(model => model.Quantity)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.ExpiryDate)
+                    @Html.DisplayNameFor(model => model.OutOfStock)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.IsExpiring)
+                    @Html.DisplayNameFor(model => model.Action)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Visibility)
+                    @Html.DisplayNameFor(model => model.Time)
                 </th>
                 <th></th>
             </tr>
@@ -56,18 +51,18 @@
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.ExpiryDate)
+                        @Html.DisplayFor(modelItem => item.OutOfStock)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.IsExpiring)
+                        @Html.DisplayFor(modelItem => item.Action)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Visibility)
+                        @Html.DisplayFor(modelItem => item.Time)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.InventoryId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.InventoryId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.InventoryId">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.PantryId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.PantryId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.PantryId">Delete</a>
                     </td>
                 </tr>
             }

@@ -10,33 +10,28 @@ using RecipeCube.Models;
 namespace RecipeCube.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class ProductsController : Controller
+    public class PantryManagementsController : Controller
     {
         private readonly RecipeCubeContext _context;
 
-        public ProductsController(RecipeCubeContext context)
+        public PantryManagementsController(RecipeCubeContext context)
         {
             _context = context;
         }
-        public async Task<IActionResult> ProductIndexPartial()
-        {
-            var products = await _context.Products.ToListAsync();
-            return PartialView("_ProductIndexPartial", products);
-        }
 
-        // GET: Admin/Products
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Products.ToListAsync());
-        }
-
-        // 圖片
-        //public async Task<FileResult> GetPhoto(int id)
+        // GET: Admin/PantryManagements
+        //public async Task<IActionResult> Index()
         //{
-
+        //    return View(await _context.PantryManagements.ToListAsync());
         //}
 
-        // GET: Admin/Products/Details/5
+        public async Task<IActionResult> PantryIndexPartial()
+        {
+            var Pantries = await _context.PantryManagements.ToListAsync();
+            return PartialView("_PantryIndexPartial", Pantries);
+        }
+
+        // GET: Admin/PantryManagements/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,39 +39,39 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            var pantryManagement = await _context.PantryManagements
+                .FirstOrDefaultAsync(m => m.PantryId == id);
+            if (pantryManagement == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(pantryManagement);
         }
 
-        // GET: Admin/Products/Create
+        // GET: Admin/PantryManagements/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/Products/Create
+        // POST: Admin/PantryManagements/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Create([Bind("PantryId,GroupId,UserId,IngredientId,Quantity,OutOfStock,Action,Time")] PantryManagement pantryManagement)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(pantryManagement);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(pantryManagement);
         }
 
-        // GET: Admin/Products/Edit/5
+        // GET: Admin/PantryManagements/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,22 +79,22 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var pantryManagement = await _context.PantryManagements.FindAsync(id);
+            if (pantryManagement == null)
             {
                 return NotFound();
             }
-            return View(product);
+            return View(pantryManagement);
         }
 
-        // POST: Admin/Products/Edit/5
+        // POST: Admin/PantryManagements/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("PantryId,GroupId,UserId,IngredientId,Quantity,OutOfStock,Action,Time")] PantryManagement pantryManagement)
         {
-            if (id != product.ProductId)
+            if (id != pantryManagement.PantryId)
             {
                 return NotFound();
             }
@@ -108,12 +103,12 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    _context.Update(pantryManagement);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ProductId))
+                    if (!PantryManagementExists(pantryManagement.PantryId))
                     {
                         return NotFound();
                     }
@@ -124,10 +119,10 @@ namespace RecipeCube.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(pantryManagement);
         }
 
-        // GET: Admin/Products/Delete/5
+        // GET: Admin/PantryManagements/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,34 +130,34 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            var pantryManagement = await _context.PantryManagements
+                .FirstOrDefaultAsync(m => m.PantryId == id);
+            if (pantryManagement == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(pantryManagement);
         }
 
-        // POST: Admin/Products/Delete/5
+        // POST: Admin/PantryManagements/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            var pantryManagement = await _context.PantryManagements.FindAsync(id);
+            if (pantryManagement != null)
             {
-                _context.Products.Remove(product);
+                _context.PantryManagements.Remove(pantryManagement);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private bool PantryManagementExists(int id)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            return _context.PantryManagements.Any(e => e.PantryId == id);
         }
     }
 }

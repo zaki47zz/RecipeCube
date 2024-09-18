@@ -85,11 +85,4 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
-    <script>
-        @* 改變navbar *@
-            $(".sidenav .nav-item a").removeClass("active");
-        $("#recipe a").addClass("active");
-    </script>
-
 }

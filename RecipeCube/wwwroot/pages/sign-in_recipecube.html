@@ -45,15 +45,21 @@
                         <div class="collapse navbar-collapse" id="navigation">
                             <ul class="navbar-nav mx-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="../pages/dashboard.html">
-                                        <i class="fa fa-chart-pie opacity-6 text-dark me-1"></i>
+                                    <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="">
+                                        <i class="fa fa-home opacity-6 text-dark me-1"></i>
                                         首頁
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link me-2" href="../pages/sign-up.html">
+                                    <a class="nav-link me-2" asp-area="Identity" asp-page="/Account/Register">
                                         <i class="fas fa-user-circle opacity-6 text-dark me-1"></i>
                                         註冊
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link me-2" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                        <i class="fa-solid fa-bars-progress opacity-6 text-dark me-1"></i>
+                                        進入後台(為了方便的測試按鈕)
                                     </a>
                                 </li>
                             </ul>
