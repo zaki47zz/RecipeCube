@@ -39,7 +39,6 @@
                 <td>
                     <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button> <br />
                     <a asp-action="Details" asp-route-id="@item.RecipeId">詳細</a> <br />
-                    <a asp-action="Delete" asp-route-id="@item.RecipeId">刪除</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.RecipeName)

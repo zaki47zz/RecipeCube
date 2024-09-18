@@ -393,6 +393,7 @@
     <!-- 連結View內script -->
     <script>
         $(document).ready(function () {
+            let previousContent = '';  // 全局變量保存之前的局部檢視內容
             // sidebar 的卷軸生成
             var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -445,11 +446,11 @@
             // 當點擊側邊欄時，載入局部檢視
             // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
             var controller = ''; // 把控制器變全域變量(因為再下一個function也要用)
-
+            var parentId = '';
             $("ul.navbar-nav .nav-link").on('click', function (e) {
                 $("ul.navbar-nav .nav-link").removeClass("active");
                 $(this).addClass("active");
-                var parentId = $(this).parent().attr('id');
+                parentId = $(this).parent().attr('id');
                 if (parentId !== "Home") {
                     e.preventDefault();
                 }
@@ -468,9 +469,9 @@
                     case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
                     case 'Product': controller = 'Products'; filterRow = null; break;
                     case 'Order': controller = 'Orders'; filterRow = null; break;
+                    default:controller = undefined; // 確保有未處理的情況時，controller 會明確為 undefined
                 }
-
-                if (parentId !== "Home") {
+                if (parentId !== "Home"  && controller) {
                     $.ajax({
                         url: `/Admin/${controller}/${parentId}IndexPartial`,
                         type: 'GET',
@@ -482,12 +483,14 @@
                             alert("Error: " + error);
                         }
                     });
+                } else {
+                    console.error('Controller 未定義或 parentId 為 Home');
                 }
             });
 
             $(document).on('click', '.edit', function () {
                 let id = $(this).data('id');
-
+                previousContent = $('#dynamic-content').html();   // 保存當前局部檢視內容
                 $.ajax({
                     url: `/Admin/${controller}/EditPartial/` + id,
                     type: 'GET',
@@ -504,6 +507,50 @@
                     }
                 });
             });
+            // 當 Modal 編輯表單提交時，使用 AJAX 傳送數據
+           $(document).on('submit', '#editForm', function (e) {
+                e.preventDefault();  // 阻止默認的表單提交行為
+                var formData = $(this).serialize();  // 獲取表單數據
+                console.log('formData:', formData);  // 確認表單數據中是否包含正確的 RecipeId
+                $.ajax({
+                    url: $(this).attr('action'),  // 表單的 action URL
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log('AJAX response:', response);  // 在 console 中打印出 AJAX 回應的內容
+                        if (response.success) {
+                            $('#editModal').modal('hide');
+                            $('#dynamic-content').html(previousContent);
+                        } else {
+                            let errorMessages = response.errors ? response.errors.join('\n') : '無法保存編輯';
+                            alert('保存失敗: ' + errorMessages);
+                        }
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法保存編輯');
+                    }
+                });
+            });
+
+            // 監聽 Modal 關閉事件
+            $('#editModal').on('hidden.bs.modal', function () {
+                // 如果之前有保存的局部檢視內容，則恢復顯示
+                if (previousContent) {
+                    $('#dynamic-content').html(previousContent);
+                }
+            });
+                // 返回按鈕：關閉 Modal 而不刷新頁面
+            $(document).on('click', '#closeModal', function () {
+                $('#editModal').modal('hide');  // 隱藏模態框
+                console.log('返回按鈕被點擊了');
+                if (previousContent) {
+                    $('#dynamic-content').html(previousContent);
+                }
+            });
+            var element = document.querySelector('#some-element');
+            if (element) {
+                element.classList.add('new-class');
+            }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
