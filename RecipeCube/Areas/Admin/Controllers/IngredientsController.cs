@@ -73,9 +73,9 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 _context.Add(ingredient);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
             }
-            return View(ingredient);
+            return PartialView("_CreatePartial", ingredient);
         }
 
         //// GET: Admin/Ingredients/Edit/5
@@ -111,11 +111,11 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] Ingredient ingredient)
+        public JsonResult Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] Ingredient ingredient)
         {
             if (id != ingredient.IngredientId)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -123,24 +123,23 @@ namespace RecipeCube.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(ingredient);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!IngredientExists(ingredient.IngredientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(ingredient);
-        }
 
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
+        }
+        
         // GET: Admin/Ingredients/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

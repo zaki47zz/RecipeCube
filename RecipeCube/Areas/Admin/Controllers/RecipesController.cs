@@ -98,13 +98,9 @@ namespace RecipeCube.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult Edit(int id, [Bind("RecipeId,RecipeName,UserId,IsCustom,Restriction,WestEast,Category,DetailedCategory,Steps,Seasoning,Visibility,Photo,Status")] Recipe recipe)
         {
-            // 使用 Console.WriteLine 打印 `id` 和 `recipe.RecipeId` 來檢查它們是否一致
-            Console.WriteLine("id from route: " + id);
-            Console.WriteLine("RecipeId from model: " + recipe.RecipeId);
             if (id != recipe.RecipeId)
             {
-
-                return new JsonResult(new { success = false, error = "食譜ID不符合。" });
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -117,14 +113,14 @@ namespace RecipeCube.Areas.Admin.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    return new JsonResult(new { success = false, error = "發生並發錯誤。" });
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
             }
 
             return new JsonResult(new
             {
                 success = false,
-                error = "資料無效。",
+                error = "資料無效!",
                 errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }

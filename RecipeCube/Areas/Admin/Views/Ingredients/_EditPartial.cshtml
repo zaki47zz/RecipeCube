@@ -43,14 +43,20 @@
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <input type="submit" value="儲存" class="btn btn-info me-3" />
-                    <a asp-action="Index" class="btn btn-secondary">回到列表</a>
+                    <input type="submit" value="儲存" class="btn btn-danger mx-4" />
+                    <a href="javascript:void(0)" class="btn btn-secondary" id="closeModal">回到列表</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        // 初始化表單驗證功能
+        $.validator.unobtrusive.parse('#editForm');
+    });
+</script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
