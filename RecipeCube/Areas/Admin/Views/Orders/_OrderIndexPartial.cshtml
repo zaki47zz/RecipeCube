@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<RecipeCube.Models.Order>
 
 @section Styles {
-    <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+   @*  <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" /> *@
 
     <style>
         .table th, .table td {
@@ -57,7 +57,7 @@
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.OrderId">修改訂單</a> |
                         @* <a asp-action="Details" asp-route-id="@item.OrderId">查看訂單明細</a>  *@
-                        <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index" asp-route-orderId="@item.OrderId">查看訂單明細</a>
+                            <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index" asp-route-orderId="@item.OrderId">查看訂單明細</a>
                         @* <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a> *@
                     </td>
                 </tr>
@@ -69,21 +69,21 @@
 @section Scripts {
     <script src="~/lib/datatables/datatables.min.js"></script>
     <script>
-        $(".sidenav .nav-item a").removeClass("active");
-        $("#order a").addClass("active");
+        // $(".sidenav .nav-item a").removeClass("active");
+        // $("#order a").addClass("active");
 
-        @* 套用datatabes套件 *@
-            new DataTable("table", {
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-                    paginate: {
-                        first: "«",   // 保持圖示化
-                        previous: "‹", // 保持圖示化
-                        next: "›",    // 保持圖示化
-                        last: "»"     // 保持圖示化
-                    },
-                }
-            })
+        // @* 套用datatabes套件 *@
+        //     new DataTable("table", {
+        //         language: {
+        //             url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+        //             paginate: {
+        //                 first: "«",   // 保持圖示化
+        //                 previous: "‹", // 保持圖示化
+        //                 next: "›",    // 保持圖示化
+        //                 last: "»"     // 保持圖示化
+        //             },
+        //         }
+        //     })
 
 
     </script>

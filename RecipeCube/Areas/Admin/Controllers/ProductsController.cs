@@ -18,12 +18,23 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
+        public async Task<IActionResult> ProductIndexPartial()
+        {
+            var products = await _context.Products.ToListAsync();
+            return PartialView("_ProductIndexPartial", products);
+        }
 
         // GET: Admin/Products
         public async Task<IActionResult> Index()
         {
             return View(await _context.Products.ToListAsync());
         }
+
+        // 圖片
+        //public async Task<FileResult> GetPhoto(int id)
+        //{
+
+        //}
 
         // GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)

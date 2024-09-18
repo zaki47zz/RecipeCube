@@ -70,6 +70,21 @@
         $(".sidenav .nav-item a").removeClass("active");
         $("#order_item a").addClass("active");
 
+        $(function(){
+            
+            var orderId = '@ViewBag.OrderId';
+            // alert('訂單編號:'+orderId);
+   
+            // 填入訂單標號至搜索欄位
+            if(orderId !=0)
+            {
+            $('#dt-search-0').val(orderId);
+            }
+            // 觸發input事件
+            $('#dt-search-0').trigger('input');
+
+        });
+
         @* 套用datatabes套件 *@
             new DataTable("table", {
                 language: {
