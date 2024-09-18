@@ -57,7 +57,7 @@
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.OrderId">修改訂單</a> |
                         @* <a asp-action="Details" asp-route-id="@item.OrderId">查看訂單明細</a>  *@
-                        <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index">查看訂單明細</a>
+                            <a asp-area="Admin" asp-controller="OrderItems" asp-action="Index" asp-route-orderId="@item.OrderId">查看訂單明細</a>
                         @* <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a> *@
                     </td>
                 </tr>

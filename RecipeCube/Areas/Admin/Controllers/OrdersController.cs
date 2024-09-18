@@ -18,7 +18,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
-
+       
         // GET: Admin/Orders
         public async Task<IActionResult> Index()
         {
