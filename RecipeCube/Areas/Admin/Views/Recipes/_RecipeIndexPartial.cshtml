@@ -81,10 +81,29 @@
     </div>
 </div>
 
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <!-- 確保這裡有加上 modal-dialog-scrollable -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-circle-xmark fs-3"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 在這裡動態載入編輯的表單 -->
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <!-- 加上 modal-dialog-scrollable -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
@@ -103,6 +122,7 @@
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <!-- 加上 modal-dialog-scrollable -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createLabel">新增食譜</h5>

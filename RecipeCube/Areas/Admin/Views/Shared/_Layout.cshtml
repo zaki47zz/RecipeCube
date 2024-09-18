@@ -507,7 +507,7 @@
                             damping: 0.5
                         });
                         $('#editModal').modal('show');
-                        $.validator.unobtrusive.parse('#editForm');
+                        
                     },
                     error: function () {
                         alert('發生錯誤，無法載入編輯表單');
@@ -546,6 +546,9 @@
                     type: 'GET',
                     success: function (data) {
                         $('#detailsModal .modal-body').html(data);
+                        new PerfectScrollbar('#detailsModal .modal-body', {
+                            damping: 0.5
+                        });
                         $('#detailsModal').modal('show');
                     },
                     error: function () {
@@ -567,7 +570,9 @@
                     success: function (data) {
                         // 將返回的編輯表單載入到 editModal 的 body 中
                         $('#editModal .modal-body').html(data);
-
+                        new PerfectScrollbar('#editModal .modal-body', {
+                            damping: 0.5
+                        });
                         // 顯示 editModal
                         $('#editModal').modal('show');
                     },
@@ -578,14 +583,18 @@
             });
             // CreateMoadl 
             $(document).on('click', '#openCreateModal', function () {
+
                 $.ajax({
                     url: `/Admin/${controller}/CreatePartial`,
                     type: 'GET',
                     success: function (data) {
-                        $('#createModal .modal-body').html(data);  
+                        $('#createModal .modal-body').html(data);
+                        new PerfectScrollbar('#createModal .modal-body', {
+                            damping: 0.5
+                        });
                         $('#createModal').modal('show');
                         // 初始化局部檢視中的腳本
-                        initCreateForm();
+                        initCreateForm();   
                     },
                     error: function () {
                         alert('無法載入建立表單');
