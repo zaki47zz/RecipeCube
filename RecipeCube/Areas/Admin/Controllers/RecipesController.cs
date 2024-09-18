@@ -63,10 +63,10 @@ namespace RecipeCube.Areas.Admin.Controllers
 
             return PartialView("_DetailsPartial", recipe);
         }
-        // GET: Admin/Recipes/Create
-        public IActionResult Create()
+        // GET: Admin/Recipes/CreatePartial
+        public IActionResult CreatePartial()
         {
-            return View();
+            return PartialView("_CreatePartial");
         }
 
         // POST: Admin/Recipes/Create
@@ -80,9 +80,9 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 _context.Add(recipe);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
             }
-            return View(recipe);
+            return PartialView("_CreatePartial", recipe);
         }
 
         // GET: Admin/Recipes/Edit/5

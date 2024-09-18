@@ -391,6 +391,11 @@
     <script src="/lib/datatables/datatables.min.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+    <!-- 掛載validation驗證js -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
     <!-- 連結View內script -->
     <script>
         $(document).ready(function () {
@@ -502,6 +507,7 @@
                             damping: 0.5
                         });
                         $('#editModal').modal('show');
+                        $.validator.unobtrusive.parse('#editForm');
                     },
                     error: function () {
                         alert('發生錯誤，無法載入編輯表單');
@@ -536,7 +542,7 @@
             $(document).on('click', '.view', function () {
                 let id = $(this).data('id');
                 $.ajax({
-                    url: `/Admin/Recipes/DetailsPartial/` + id,
+                    url: `/Admin/${controller}/DetailsPartial/` + id,
                     type: 'GET',
                     success: function (data) {
                         $('#detailsModal .modal-body').html(data);
@@ -556,7 +562,7 @@
 
                 // 然後通過 AJAX 載入編輯表單
                 $.ajax({
-                    url: '/Admin/Recipes/EditPartial/' + recipeId,  // 請根據實際 URL 路徑調整
+                    url: `/Admin/${controller}/EditPartial/` + recipeId,  // 請根據實際 URL 路徑調整
                     type: 'GET',
                     success: function (data) {
                         // 將返回的編輯表單載入到 editModal 的 body 中
@@ -567,6 +573,45 @@
                     },
                     error: function () {
                         alert('無法載入編輯表單');
+                    }
+                });
+            });
+            // CreateMoadl 
+            $(document).on('click', '#openCreateModal', function () {
+                $.ajax({
+                    url: `/Admin/${controller}/CreatePartial`,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#createModal .modal-body').html(data);  
+                        $('#createModal').modal('show');
+                        // 初始化局部檢視中的腳本
+                        initCreateForm();
+                    },
+                    error: function () {
+                        alert('無法載入建立表單');
+                    }
+                });
+            });
+            
+
+            // 當表單提交時
+            $(document).on('submit', '#createForm', function (e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            $('#createModal').modal('hide');
+                            location.reload(); // 成功後可以重新加載頁面或刷新表單
+                        } else {
+                            $('#createModal .modal-body').html(response);
+                        }
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法建立');
                     }
                 });
             });
