@@ -382,7 +382,7 @@
     </main>
 
     <!--   核心JS   -->
-    
+
     <script src="/js/core/popper.min.js"></script>
     <script src="/js/core/bootstrap.min.js"></script>
     <script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -400,6 +400,7 @@
     <script>
         $(document).ready(function () {
             let previousContent = '';  // 全局變量保存之前的局部檢視內容
+
             // sidebar 的卷軸生成
             var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -407,6 +408,13 @@
                     damping: '0.5'
                 }
                 Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+            }
+
+            //其他的卷軸生成寫成函式以便調用
+            function initializePerfectScrollbar(selector) {
+                new PerfectScrollbar(selector, {
+                    damping: 0.5
+                });
             }
 
             // 初始化 DataTable，傳入需要篩選的列的索引
@@ -477,7 +485,7 @@
                     case 'Order': controller = 'Orders'; filterRow = null; break;
                     case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
                 }
-                if (parentId !== "Home"  && controller) {
+                if (parentId !== "Home" && controller) {
                     $.ajax({
                         url: `/Admin/${controller}/${parentId}IndexPartial`,
                         type: 'GET',
@@ -494,28 +502,31 @@
                 }
             });
 
-            $(document).on('click', '.edit', function () {
-                let id = $(this).data('id');
-                previousContent = $('#dynamic-content').html();   // 保存當前局部檢視內容
+            //把子功能的局部檢視加載寫成函式以供調用
+            function loadModalData(url, modalSelector, successCallback) {
                 $.ajax({
-                    url: `/Admin/${controller}/EditPartial/` + id,
+                    url: url,
                     type: 'GET',
                     success: function (data) {
-                        $('#editModal .modal-body').html(data);
-                        // 初始化 Perfect Scrollbar
-                        new PerfectScrollbar('#editModal .modal-body', {
-                            damping: 0.5
-                        });
-                        $('#editModal').modal('show');
-                        
+                        $(modalSelector + ' .modal-body').html(data);
+                        initializePerfectScrollbar(modalSelector + ' .modal-body');
+                        $(modalSelector).modal('show');
+                        if (successCallback) successCallback();
                     },
                     error: function () {
-                        alert('發生錯誤，無法載入編輯表單');
+                        alert('發生錯誤，無法載入資料');
                     }
                 });
+            }
+
+            $(document).on('click', '.edit', function () {
+                let id = $(this).data('id');
+                previousContent = $('#dynamic-content').html();
+                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal');
             });
+
             // 當 Modal 編輯表單提交時，使用 AJAX 傳送數據
-           $(document).on('submit', '#editForm', function (e) {
+            $(document).on('submit', '#editForm', function (e) {
                 e.preventDefault();  // 阻止默認的表單提交行為
                 var formData = $(this).serialize();  // 獲取表單數據
                 console.log('formData:', formData);  // 確認表單數據中是否包含正確的 RecipeId
@@ -538,70 +549,25 @@
                     }
                 });
             });
+
             // 載入詳細資訊的 AJAX 調用
             $(document).on('click', '.view', function () {
                 let id = $(this).data('id');
-                $.ajax({
-                    url: `/Admin/${controller}/DetailsPartial/` + id,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#detailsModal .modal-body').html(data);
-                        new PerfectScrollbar('#detailsModal .modal-body', {
-                            damping: 0.5
-                        });
-                        $('#detailsModal').modal('show');
-                    },
-                    error: function () {
-                        alert('發生錯誤，無法載入詳細資訊');
-                    }
-                });
+                loadModalData(`/Admin/${controller}/DetailsPartial/` + id, '#detailsModal');
             });
+
             // 從詳細資訊open editModal
             $(document).on('click', '#openeditModal', function () {
-                var recipeId = $(this).data('id');  // 假設你在按鈕中設置了 data-id 屬性
-
-                // 首先關閉 detailsModal
+                let recipeId = $(this).data('id');
                 $('#detailsModal').modal('hide');
-
-                // 然後通過 AJAX 載入編輯表單
-                $.ajax({
-                    url: `/Admin/${controller}/EditPartial/` + recipeId,  // 請根據實際 URL 路徑調整
-                    type: 'GET',
-                    success: function (data) {
-                        // 將返回的編輯表單載入到 editModal 的 body 中
-                        $('#editModal .modal-body').html(data);
-                        new PerfectScrollbar('#editModal .modal-body', {
-                            damping: 0.5
-                        });
-                        // 顯示 editModal
-                        $('#editModal').modal('show');
-                    },
-                    error: function () {
-                        alert('無法載入編輯表單');
-                    }
-                });
+                loadModalData(`/Admin/${controller}/EditPartial/` + recipeId, '#editModal');
             });
-            // CreateMoadl 
+
+            // CreateModal
             $(document).on('click', '#openCreateModal', function () {
-
-                $.ajax({
-                    url: `/Admin/${controller}/CreatePartial`,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#createModal .modal-body').html(data);
-                        new PerfectScrollbar('#createModal .modal-body', {
-                            damping: 0.5
-                        });
-                        $('#createModal').modal('show');
-                        // 初始化局部檢視中的腳本
-                        initCreateForm();   
-                    },
-                    error: function () {
-                        alert('無法載入建立表單');
-                    }
-                });
+                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal');
             });
-            
+
 
             // 當表單提交時
             $(document).on('submit', '#createForm', function (e) {
@@ -624,6 +590,7 @@
                     }
                 });
             });
+
             // 監聽 Modal 關閉事件
             $('#editModal').on('hidden.bs.modal', function () {
                 // 如果之前有保存的局部檢視內容，則恢復顯示
@@ -643,6 +610,8 @@
                     $('#dynamic-content').html(previousContent);
                 }
             });
+
+            //這是什麼挖?
             var element = document.querySelector('#some-element');
             if (element) {
                 element.classList.add('new-class');
