@@ -382,6 +382,7 @@
     </main>
 
     <!--   核心JS   -->
+    
     <script src="/js/core/popper.min.js"></script>
     <script src="/js/core/bootstrap.min.js"></script>
     <script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -531,7 +532,44 @@
                     }
                 });
             });
+            // 載入詳細資訊的 AJAX 調用
+            $(document).on('click', '.view', function () {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: `/Admin/Recipes/DetailsPartial/` + id,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#detailsModal .modal-body').html(data);
+                        $('#detailsModal').modal('show');
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法載入詳細資訊');
+                    }
+                });
+            });
+            // 從詳細資訊open editModal
+            $(document).on('click', '#openeditModal', function () {
+                var recipeId = $(this).data('id');  // 假設你在按鈕中設置了 data-id 屬性
 
+                // 首先關閉 detailsModal
+                $('#detailsModal').modal('hide');
+
+                // 然後通過 AJAX 載入編輯表單
+                $.ajax({
+                    url: '/Admin/Recipes/EditPartial/' + recipeId,  // 請根據實際 URL 路徑調整
+                    type: 'GET',
+                    success: function (data) {
+                        // 將返回的編輯表單載入到 editModal 的 body 中
+                        $('#editModal .modal-body').html(data);
+
+                        // 顯示 editModal
+                        $('#editModal').modal('show');
+                    },
+                    error: function () {
+                        alert('無法載入編輯表單');
+                    }
+                });
+            });
             // 監聽 Modal 關閉事件
             $('#editModal').on('hidden.bs.modal', function () {
                 // 如果之前有保存的局部檢視內容，則恢復顯示
@@ -539,10 +577,14 @@
                     $('#dynamic-content').html(previousContent);
                 }
             });
-                // 返回按鈕：關閉 Modal 而不刷新頁面
+            // 返回按鈕：關閉 Modal 而不刷新頁面
             $(document).on('click', '#closeModal', function () {
-                $('#editModal').modal('hide');  // 隱藏模態框
-                console.log('返回按鈕被點擊了');
+                if ($('#editModal').hasClass('show')) {  // 如果 editModal 正在顯示
+                    $('#editModal').modal('hide');  // 隱藏
+                }
+                if ($('#detailsModal').hasClass('show')) {  // 如果 detailsModal 正在顯示
+                    $('#detailsModal').modal('hide');  // 隱藏
+                }
                 if (previousContent) {
                     $('#dynamic-content').html(previousContent);
                 }
@@ -554,5 +596,6 @@
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

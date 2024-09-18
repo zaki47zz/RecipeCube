@@ -37,8 +37,8 @@
         {
             <tr>
                 <td>
-                    <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button> <br />
-                    <a asp-action="Details" asp-route-id="@item.RecipeId">詳細</a> <br />
+                    <button class="view btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.RecipeId">詳細</button> <br />
+                    <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.RecipeName)
@@ -63,16 +63,37 @@
     </tbody>
 </table>
 
-<!-- Modal -->
+<!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable"> <!-- 加modal-dialog-scrollable -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-circle-xmark fs-3"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <!-- 在這裡動態載入編輯的表單 -->
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-circle-xmark fs-3"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 動態載入詳細資訊 -->
                 <p>Loading...</p>
             </div>
         </div>

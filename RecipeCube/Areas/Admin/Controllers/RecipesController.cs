@@ -34,23 +34,35 @@ namespace RecipeCube.Areas.Admin.Controllers
 
 
         // GET: Admin/Recipes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
+        //    var recipe = await _context.Recipes
+        //        .FirstOrDefaultAsync(m => m.RecipeId == id);
+        //    if (recipe == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(recipe);
+        //}
+        // 新增的部分：RecipesController.cs
+        public async Task<IActionResult> DetailsPartial(int id)
+        {
             var recipe = await _context.Recipes
                 .FirstOrDefaultAsync(m => m.RecipeId == id);
+
             if (recipe == null)
             {
                 return NotFound();
             }
 
-            return View(recipe);
+            return PartialView("_DetailsPartial", recipe);
         }
-
         // GET: Admin/Recipes/Create
         public IActionResult Create()
         {
