@@ -18,7 +18,13 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
-       
+
+        public async Task<IActionResult> OrderIndexPartial()
+        {
+            var orders = await _context.Orders.ToListAsync();
+            return PartialView("_OrderIndexPartial", orders);
+        }
+
         // GET: Admin/Orders
         public async Task<IActionResult> Index()
         {

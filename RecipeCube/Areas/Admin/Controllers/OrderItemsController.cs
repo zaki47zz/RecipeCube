@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Admin.Controllers
-{
+{ 
     [Area("Admin")]
     public class OrderItemsController : Controller
     {
@@ -18,15 +18,24 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
+        public async Task<IActionResult> OrderItemIndexPartial(long orderid)
+        {
+            ViewBag.OrderId = orderid;
+            var orderItems = await _context.OrderItems.ToListAsync();
+            return PartialView("_OrderItemIndexPartial", orderItems);
+        }
 
         //自訂義Route
-        [Route("Admin/OrderItems/{orderId?}")]
-        // GET: Admin/OrderItems
+        //[Route("Admin/OrderItems/{orderId?}")]
+        //GET: Admin/OrderItems
         public async Task<IActionResult> Index(long orderid)
         {
             ViewBag.OrderId = orderid;
             return View(await _context.OrderItems.ToListAsync());
-    }
+        }
+
+        
+
 
         // GET: Admin/OrderItems/Details/5
         public async Task<IActionResult> Details(int? id)
