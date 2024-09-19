@@ -1,4 +1,4 @@
-﻿@model RecipeCube.Models.Recipe
+﻿@model RecipeCube.ViewModels.RecipeViewModel
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -73,6 +73,22 @@
                     <span asp-validation-for="Steps" class="text-danger"></span>
                 </div>
 
+                <!-- 食材選擇 -->
+                <div class="form-group">
+                    <label asp-for="SelectedIngredients" class="control-label">選擇食材</label>
+                    <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
+                        @foreach (var ingredient in Model.AvailableIngredients)
+                        {
+                            <option value="@ingredient.IngredientId">@ingredient.IngredientName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SelectedIngredients" class="text-danger"></span>
+                </div>
+                <!-- 食材數量輸入框 (動態生成) -->
+                <div class="form-group" id="ingredientQuantities">
+                    <!-- 當選擇食材時，會在這裡動態生成數量輸入框 -->
+                </div>
+
                 <div class="form-group">
                     <label asp-for="Seasoning" class="control-label"></label>
                     <input asp-for="Seasoning" class="form-control" />
@@ -116,7 +132,7 @@
 <!-- 在局部檢視內包含腳本 -->
 <script>
     function initCreateForm() {
-        alert("我來自局部檢視");
+        //alert("我來自局部檢視");
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#createForm');
 
@@ -142,8 +158,99 @@
 
         // 初始載入時觸發 change 事件
         $('#categorySelect').trigger('change');
+
+        // 首先載入所有食材
+        $.ajax({
+            url: '/Admin/Recipes/GetIngredients',  // 後端控制器路徑
+            type: 'GET',
+            placeholder: '選擇食材',
+            allowClear: true,
+            width: '100%',
+            success: function (data) {
+                // 初始化 Select2 並加入抓取的資料
+                $('#selectedIngredients').select2({
+                    placeholder: '選擇食材',
+                    allowClear: true,
+                    width: '100%',
+                    ajax: {
+                        url: '/Admin/Recipes/SearchIngredients',  // 後端控制器路徑
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                query: params.term // 搜尋的關鍵字
+                            };
+                        },
+                        processResults: function (data) {
+                            // 分組顯示資料
+                            var categories = {};
+
+                            // 將食材依照類別分類
+                            data.forEach(function (ingredient) {
+                                if (!categories[ingredient.category]) {
+                                    categories[ingredient.category] = [];
+                                }
+                                categories[ingredient.category].push({
+                                    id: ingredient.ingredientId,
+                                    text: ingredient.ingredientName // 使用 ingredientName 來顯示選項名稱
+                                });
+                            });
+
+                            // 將分類轉換為 Select2 支援的格式
+                            var results = [];
+                            for (var category in categories) {
+                                results.push({
+                                    text: category,
+                                    children: categories[category]
+                                });
+                            }
+
+                            return {
+                                results: results
+                            };
+                        },
+                        cache: true
+                    }
+                }).on('select2:open', function () {
+                    // 當下拉選單打開時應用 PerfectScrollbar
+                    setTimeout(function () {
+                        var ps = new PerfectScrollbar('.select2-results__options', {
+                            damping: 0.5
+                        });
+                    }, 100);  // 延遲 100ms 確保下拉選單已經完全渲染
+                });
+
+            },
+            error: function () {
+                alert('無法從資料庫中載入食材');
+            }
+        });
+
+        // 當使用者選擇食材時
+        $('#selectedIngredients').on('change', function () {
+            console.log('Change event triggered');
+            var selectedIngredients = $(this).select2('data');  // 使用 select2('data') 來獲取已選擇的選項
+            var ingredientQuantitiesDiv = $('#ingredientQuantities');
+
+            // 清空原有的數量輸入框
+            ingredientQuantitiesDiv.empty();
+
+            // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱而不是ID
+            selectedIngredients.forEach(function (ingredient) {
+                var ingredientName = ingredient.text;  // 使用 ingredient.text 來顯示名稱
+                console.log('Selected Ingredient:', ingredientName);
+                var inputHtml = `
+            <div class="form-group">
+                <label for="IngredientQuantities_${ingredient.id}" class="control-label">${ingredientName} 的數量</label>
+                <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredient.id}" name="IngredientQuantities[${ingredient.id}]" />
+            </div>`;
+                ingredientQuantitiesDiv.append(inputHtml);
+            });
+        });
+        
     }
 </script>
+
 
 @section Scripts {
     @{

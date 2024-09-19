@@ -22,6 +22,8 @@
     <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
     <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- select2插件 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <!-- 連結View內style -->
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -393,12 +395,13 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
+    <!-- 掛載 select2 js-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- 連結View內script -->
     <script>
         $(document).ready(function () {
-            let previousContent = '';  // 全局變量保存之前的局部檢視內容
-
+            var controller = ''; // 把控制器變全域變量(因為再下一個function也要用)
+            var parentId = '';
             // sidebar 的卷軸生成
             var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -457,46 +460,19 @@
 
             // 當點擊側邊欄時，載入局部檢視
             // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
-            var controller = ''; // 把控制器變全域變量(因為再下一個function也要用)
-            var parentId = '';
+ 
             $("ul.navbar-nav .nav-link").on('click', function (e) {
                 $("ul.navbar-nav .nav-link").removeClass("active");
                 $(this).addClass("active");
+                // 設置 parentId
                 parentId = $(this).parent().attr('id');
+
                 if (parentId !== "Home") {
                     e.preventDefault();
-                }
-                $('#dynamic-content').html('<div>Loading...</div>');
-
-                // 根據 parentId 設置 controller
-                let filterRow = 0;
-                switch (parentId) {
-                    case 'User': controller = 'Users'; filterRow = null; break;
-                    case 'Group': controller = 'Groups'; filterRow = null; break;
-                    case 'PreferedFood': controller = ''; filterRow = null; break;
-                    case 'ExclusiveFood': controller = ''; filterRow = null; break;
-                    case 'Inventory': controller = 'Inventories'; filterRow = null; break;
-                    case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
-                    case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
-                    case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
-                    case 'Product': controller = 'Products'; filterRow = null; break;
-                    case 'Order': controller = 'Orders'; filterRow = null; break;
-                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
-                }
-                if (parentId !== "Home" && controller) {
-                    $.ajax({
-                        url: `/Admin/${controller}/${parentId}IndexPartial`,
-                        type: 'GET',
-                        success: function (data) {
-                            $('#dynamic-content').html(data);
-                            initializeDataTableWithFilter(filterRow);
-                        },
-                        error: function (xhr, status, error) {
-                            alert("Error: " + error);
-                        }
-                    });
+                    $('#dynamic-content').html('<div>Loading...</div>');  // 顯示加載中
+                    loadPartialView(parentId);  // 調用統一的函數
                 } else {
-                    console.error('Controller 未定義或 parentId 為 Home');
+                    console.error('Home 無需加載');
                 }
             });
 
@@ -563,22 +539,43 @@
 
             // CreateModal
             $(document).on('click', '.create', function () {
-                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal');
-            });
+                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal', function () {
+                    initCreateForm(); // 表單加載完畢後再初始化
+                });
 
+            });
+            
 
             // 當表單提交時
             $(document).on('submit', '#createForm', function (e) {
-                e.preventDefault();
-                var formData = $(this).serialize();
+                e.preventDefault();  // 阻止默認表單提交行為
+                // 初始化表單數據
+                var formData = $(this).serializeArray();
+
+                // 初始化表單數據
+                var formData = $(this).serializeArray();  // 轉換為陣列形式
+                console.log('初始 formData:', formData);
+
+                // 獲取 Select2 選中的食材
+                if ($('#selectedIngredients').length) {
+                    var selectedIngredients = $('#selectedIngredients').val(); // 這裡獲取的是數組
+                    selectedIngredients.forEach(function (ingredientId) {
+                        formData.push({ name: 'SelectedIngredients', value: ingredientId });
+                    });
+                }
+
+                console.log('formData:', formData);  // 確認不再有重複的 SelectedIngredients
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
-                    data: formData,
+                    data: formData,  
+                    traditional: true,  // 加入這個屬性，確保數據正確傳遞為多個獨立值
                     success: function (response) {
                         if (response.success) {
                             $('#createModal').modal('hide');
-                            location.reload(); // 成功後可以重新加載頁面或刷新表單
+                            // 重新加載局部檢視來更新最新數據
+                            loadPartialView(parentId);
                         } else {
                             $('#createModal .modal-body').html(response);
                         }
@@ -588,13 +585,45 @@
                     }
                 });
             });
+            // 重新加載局部檢視的函數
+            function loadPartialView(parentId) {
+                let filterRow = 0;  // 根據 parentId 設定 DataTable 的 filterRow
+
+                // 根據 parentId 設置 controller 和 filterRow
+                switch (parentId) {
+                    case 'User': controller = 'Users'; filterRow = null; break;
+                    case 'Group': controller = 'Groups'; filterRow = null; break;
+                    case 'PreferedFood': controller = ''; filterRow = null; break;
+                    case 'ExclusiveFood': controller = ''; filterRow = null; break;
+                    case 'Inventory': controller = 'Inventories'; filterRow = null; break;
+                    case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
+                    case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
+                    case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
+                    case 'Product': controller = 'Products'; filterRow = null; break;
+                    case 'Order': controller = 'Orders'; filterRow = null; break;
+                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
+                    default: console.error('Controller 未定義或 parentId 為 Home'); return;
+                }
+
+                if (controller) {
+                    $.ajax({
+                        url: `/Admin/${controller}/${parentId}IndexPartial`,  // 動態生成 URL
+                        type: 'GET',
+                        success: function (data) {
+                            $('#dynamic-content').html(data);  // 更新局部檢視的內容
+                            initializeDataTableWithFilter(filterRow);  // 初始化 DataTable
+                        },
+                        error: function () {
+                            alert('無法重新加載內容');
+                        }
+                    });
+                }
+            }
 
             // 監聽 Modal 關閉事件
             $('#editModal').on('hidden.bs.modal', function () {
                 // 如果之前有保存的局部檢視內容，則恢復顯示
-                if (previousContent) {
-                    $('#dynamic-content').html(previousContent);
-                }
+                loadPartialView(parentId);
             });
             // 返回按鈕：關閉 Modal 而不刷新頁面
             $(document).on('click', '#closeModal', function () {
@@ -604,12 +633,13 @@
                 if ($('#detailsModal').hasClass('show')) {  // 如果 detailsModal 正在顯示
                     $('#detailsModal').modal('hide');  // 隱藏
                 }
-                if (previousContent) {
-                    $('#dynamic-content').html(previousContent);
+                if ($('#createModal').hasClass('show')) {  // 如果 detailsModal 正在顯示
+                    $('#createModal').modal('hide');  // 隱藏
                 }
+                loadPartialView(parentId);
             });
 
-            //這是什麼挖?
+            //可以讓手機瀏覽的sidebar不會出錯 (應該拉)
             var element = document.querySelector('#some-element');
             if (element) {
                 element.classList.add('new-class');
