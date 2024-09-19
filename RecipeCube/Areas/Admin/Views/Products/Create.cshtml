@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ProductName" class="control-label"></label>
@@ -37,11 +37,19 @@
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-            <div class="form-group">
+           @*  <div class="form-group">
                 <label asp-for="Photo" class="control-label"></label>
                 <input asp-for="Photo" class="form-control" />
                 <span asp-validation-for="Photo" class="text-danger"></span>
+            </div> *@
+
+            @* 呼叫圖片局部檢視，新增圖片上傳欄位_僅允許(jpg,jpeg,png) *@
+           <div class="mb-3">
+                <label asp-for="Photo" class="control-label"></label>
+                 @* id="Photo" name="Picture"  *@
+                <input type="file" asp-for="Photo" accept=".jpg, .jpeg, .png" class="form-control" />
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

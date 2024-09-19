@@ -83,6 +83,22 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                //將上傳的圖片寫進資料庫
+                if (Request.Form.Files["Photo"] != null)
+                {
+                    var file = Request.Form.Files["Photo"];
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // 寫產品圖片檔名
+                    product.Photo = fileName;
+                }
+                //=====================================================================
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -125,6 +141,30 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
+                    //將上傳修改的圖片寫進資料庫
+                    Product p = await _context.Products.FindAsync(product.ProductId);
+                    if (Request.Form.Files["Photo"] != null)
+                    {
+                        var file = Request.Form.Files["Photo"];
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // 更新產品圖片
+                        product.Photo = fileName;
+                    }
+                    else
+                    {
+                        product.Photo = p.Photo;
+                    }
+                    _context.Entry(p).State = EntityState.Detached;
+
+                    //=====================================================================
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -141,6 +181,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(product);
         }
 

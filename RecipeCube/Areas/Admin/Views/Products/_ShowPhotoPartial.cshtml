@@ -1,5 +1,12 @@
 ﻿@model RecipeCube.Models.Product
 
 <div>
-    <img src="~/img/ingredient/@Model.Photo" alt="@Model.Photo" style="width:256px;height:256px"/>
+    @if (@Model.Photo != null)
+    {    
+        <img src="~/img/ingredient/@Model.Photo" alt="@Model.Photo" style="width:256px;height:256px"/>
+    }
+    else
+    {
+        <img src="~/img/icon_large.png" alt="NotFound" style="width:256px;height:256px"/>
+    }
 </div>
