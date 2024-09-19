@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RecipeCube.Data;
 using RecipeCube.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace RecipeCube.Areas.Identity.Pages.Account
 {
