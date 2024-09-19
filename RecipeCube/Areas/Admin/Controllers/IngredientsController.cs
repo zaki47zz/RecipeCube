@@ -202,7 +202,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
-        
+
         // GET: Admin/Ingredients/Delete/5
         public async Task<IActionResult> DeletePartial(int? id)
         {
@@ -245,7 +245,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 {
                     _context.Ingredients.Remove(ingredient);
                 }
-                 _context.SaveChanges();
+                _context.SaveChanges();
                 return new JsonResult(new { success = true, error = "成功刪除!" });
             }
             catch (DbUpdateConcurrencyException)
