@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Admin.Controllers
@@ -18,7 +19,22 @@ namespace RecipeCube.Areas.Admin.Controllers
         public async Task<IActionResult> IngredientIndexPartial()
         {
             var ingredients = await _context.Ingredients.ToListAsync();
-            return PartialView("_IngredientIndexPartial", ingredients);
+
+            // 將 Ingredient 列表轉換為 IngredientViewModel 列表
+            var viewModel = ingredients.Select(ingredient => new IngredientViewModel
+            {
+                IngredientId = ingredient.IngredientId,
+                IngredientName = ingredient.IngredientName,
+                Category = ingredient.Category,
+                Synonym = ingredient.Synonym,
+                ExpireDay = ingredient.ExpireDay,
+                Unit = ingredient.Unit,
+                Gram = ingredient.Gram,
+                Photo = ingredient.Photo
+            }).ToList();
+
+            // 傳遞 ViewModel 列表到 PartialView
+            return PartialView("_IngredientIndexPartial", viewModel);
         }
 
         // GET: Admin/Ingredients/Details/5
@@ -49,7 +65,19 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DetailsPartial", ingredient);
+            var viewmodel = new IngredientViewModel
+            {
+                IngredientId = ingredient.IngredientId,
+                IngredientName = ingredient.IngredientName,
+                Category = ingredient.Category,
+                Synonym = ingredient.Synonym,
+                ExpireDay = ingredient.ExpireDay,
+                Unit = ingredient.Unit,
+                Gram = ingredient.Gram,
+                Photo = ingredient.Photo
+            };
+
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         // GET: Admin/Ingredients/Create
@@ -98,12 +126,28 @@ namespace RecipeCube.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> EditPartial(int id)
         {
+            // 從資料庫獲取 Ingredient (id == id) 該筆資料
             var ingredient = await _context.Ingredients.FindAsync(id);
+
             if (ingredient == null)
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial", ingredient);
+
+            // 將 Ingredient 資料轉換為 IngredientViewModel 型別
+            var viewmodel = new IngredientViewModel
+            {
+                IngredientId = ingredient.IngredientId,
+                IngredientName = ingredient.IngredientName,
+                Category = ingredient.Category,
+                Synonym = ingredient.Synonym,
+                ExpireDay = ingredient.ExpireDay,
+                Unit = ingredient.Unit,
+                Gram = ingredient.Gram,
+                Photo = ingredient.Photo
+            };
+
+            return PartialView("_EditPartial", viewmodel);
         }
 
         // POST: Admin/Ingredients/Edit/5
@@ -155,7 +199,19 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DeletePartial",ingredient);
+            var viewmodel = new IngredientViewModel
+            {
+                IngredientId = ingredient.IngredientId,
+                IngredientName = ingredient.IngredientName,
+                Category = ingredient.Category,
+                Synonym = ingredient.Synonym,
+                ExpireDay = ingredient.ExpireDay,
+                Unit = ingredient.Unit,
+                Gram = ingredient.Gram,
+                Photo = ingredient.Photo
+            };
+
+            return PartialView("_DeletePartial", viewmodel);
         }
 
         // POST: Admin/Ingredients/Delete/5

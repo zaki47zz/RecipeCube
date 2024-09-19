@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
+using System.Text.RegularExpressions;
 
 namespace RecipeCube.Areas.Admin.Controllers
 {
@@ -17,13 +19,28 @@ namespace RecipeCube.Areas.Admin.Controllers
         // GET: Admin/Inventories
         public async Task<IActionResult> Index()
         {
+
             return View(await _context.Inventories.ToListAsync());
         }
 
         public async Task<IActionResult> InventoryIndexPartial()
         {
             var Inventories = await _context.Inventories.ToListAsync();
-            return PartialView("_InventoryIndexPartial", Inventories);
+
+            var viewmodel = Inventories.Select(inventory => new InventoryViewModel
+            {
+                InventoryId = inventory.InventoryId,
+                GroupId = inventory.GroupId,
+                UserId = inventory.UserId,
+                IngredientId = inventory.IngredientId,
+                Quantity = inventory.Quantity,
+                ExpiryDate = inventory.ExpiryDate,
+                IsExpiring = inventory.IsExpiring,
+                Visibility = inventory.Visibility
+            }).ToList();
+
+
+            return PartialView("_InventoryIndexPartial", viewmodel);
         }
 
         // GET: Admin/Inventories/Details/5
@@ -54,7 +71,19 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DetailsPartial", Inventory);
+            var viewmodel = new InventoryViewModel
+            {
+                InventoryId = Inventory.InventoryId,
+                GroupId = Inventory.GroupId,
+                UserId = Inventory.UserId,
+                IngredientId = Inventory.IngredientId,
+                Quantity = Inventory.Quantity,
+                ExpiryDate = Inventory.ExpiryDate,
+                IsExpiring = Inventory.IsExpiring,
+                Visibility = Inventory.Visibility
+            };
+
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         // GET: Admin/Inventories/Create
@@ -103,7 +132,20 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial", inventory);
+
+            var viewmodel = new InventoryViewModel
+            {
+                InventoryId = inventory.InventoryId,
+                GroupId = inventory.GroupId,
+                UserId = inventory.UserId,
+                IngredientId = inventory.IngredientId,
+                Quantity = inventory.Quantity,
+                ExpiryDate = inventory.ExpiryDate,
+                IsExpiring = inventory.IsExpiring,
+                Visibility = inventory.Visibility
+            };
+
+            return PartialView("_EditPartial", viewmodel);
         }
 
         // POST: Admin/Inventories/Edit/5
@@ -155,7 +197,19 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DeletePartial", inventory);
+            var viewmodel = new InventoryViewModel
+            {
+                InventoryId = inventory.InventoryId,
+                GroupId = inventory.GroupId,
+                UserId = inventory.UserId,
+                IngredientId = inventory.IngredientId,
+                Quantity = inventory.Quantity,
+                ExpiryDate = inventory.ExpiryDate,
+                IsExpiring = inventory.IsExpiring,
+                Visibility = inventory.Visibility
+            };
+
+            return PartialView("_DeletePartial", viewmodel);
         }
 
         // POST: Admin/Inventories/Delete/5

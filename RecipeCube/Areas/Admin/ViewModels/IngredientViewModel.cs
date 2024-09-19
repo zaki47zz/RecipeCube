@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RecipeCube.ViewModels
+namespace RecipeCube.Areas.Admin.ViewModels
 {
     public class IngredientViewModel
     {

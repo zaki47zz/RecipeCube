@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
+using System.Text.RegularExpressions;
 
 namespace RecipeCube.Areas.Admin.Controllers
 {
@@ -17,7 +19,19 @@ namespace RecipeCube.Areas.Admin.Controllers
         public async Task<IActionResult> PantryIndexPartial()
         {
             var Pantries = await _context.PantryManagements.ToListAsync();
-            return PartialView("_PantryIndexPartial", Pantries);
+            var viewmodel = Pantries.Select(pantry => new PantryViewModel
+            {
+                PantryId = pantry.PantryId,
+                GroupId = pantry.GroupId,
+                UserId = pantry.UserId,
+                IngredientId = pantry.IngredientId,
+                Quantity = pantry.Quantity,
+                OutOfStock = pantry.OutOfStock,
+                Action = pantry.Action,
+                Time = pantry.Time
+            }).ToList();
+
+            return PartialView("_PantryIndexPartial", viewmodel);
         }
 
         public async Task<IActionResult> DetailsPartial(int id)
@@ -30,7 +44,19 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DetailsPartial", pantry);
+            var viewmodel = new PantryViewModel
+            {
+                PantryId = pantry.PantryId,
+                GroupId = pantry.GroupId,
+                UserId = pantry.UserId,
+                IngredientId = pantry.IngredientId,
+                Quantity = pantry.Quantity,
+                OutOfStock = pantry.OutOfStock,
+                Action = pantry.Action,
+                Time = pantry.Time
+            };
+
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         private bool PantryManagementExists(int id)
