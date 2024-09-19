@@ -27,27 +27,40 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/Inventories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var inventory = await _context.Inventories
+        //        .FirstOrDefaultAsync(m => m.InventoryId == id);
+        //    if (inventory == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(inventory);
+        //}
+
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var inventory = await _context.Inventories
+            var Inventory = await _context.Inventories
                 .FirstOrDefaultAsync(m => m.InventoryId == id);
-            if (inventory == null)
+
+            if (Inventory == null)
             {
                 return NotFound();
             }
 
-            return View(inventory);
+            return PartialView("_DetailsPartial", Inventory);
         }
 
         // GET: Admin/Inventories/Create
-        public IActionResult Create()
+        public IActionResult CreatePartial()
         {
-            return View();
+            return PartialView("_CreatePartial");
         }
 
         // POST: Admin/Inventories/Create
@@ -61,25 +74,36 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 _context.Add(inventory);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
             }
-            return View(inventory);
+            return PartialView("_CreatePartial", inventory);
         }
 
         // GET: Admin/Inventories/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
+        //    var inventory = await _context.Inventories.FindAsync(id);
+        //    if (inventory == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(inventory);
+        //}
+
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(int id)
+        {
             var inventory = await _context.Inventories.FindAsync(id);
             if (inventory == null)
             {
                 return NotFound();
             }
-            return View(inventory);
+            return PartialView("_EditPartial", inventory);
         }
 
         // POST: Admin/Inventories/Edit/5
@@ -87,11 +111,11 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InventoryId,GroupId,UserId,IngredientId,Quantity,ExpiryDate,IsExpiring,Visibility")] Inventory inventory)
+        public JsonResult Edit(int id, [Bind("InventoryId,GroupId,UserId,IngredientId,Quantity,ExpiryDate,IsExpiring,Visibility")] Inventory inventory)
         {
             if (id != inventory.InventoryId)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -99,26 +123,25 @@ namespace RecipeCube.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(inventory);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!InventoryExists(inventory.InventoryId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(inventory);
+
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
         }
 
         // GET: Admin/Inventories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> DeletePartial(int? id)
         {
             if (id == null)
             {
@@ -132,22 +155,28 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return View(inventory);
+            return PartialView("_DeletePartial", inventory);
         }
 
         // POST: Admin/Inventories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public JsonResult DeleteConfirmed(int id)
         {
-            var inventory = await _context.Inventories.FindAsync(id);
-            if (inventory != null)
+            try
             {
-                _context.Inventories.Remove(inventory);
+                var inventory = _context.Inventories.Find(id);
+                if (inventory != null)
+                {
+                    _context.Inventories.Remove(inventory);
+                }
+                _context.SaveChanges();
+                return new JsonResult(new { success = true, error = "成功刪除!" });
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateConcurrencyException)
+            {
+                return new JsonResult(new { success = false, error = "發生錯誤!" });
+            }
         }
 
         private bool InventoryExists(int id)

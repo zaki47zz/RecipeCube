@@ -1,0 +1,74 @@
+﻿@model RecipeCube.Models.Inventory
+
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <dl class="row">
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.GroupId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.GroupId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.UserId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.UserId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.IngredientId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.IngredientId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Quantity)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.ExpiryDate)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.ExpiryDate)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.IsExpiring)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.IsExpiring)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Visibility)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Visibility)
+                    </dd>
+                </div>
+            </dl>
+            <div class="d-flex justify-content-center">
+                <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.InventoryId" method="post">
+                    <input type="hidden" asp-for="InventoryId" />
+                    <input type="submit" class="btn btn-danger mx-3" id="" data-id="@Model.InventoryId" value="刪除" />
+                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
