@@ -1,0 +1,102 @@
+﻿@model RecipeCube.Models.Product
+
+@{
+    ViewData["Title"] = "編輯商品";
+}
+
+<h1>編輯</h1>
+
+<h4>商品</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ProductId" />
+            <div class="form-group">
+                <label asp-for="ProductName" class="control-label">商品名稱</label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IngredientId" class="control-label">食材id</label>
+                <input asp-for="IngredientId" class="form-control" />
+                <span asp-validation-for="IngredientId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label">價格</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Stock" class="control-label">庫存</label>
+                <input asp-for="Stock" class="form-control" />
+                <span asp-validation-for="Stock" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label">狀態</label>
+                <select asp-for="Status" class="form-control">
+                    <option value="true">正常供貨</option>
+                    <option value="false">停售</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            @*  <div class="form-group">
+            <label asp-for="Photo" class="control-label"></label>
+            <input asp-for="Photo" class="form-control" />
+            <span asp-validation-for="Photo" class="text-danger"></span>
+            </div> *@
+
+            @* 呼叫圖片局部檢視，新增圖片上傳欄位_僅允許(jpg,jpeg,png) *@
+            <div>
+                <label asp-for="Photo" class="control-label col-lg-6">商品圖</label>
+                <partial name="_ShowPhotoPartial" class="col-lg-6" />
+                @* id="Photo" name="Picture" *@
+                <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="儲存" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">回到列表</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        @*圖檔預覽*@
+            function previewImage(inputFile) {
+                if (inputFile.files[0]) {
+                    var allowTypes = "image.*";
+                    var file = inputFile.files[0];
+                    if (file.type.match(allowTypes)) {
+        @*預覽*@
+                                                var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $("#Photo").prev().attr("src", e.target.result);
+                            $("#Photo").prev().attr("title", file.name);
+                        };
+                        reader.readAsDataURL(file);
+                        $(".btn.btn-primary").prop("disabled", false);
+                    }
+                    else {
+                        alert("不允許的檔案上傳類型")
+                        $(".btn.btn-primary").prop("disabled", true);
+                        inputFile.value = "";
+                        $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
+                        $("#Photo").prev().attr("title", "尚無圖檔");
+                    }
+                }
+            }
+
+        $("#Photo").on("change", function () {
+            previewImage(this);
+
+        })
+
+    </script>
+}

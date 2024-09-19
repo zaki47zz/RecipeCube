@@ -1,9 +1,6 @@
 ﻿@model IEnumerable<RecipeCube.Models.Product>
 
 @section Styles {
-    @* <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true"/>
-    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" /> *@
-
 
     <style>
         .table th, .table td {
@@ -19,7 +16,7 @@
 <h1>商品檢視</h1>
 
 <p class="mt-1">
-    <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新商品</a>
+    <button type="button" class="create btn bg-gradient-info">加入新商品</button>
 </p>
 <div class="card-body">
     <table class="table table-hover w-100">
@@ -68,10 +65,9 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Photo)
                     </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.ProductId">修改</a> |
-                        <a asp-action="Details" asp-route-id="@item.ProductId">查看細項</a> 
-                        @* <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a> *@
+                    <td class="text-center">
+                        <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.ProductId">編輯</button>
+                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.ProductId">詳細</button>
                     </td>
                 </tr>
             }
@@ -80,24 +76,47 @@
 </div>
 
 
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-@section Scripts {
-    @* <script src="~/lib/datatables/datatables.min.js"></script> *@
-    <script>
-        // $(".sidenav .nav-item a").removeClass("active");
-        // $("#product a").addClass("active");
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // @* 套用datatabes套件 *@
-        // new DataTable("table", {
-        //     language: {
-        //         url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-        //         paginate: {
-        //             first: "«",   // 保持圖示化
-        //             previous: "‹", // 保持圖示化
-        //             next: "›",    // 保持圖示化
-        //             last: "»"     // 保持圖示化
-        //         },
-        //     }
-        // })
-    </script>
-}
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">新增商品</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
