@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+//using AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
+
         public async Task<IActionResult> ProductIndexPartial()
         {
             var products = await _context.Products.ToListAsync();
@@ -30,13 +32,25 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(await _context.Products.ToListAsync());
         }
 
-        // Get: /Products/GetPhoto/1
-        //public async Task<FileResult> GetPhoto(int id)
-        //{
-        //    Product c = await _context.Products.FindAsync(id);
-        //}
+        // Get: /Products/ShowPhotoPartial/1
+        public async Task<IActionResult> ShowPhotoPartial(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        // GET: Admin/Products/Details/5
+            var product = await _context.Products
+                .FirstOrDefaultAsync(m => m.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_ShowPhotoPartial",product);
+        }
+
+        //GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
