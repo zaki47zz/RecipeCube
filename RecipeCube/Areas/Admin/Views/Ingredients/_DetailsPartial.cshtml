@@ -1,0 +1,74 @@
+﻿@model RecipeCube.Models.Ingredient
+
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <dl class="row">
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.IngredientName)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.IngredientName)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Category)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Category)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Synonym)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Synonym)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.ExpireDay)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.ExpireDay)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Unit)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Gram)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Gram)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Photo)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Photo)
+                    </dd>
+                </div>
+            </dl>
+            <div class="d-flex justify-content-center">
+                <a href="javascript:void(0)" class="btn btn-info me-3" id="openeditModal" data-id="@Model.IngredientId">編輯</a>
+                <a href="javascript:void(0)" class="btn btn-secondary" id="closeModal">回到列表</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using RecipeCube.Models;
 using RecipeCube.ViewModels;
+using System.Diagnostics;
 
 namespace RecipeCube.Controllers
 {

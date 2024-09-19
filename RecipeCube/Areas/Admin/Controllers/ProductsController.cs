@@ -40,14 +40,13 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            return PartialView("_ShowPhotoPartial",product);
+            return PartialView("_ShowPhotoPartial", product);
         }
 
         //GET: Admin/Products/Details/5
@@ -58,8 +57,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
@@ -79,7 +77,9 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Create(
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+        )
         {
             if (ModelState.IsValid)
             {
@@ -111,7 +111,10 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+        )
         {
             if (id != product.ProductId)
             {
@@ -149,8 +152,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
