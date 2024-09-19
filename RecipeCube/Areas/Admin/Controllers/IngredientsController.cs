@@ -141,7 +141,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
         
         // GET: Admin/Ingredients/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> DeletePartial(int? id)
         {
             if (id == null)
             {
@@ -155,22 +155,28 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return View(ingredient);
+            return PartialView("_DeletePartial",ingredient);
         }
 
         // POST: Admin/Ingredients/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public JsonResult DeleteConfirmed(int id)
         {
-            var ingredient = await _context.Ingredients.FindAsync(id);
-            if (ingredient != null)
+            try
             {
-                _context.Ingredients.Remove(ingredient);
+                var ingredient =  _context.Ingredients.Find(id);
+                if (ingredient != null)
+                {
+                    _context.Ingredients.Remove(ingredient);
+                }
+                 _context.SaveChanges();
+                return new JsonResult(new { success = true, error = "成功刪除!" });
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateConcurrencyException)
+            {
+                return new JsonResult(new { success = false, error = "發生錯誤!" });
+            }
         }
 
         private bool IngredientExists(int id)

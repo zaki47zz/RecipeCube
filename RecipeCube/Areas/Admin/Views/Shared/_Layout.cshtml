@@ -324,7 +324,7 @@
                     </div>
                     <ul class="navbar-nav  justify-content-end">
                         <li class="nav-item d-flex align-items-center">
-                                @* 註冊&登入&登出  *@
+                            @* 註冊&登入&登出  *@
                                 <partial name="_LoginPartial" />
                         </li>
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
@@ -457,8 +457,9 @@
 
             // 當點擊側邊欄時，載入局部檢視
             // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
-            var controller = ''; // 把控制器變全域變量(因為再下一個function也要用)
+            var controller = '';
             var parentId = '';
+            var filterRow = null;
             $("ul.navbar-nav .nav-link").on('click', function (e) {
                 $("ul.navbar-nav .nav-link").removeClass("active");
                 $(this).addClass("active");
@@ -469,7 +470,6 @@
                 $('#dynamic-content').html('<div>Loading...</div>');
 
                 // 根據 parentId 設置 controller
-                let filterRow = 0;
                 switch (parentId) {
                     case 'User': controller = 'Users'; filterRow = null; break;
                     case 'Group': controller = 'Groups'; filterRow = null; break;
@@ -484,7 +484,15 @@
                     case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
                 }
                 if (parentId !== "Home" && controller) {
-                    $.ajax({
+                    loadPartial();
+                } else {
+                    console.error('Controller 未定義或 parentId 為 Home');
+                }
+            });
+
+            //把Partial加載寫成函式以供調用
+            function loadPartial() {
+                $.ajax({
                         url: `/Admin/${controller}/${parentId}IndexPartial`,
                         type: 'GET',
                         success: function (data) {
@@ -495,13 +503,11 @@
                             alert("Error: " + error);
                         }
                     });
-                } else {
-                    console.error('Controller 未定義或 parentId 為 Home');
-                }
-            });
+            }
 
-            //把子功能的局部檢視加載寫成函式以供調用
+            //把Modal加載寫成函式以供調用
             function loadModalData(url, modalSelector, successCallback) {
+                previousContent = $('#dynamic-content').html();
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -517,13 +523,13 @@
                 });
             }
 
+            // EditModal
             $(document).on('click', '.edit', function () {
                 let id = $(this).data('id');
-                previousContent = $('#dynamic-content').html();
                 loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal');
             });
 
-            // 當 Modal 編輯表單提交時，使用 AJAX 傳送數據
+            // 當Edit表單提交時
             $(document).on('submit', '#editForm', function (e) {
                 e.preventDefault();  // 阻止默認的表單提交行為
                 var formData = $(this).serialize();  // 獲取表單數據
@@ -536,7 +542,7 @@
                         console.log('AJAX response:', response);  // 在 console 中打印出 AJAX 回應的內容
                         if (response.success) {
                             $('#editModal').modal('hide');
-                            $('#dynamic-content').html(previousContent);
+                            loadPartial(); //必須重新載入，否則Datatables會壞掉
                         } else {
                             let errorMessages = response.errors ? response.errors.join('\n') : '無法保存編輯';
                             alert('保存失敗: ' + errorMessages);
@@ -548,13 +554,13 @@
                 });
             });
 
-            // 載入詳細資訊的 AJAX 調用
+            // DetailsModal
             $(document).on('click', '.detail', function () {
                 let id = $(this).data('id');
                 loadModalData(`/Admin/${controller}/DetailsPartial/` + id, '#detailsModal');
             });
 
-            // 從詳細資訊open editModal
+            // 從詳細資訊開啟editModal
             $(document).on('click', '#openeditModal', function () {
                 let id = $(this).data('id');
                 $('#detailsModal').modal('hide');
@@ -567,7 +573,7 @@
             });
 
 
-            // 當表單提交時
+            // 當Create表單提交時
             $(document).on('submit', '#createForm', function (e) {
                 e.preventDefault();
                 var formData = $(this).serialize();
@@ -578,7 +584,7 @@
                     success: function (response) {
                         if (response.success) {
                             $('#createModal').modal('hide');
-                            location.reload(); // 成功後可以重新加載頁面或刷新表單
+                            loadPartial();
                         } else {
                             $('#createModal .modal-body').html(response);
                         }
@@ -589,27 +595,46 @@
                 });
             });
 
-            // 監聽 Modal 關閉事件
-            $('#editModal').on('hidden.bs.modal', function () {
+            // DeleteModal
+            $(document).on('click', '.delete', function () {
+                let id = $(this).data('id');
+                loadModalData(`/Admin/${controller}/DeletePartial/` + id, '#deleteModal');
+            });
+
+            // 當Delete表單提交時
+            $(document).on('submit', '#deleteForm', function (e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log('AJAX response:', response);
+                        if (response.success) {
+                            $('#deleteModal').modal('hide');
+                            loadPartial();
+                        } else {
+                            let errorMessages = response.errors ? response.errors.join('\n') : '無法保存編輯';
+                            alert('保存失敗: ' + errorMessages);
+                        }
+                    },
+                    error: function () {
+                        alert('發生錯誤，無法保存編輯');
+                    }
+                });
+            });
+
+            // 監聽所有 Modal 關閉事件
+            $('.Modal').on('hidden.bs.modal', function () {
                 // 如果之前有保存的局部檢視內容，則恢復顯示
                 if (previousContent) {
                     $('#dynamic-content').html(previousContent);
-                }
-            });
-            // 返回按鈕：關閉 Modal 而不刷新頁面
-            $(document).on('click', '#closeModal', function () {
-                if ($('#editModal').hasClass('show')) {  // 如果 editModal 正在顯示
-                    $('#editModal').modal('hide');  // 隱藏
-                }
-                if ($('#detailsModal').hasClass('show')) {  // 如果 detailsModal 正在顯示
-                    $('#detailsModal').modal('hide');  // 隱藏
-                }
-                if (previousContent) {
-                    $('#dynamic-content').html(previousContent);
+                    previousContent = null;
                 }
             });
 
-            //這是什麼挖?
+            //為了讓莫名其妙的alert消失
             var element = document.querySelector('#some-element');
             if (element) {
                 element.classList.add('new-class');

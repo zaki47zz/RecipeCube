@@ -51,7 +51,8 @@
                     </td>
                     <td class="text-center">
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.IngredientId">編輯</button>
-                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.IngredientId">詳細</button> <br />
+                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.IngredientId">詳細</button>
+                        <button class="delete btn bg-gradient-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.IngredientId">刪除</button>
                     </td>
                 </tr>
             }
@@ -95,6 +96,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createLabel">新增食材</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">刪除食材</h5>
                 <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
             </div>
             <div class="modal-body">

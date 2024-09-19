@@ -105,7 +105,7 @@
 
                 <div class="form-group">
                     <input type="submit" value="新增" class="btn btn-info" />
-                    <a href="javascript:void(0)" class="btn btn-secondary" id="closeModal">返回</a>
+                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
                 </div>
             </form>
 
@@ -143,6 +143,7 @@
         // 初始載入時觸發 change 事件
         $('#categorySelect').trigger('change');
     }
+        initCreateForm();
 </script>
 
 @section Scripts {

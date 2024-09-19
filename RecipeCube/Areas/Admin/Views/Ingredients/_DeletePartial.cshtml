@@ -63,12 +63,12 @@
                 </div>
             </dl>
             <div class="d-flex justify-content-center">
-                <a href="javascript:void(0)" class="btn btn-info me-3" id="openeditModal" data-id="@Model.IngredientId">編輯</a>
-                <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.IngredientId" method="post">
+                    <input type="hidden" asp-for="IngredientId" />
+                    <input type="submit" class="btn btn-danger mx-3" id="" data-id="@Model.IngredientId" value="刪除" />
+                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-
-
