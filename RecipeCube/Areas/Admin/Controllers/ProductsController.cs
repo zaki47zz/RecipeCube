@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+//using AspNetCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Models;
 
@@ -13,6 +19,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             _context = context;
         }
+
         public async Task<IActionResult> ProductIndexPartial()
         {
             var products = await _context.Products.ToListAsync();
@@ -25,13 +32,24 @@ namespace RecipeCube.Areas.Admin.Controllers
             return View(await _context.Products.ToListAsync());
         }
 
-        // 圖片
-        //public async Task<FileResult> GetPhoto(int id)
-        //{
+        // Get: /Products/ShowPhotoPartial/1
+        public async Task<IActionResult> ShowPhotoPartial(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //}
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
 
-        // GET: Admin/Products/Details/5
+            return PartialView("_ShowPhotoPartial", product);
+        }
+
+        //GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,8 +57,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
@@ -60,10 +77,28 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Create(
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+        )
         {
             if (ModelState.IsValid)
             {
+                //將上傳的圖片寫進資料庫
+                if (Request.Form.Files["Photo"] != null)
+                {
+                    var file = Request.Form.Files["Photo"];
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // 寫產品圖片檔名
+                    product.Photo = fileName;
+                }
+                //=====================================================================
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -92,7 +127,10 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+        )
         {
             if (id != product.ProductId)
             {
@@ -103,6 +141,30 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
+                    //將上傳修改的圖片寫進資料庫
+                    Product p = await _context.Products.FindAsync(product.ProductId);
+                    if (Request.Form.Files["Photo"] != null)
+                    {
+                        var file = Request.Form.Files["Photo"];
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // 更新產品圖片
+                        product.Photo = fileName;
+                    }
+                    else
+                    {
+                        product.Photo = p.Photo;
+                    }
+                    _context.Entry(p).State = EntityState.Detached;
+
+                    //=====================================================================
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -119,6 +181,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(product);
         }
 
@@ -130,8 +193,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
