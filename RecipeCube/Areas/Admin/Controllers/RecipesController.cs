@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
-using RecipeCube.ViewModels;
 
 namespace RecipeCube.Areas.Admin.Controllers
 {

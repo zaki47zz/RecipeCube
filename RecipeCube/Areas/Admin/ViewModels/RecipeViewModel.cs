@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 
-namespace RecipeCube.ViewModels
+namespace RecipeCube.Areas.Admin.ViewModels
 {
     public class RecipeViewModel
     {
-        
+
         public int RecipeId { get; set; }
         [Display(Name = "食譜名稱")]
         public string? RecipeName { get; set; }

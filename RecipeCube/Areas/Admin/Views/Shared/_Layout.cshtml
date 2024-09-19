@@ -400,8 +400,7 @@
     <!-- 連結View內script -->
     <script>
         $(document).ready(function () {
-            var controller = ''; // 把控制器變全域變量(因為再下一個function也要用)
-            var parentId = '';
+
             // sidebar 的卷軸生成
             var win = navigator.userAgent.indexOf('Win') > -1;
             if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -468,7 +467,7 @@
                 $(this).addClass("active");
                 // 設置 parentId
                 parentId = $(this).parent().attr('id');
-
+                console.log(parentId);
                 if (parentId !== "Home") {
                     e.preventDefault();
                 }
@@ -698,6 +697,7 @@
                 element.classList.add('new-class');
             }
         });
+    });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 
