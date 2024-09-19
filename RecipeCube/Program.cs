@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Data;
 using RecipeCube.Models;
+using RecipeCube.Services;
+//using RecipeCube.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,8 @@ builder
     // 讓user可以加入角色
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddControllersWithViews();
 
