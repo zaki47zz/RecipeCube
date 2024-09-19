@@ -40,6 +40,7 @@
     <Folder Include="Areas\Client\Controllers\" />
     <Folder Include="Areas\Client\Data\" />
     <Folder Include="Areas\Client\Models\" />
+    <Folder Include="wwwroot\img\recipe\" />
   </ItemGroup>
 
 </Project>
