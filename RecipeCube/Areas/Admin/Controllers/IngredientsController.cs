@@ -166,6 +166,25 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
+                    Ingredient ingredientInDB = _context.Ingredients.Find(ingredient.IngredientId);
+                    if (Request.Form.Files["Photo"] != null)
+                    {
+                        var file = Request.Form.Files["Photo"];
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+                        // 更新產品圖片
+                        ingredient.Photo = fileName;
+                    }
+                    else
+                    {
+                        ingredient.Photo = ingredientInDB.Photo;
+                    }
+                    _context.Entry(ingredientInDB).State = EntityState.Detached;
+
                     _context.Update(ingredient);
                     _context.SaveChanges();
                     return new JsonResult(new { success = true });
@@ -221,7 +240,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             try
             {
-                var ingredient =  _context.Ingredients.Find(id);
+                var ingredient = _context.Ingredients.Find(id);
                 if (ingredient != null)
                 {
                     _context.Ingredients.Remove(ingredient);
@@ -238,6 +257,22 @@ namespace RecipeCube.Areas.Admin.Controllers
         private bool IngredientExists(int id)
         {
             return _context.Ingredients.Any(e => e.IngredientId == id);
+        }
+
+        public async Task<IActionResult> ShowPhotoPartial(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(m => m.IngredientId == id);
+            if (ingredient == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_ShowPhotoPartial", ingredient);
         }
     }
 }

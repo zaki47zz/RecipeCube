@@ -458,7 +458,6 @@
             }
 
             // 當點擊側邊欄時，載入局部檢視
-            // let parentId = $("ul.navbar-nav .nav-link").parent().attr('id');
             var controller = '';
             var parentId = '';
             var filterRow = null;
@@ -476,12 +475,13 @@
                 // 根據 parentId 設置 controller
                 switch (parentId) {
                     case 'User': controller = 'Users'; filterRow = null; break;
-                    case 'Group': controller = 'Groups'; filterRow = null; break;
-                    case 'PreferedFood': controller = ''; filterRow = null; break;
-                    case 'ExclusiveFood': controller = ''; filterRow = null; break;
+                    case 'Group': controller = 'UserGroups'; filterRow = null; break;
+                    case 'PreferedFood': controller = 'PreferedIngredients'; filterRow = null; break;
+                    case 'ExclusiveFood': controller = 'ExclusiveIngredients'; filterRow = null; break;
                     case 'Inventory': controller = 'Inventories'; filterRow = null; break;
                     case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
                     case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
+                    case 'IngredientRecipe': controller = 'RecipeIngredients'; filterRow = 1; break;
                     case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
                     case 'Product': controller = 'Products'; filterRow = null; break;
                     case 'Order': controller = 'Orders'; filterRow = null; break;
@@ -616,40 +616,6 @@
                     }
                 });
             });
-            // 重新加載局部檢視的函數
-            function loadPartialView(parentId) {
-                let filterRow = 0;  // 根據 parentId 設定 DataTable 的 filterRow
-
-                // 根據 parentId 設置 controller 和 filterRow
-                switch (parentId) {
-                    case 'User': controller = 'Users'; filterRow = null; break;
-                    case 'Group': controller = 'Groups'; filterRow = null; break;
-                    case 'PreferedFood': controller = ''; filterRow = null; break;
-                    case 'ExclusiveFood': controller = ''; filterRow = null; break;
-                    case 'Inventory': controller = 'Inventories'; filterRow = null; break;
-                    case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
-                    case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
-                    case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
-                    case 'Product': controller = 'Products'; filterRow = null; break;
-                    case 'Order': controller = 'Orders'; filterRow = null; break;
-                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
-                    default: console.error('Controller 未定義或 parentId 為 Home'); return;
-                }
-
-                if (controller) {
-                    $.ajax({
-                        url: `/Admin/${controller}/${parentId}IndexPartial`,  // 動態生成 URL
-                        type: 'GET',
-                        success: function (data) {
-                            $('#dynamic-content').html(data);  // 更新局部檢視的內容
-                            initializeDataTableWithFilter(filterRow);  // 初始化 DataTable
-                        },
-                        error: function () {
-                            alert('無法重新加載內容');
-                        }
-                    });
-                }
-            }
 
             // DeleteModal
             $(document).on('click', '.delete', function () {
@@ -688,7 +654,7 @@
                     $('#dynamic-content').html(previousContent);
                     previousContent = null;
                 }
-                loadPartialView(parentId);
+                    loadPartial(); //這裡感覺可以取代上面三個ajax success時的loadPartial()
             });
 
             //為了讓莫名其妙的alert消失
