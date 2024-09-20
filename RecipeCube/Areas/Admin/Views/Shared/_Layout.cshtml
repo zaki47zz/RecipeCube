@@ -494,10 +494,10 @@
                                 formData.push({ name: 'SelectedIngredients', value: ingredientId });
                             });
                         }
-                    // } else {
-                    //     // 不需要 Select2，使用 serialize()
-                    //     formData = $(this).serialize();
-                        console.log("2:",formData);
+                        // } else {
+                        //     // 不需要 Select2，使用 serialize()
+                        //     formData = $(this).serialize();
+                        console.log("2:", formData);
                         $.ajax({
                             url: $(this).attr('action'),
                             type: 'POST',
@@ -518,7 +518,7 @@
                             }
                         });
                     }
-                    else{
+                    else {
                         $.ajax({
                             url: $(this).attr('action'),
                             type: 'POST',
@@ -540,7 +540,7 @@
                         });
                     }
 
-                    
+
                 });
             }
 
