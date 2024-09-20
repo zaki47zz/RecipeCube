@@ -231,22 +231,35 @@
 
         // 當使用者選擇食材時
         $('#selectedIngredients').on('change', function () {
-            console.log('Change event triggered');
-            var selectedIngredients = $(this).select2('data');  // 使用 select2('data') 來獲取已選擇的選項
+            var selectedIngredients = $(this).select2('data');  // 獲取已選擇的食材
             var ingredientQuantitiesDiv = $('#ingredientQuantities');
+
+            // 創建一個對象來保存已選擇的食材數量
+            var existingQuantities = {};
+
+            // 保留當前已輸入的食材數量
+            ingredientQuantitiesDiv.find('input').each(function () {
+                var ingredientId = $(this).attr('id').split('_')[1];
+                var quantity = $(this).val();
+                existingQuantities[ingredientId] = quantity;
+            });
 
             // 清空原有的數量輸入框
             ingredientQuantitiesDiv.empty();
 
             // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱而不是ID
             selectedIngredients.forEach(function (ingredient) {
-                var ingredientName = ingredient.text;  // 使用 ingredient.text 來顯示名稱
-                console.log('Selected Ingredient:', ingredientName);
+                var ingredientId = ingredient.id;
+                var ingredientName = ingredient.text;
+
+                // 如果之前已經有這個食材的數量，則保留
+                var quantity = existingQuantities[ingredientId] || '';
+
                 var inputHtml = `
-            <div class="form-group">
-                <label for="IngredientQuantities_${ingredient.id}" class="control-label">${ingredientName} 的數量</label>
-                <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredient.id}" name="IngredientQuantities[${ingredient.id}]" />
-            </div>`;
+                <div class="form-group">
+                    <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
+                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                </div>`;
                 ingredientQuantitiesDiv.append(inputHtml);
             });
         });
