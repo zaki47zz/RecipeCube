@@ -120,7 +120,6 @@ namespace RecipeCube.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RecipeName,UserId,IsCustom,Restriction,WestEast,Category,DetailedCategory,Steps,Seasoning,Visibility,Photo,Status,SelectedIngredients,IngredientQuantities")] RecipeViewModel model)
         {
-            bool valid = true;
             if (ModelState.IsValid)
             {
                 // 創建新食譜
@@ -141,7 +140,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 };
 
                 _context.Add(recipe);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // 一次保存食譜
 
                 // 處理選擇的食材和數量
                 if (model.SelectedIngredients != null && model.IngredientQuantities != null)
@@ -151,27 +150,35 @@ namespace RecipeCube.Areas.Admin.Controllers
                         if (model.IngredientQuantities.ContainsKey(ingredientId))
                         {
                             var quantity = model.IngredientQuantities[ingredientId];
-                            var recipeIngredient = new RecipeIngredient
+
+                            // 確保不會重複插入相同的關聯
+                            var existingIngredient = _context.RecipeIngredients
+                                .FirstOrDefault(ri => ri.RecipeId == recipe.RecipeId && ri.IngredientId == ingredientId);
+
+                            if (existingIngredient == null)
                             {
-                                RecipeId = recipe.RecipeId,
-                                IngredientId = ingredientId,
-                                Quantity = quantity
-                            };
-                            _context.RecipeIngredients.Add(recipeIngredient);
+                                var recipeIngredient = new RecipeIngredient
+                                {
+                                    RecipeId = recipe.RecipeId,
+                                    IngredientId = ingredientId,
+                                    Quantity = quantity
+                                };
+                                _context.RecipeIngredients.Add(recipeIngredient);
+                            }
                         }
                     }
-                    await _context.SaveChangesAsync();
                 }
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // 最後只保存一次所有改變
                 return Json(new { success = true });
             }
+
             if (!ModelState.IsValid)
             {
                 return Json(new { success = false, errors = "Model validation errors: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)) });
             }
 
-            Console.WriteLine(valid);
+
             // 如果 ModelState 無效，重新載入可用的食材
             model.AvailableIngredients = _context.Ingredients
                 .Select(i => new IngredientViewModel
@@ -182,6 +189,7 @@ namespace RecipeCube.Areas.Admin.Controllers
 
             return PartialView("_CreatePartial", model);
         }
+
 
 
         // GET: Admin/Recipes/Edit/5
