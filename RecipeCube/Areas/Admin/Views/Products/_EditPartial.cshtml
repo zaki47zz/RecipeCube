@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form  asp-action="Edit" method="post" enctype="multipart/form-data" asp-route-id="@Model.ProductId">
+        <form id="editForm" asp-action="Edit" method="post" enctype="multipart/form-data" asp-route-id="@Model.ProductId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProductId" />
             <div class="form-group">
@@ -65,6 +65,9 @@
 
 
 <script>
+    $(document).ready(function () {
+        Image();
+    });
     function Image() {
     @*圖檔預覽*@
             function previewImage(inputFile) {
