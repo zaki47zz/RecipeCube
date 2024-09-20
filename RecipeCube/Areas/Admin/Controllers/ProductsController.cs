@@ -63,7 +63,7 @@ namespace RecipeCube.Areas.Admin.Controllers
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await file.CopyToAsync(stream);
+                        file.CopyTo(stream);
                     }
 
                     // 寫產品圖片檔名
@@ -116,7 +116,7 @@ namespace RecipeCube.Areas.Admin.Controllers
 
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            file.CopyTo(stream);
+                            file.CopyToAsync(stream);
                         }
 
                         // 更新產品圖片
