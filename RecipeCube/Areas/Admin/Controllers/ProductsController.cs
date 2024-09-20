@@ -229,7 +229,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         //    return View(product);
         //}
 
-        // GET: Admin/Products/Edit/5
+        //GET: Admin/Products/Edit/5
         //public async Task<IActionResult> Edit(int? id)
         //{
         //    if (id == null)
@@ -304,7 +304,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         //        }
         //        return RedirectToAction(nameof(Index));
         //    }
-            
+
         //    return View(product);
         //}
 

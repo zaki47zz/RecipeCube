@@ -125,22 +125,26 @@
 </div>
 <script>
     $(document).ready(function(){
-        test()
-        
+        getOrderId();
     })
-    function test() {
+    function getOrderId() {
         $(".detailOrder.btn.bg-gradient-secondary.btn-sm").on('click', function (e) {
+            e.preventDefault(); // 阻止默認行為
+
             $("ul.navbar-nav .nav-link").removeClass("active");
             $("#OrderItem").children(".nav-link").addClass("active");
 
             $('#dynamic-content').html('<div>Loading...</div>');
 
+            let id = $(this).data('id'); // 獲取按鈕的 data-id
+
             $.ajax({
-                url: `/Admin/OrderItems/OrderItemIndexPartial`,
-                type: 'GET',
+                url: '@Url.Action("OrderItemIndexPartial", "OrderItems")',
+                type: 'POST',
+                data: { orderid: id }, // 傳遞 orderid
                 success: function (data) {
-                    $('#dynamic-content').html(data);
-                    initializeDataTableWithFilter(1);
+                    $('#dynamic-content').html(data); // 更新 DOM
+                    initializeDataTableWithFilter(1); // 在這裡初始化 DataTable
                 },
                 error: function (xhr, status, error) {
                     alert("Error: " + error);
@@ -175,5 +179,4 @@
             },
         });
     }
-    
 </script>

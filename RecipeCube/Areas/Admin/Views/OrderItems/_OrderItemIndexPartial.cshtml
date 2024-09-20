@@ -10,6 +10,8 @@
 
 @{
     ViewData["Title"] = "訂單明細";
+    long orderid = ViewBag.OrderId;
+        <text>Order ID: @orderid</text>
 }
 
 <h1>訂單明細檢視</h1>
@@ -124,41 +126,51 @@
     </div>
 </div>
 
-@section Scripts {
-    <script src="~/lib/datatables/datatables.min.js"></script>
+
+
     <script>
-        // $(".sidenav .nav-item a").removeClass("active");
-        // $("#order_item a").addClass("active");
+     
+    // $(document).ready(function () {
+    //     var orderid = @Html.Raw(orderid);
+    //     console.log(orderid);
 
-        $(function () {
-            $('#table_orderItem_wrapper').DataTable();
-            var orderId = '@ViewBag.OrderId';
-            // alert('訂單編號:'+orderId);
+    //     if (orderid != 0) {
+    //         setTimeout(function () {
+    //             var searchInput = $('.form-control.form-control-sm');
+    //             if (searchInput.length > 0) {
+    //                 searchInput.val(orderid);
 
-            // 填入訂單標號至搜索欄位
-            if (orderId != 0) {
-                $('#dt-search-0').val(orderId);
-            }
-            // 觸發input事件
-            $('#dt-search-0').trigger('input');
+    //               searchInput.trigger('input');
 
-        });
+                    
+    //                 console.log("填入成功");
+    //             } else {
+    //                 console.log("找不到搜索欄位");
+    //             }
+    //         }, 50);  // 延遲50毫秒
+    //     }
+    // });
+    $(document).ready(function () {
+        var orderid = @Html.Raw(orderid);
+        
 
-        @* 套用datatabes套件 *@
-            // new DataTable("table", {
-            //     language: {
-            //         url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-            //         paginate: {
-            //             first: "«",   // 保持圖示化
-            //             previous: "‹", // 保持圖示化
-            //             next: "›",    // 保持圖示化
-            //             last: "»"     // 保持圖示化
-            //         },
-            //     }
-            // })
-
-       
-
-
+        if (orderid != 0) {
+            setTimeout(function () {
+                var searchInput = $('.form-control.form-control-sm');
+                if (searchInput.length > 0) {
+                    searchInput.val(orderid);
+                    console.log(orderid); //查看是否填入
+                    setTimeout(function () {
+                        searchInput.trigger('change');
+                        console.log("觸發 change 事件");
+                        console.log("目前的值：", searchInput.val()); // 確認當前值
+                    }, 1000);
+                } else {
+                    console.log("找不到搜索欄位");
+                }
+            }, 80);  // 延遲50毫秒
+        }
+    });
+   
     </script>
-}
+    
