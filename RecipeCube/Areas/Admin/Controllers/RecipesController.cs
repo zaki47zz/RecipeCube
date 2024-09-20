@@ -82,18 +82,67 @@ namespace RecipeCube.Areas.Admin.Controllers
         //    return View(recipe);
         //}
         // 新增的部分：RecipesController.cs
+        //public async Task<IActionResult> DetailsPartial(int id)
+        //{
+        //    var recipe = await _context.Recipes
+        //        .FirstOrDefaultAsync(m => m.RecipeId == id);
+
+        //    if (recipe == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return PartialView("_DetailsPartial", recipe);
+        //}
         public async Task<IActionResult> DetailsPartial(int id)
         {
-            var recipe = await _context.Recipes
-                .FirstOrDefaultAsync(m => m.RecipeId == id);
-
+            // 查詢 Recipe
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.RecipeId == id);
             if (recipe == null)
             {
                 return NotFound();
             }
 
-            return PartialView("_DetailsPartial", recipe);
+            // 手動查詢與該 Recipe 關聯的 RecipeIngredients
+            var recipeIngredients = await _context.RecipeIngredients
+                .Where(ri => ri.RecipeId == id)
+                .ToListAsync();
+
+            // 查詢對應的食材
+            var ingredientIds = recipeIngredients.Select(ri => ri.IngredientId).ToList();
+            var ingredients = await _context.Ingredients
+                .Where(i => ingredientIds.Contains(i.IngredientId))
+                .ToListAsync();
+
+            // 創建 ViewModel
+            var viewModel = new RecipeViewModel
+            {
+                RecipeId = recipe.RecipeId,
+                RecipeName = recipe.RecipeName,
+                UserId = recipe.UserId,
+                IsCustom = recipe.IsCustom,
+                Restriction = recipe.Restriction,
+                WestEast = recipe.WestEast,
+                Category = recipe.Category,
+                DetailedCategory = recipe.DetailedCategory,
+                Steps = recipe.Steps,
+                Seasoning = recipe.Seasoning,
+                Visibility = recipe.Visibility,
+                Photo = recipe.Photo,
+                Status = recipe.Status,
+                // 食材
+                AvailableIngredients = ingredients.Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName
+                }).ToList(),
+                SelectedIngredients = recipeIngredients.Select(ri => ri.IngredientId.Value).ToList(),
+                IngredientQuantities = recipeIngredients.ToDictionary(ri => ri.IngredientId.Value, ri => ri.Quantity.Value)
+            };
+
+            return PartialView("_DetailsPartial", viewModel);
         }
+
         // GET: Admin/Recipes/CreatePartial
         public IActionResult CreatePartial()
         {

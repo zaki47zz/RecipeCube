@@ -1,9 +1,11 @@
-﻿@model RecipeCube.Models.Recipe
+﻿@model RecipeCube.Areas.Admin.ViewModels.RecipeViewModel
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <h2>@Model.RecipeName 的詳細資料</h2>
         <div class="w-100">
             <dl class="row">
+                <!-- 食譜名稱 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.RecipeName)
@@ -13,6 +15,7 @@
                     </dd>
                 </div>
 
+                <!-- 使用者ID -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.UserId)
@@ -22,6 +25,7 @@
                     </dd>
                 </div>
 
+                <!-- 是否自訂 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.IsCustom)
@@ -31,6 +35,7 @@
                     </dd>
                 </div>
 
+                <!-- 葷素 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Restriction)
@@ -40,6 +45,7 @@
                     </dd>
                 </div>
 
+                <!-- 中西式 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.WestEast)
@@ -49,6 +55,7 @@
                     </dd>
                 </div>
 
+                <!-- 種類 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Category)
@@ -58,6 +65,7 @@
                     </dd>
                 </div>
 
+                <!-- 種類細項 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.DetailedCategory)
@@ -67,6 +75,7 @@
                     </dd>
                 </div>
 
+                <!-- 步驟 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Steps)
@@ -76,6 +85,27 @@
                     </dd>
                 </div>
 
+                <!-- 食材顯示 -->
+                <div class="mb-3">
+                    <dt class="col-12">
+                        食材
+                    </dt>
+                    <dd class="col-12">
+                        <ul>
+                            @foreach (var ingredientId in Model.SelectedIngredients)
+                            {
+                                var ingredient = Model.AvailableIngredients.FirstOrDefault(i => i.IngredientId == ingredientId);
+                                if (ingredient != null)
+                                {
+                                    <li>
+                                        @ingredient.IngredientName - 數量: @Model.IngredientQuantities[ingredientId] @ingredient.Unit
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </dd>
+                </div>
+                <!-- 調味料 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Seasoning)
@@ -85,6 +115,7 @@
                     </dd>
                 </div>
 
+                <!-- 可見性 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Visibility)
@@ -94,6 +125,7 @@
                     </dd>
                 </div>
 
+                <!-- 照片 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Photo)
@@ -103,6 +135,7 @@
                     </dd>
                 </div>
 
+                <!-- 食譜狀態 -->
                 <div class="mb-3">
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Status)
@@ -111,6 +144,8 @@
                         @Html.DisplayFor(model => model.Status)
                     </dd>
                 </div>
+
+               
             </dl>
             <div class="form-group">
                 <a href="javascript:void(0)" class="btn btn-info me-5" id="openeditModal" data-id="@Model.RecipeId">編輯</a>
@@ -119,6 +154,3 @@
         </div>
     </div>
 </div>
-
-
-
