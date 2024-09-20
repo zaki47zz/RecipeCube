@@ -84,7 +84,6 @@ namespace RecipeCube.Areas.Admin.Controllers
         public IActionResult CreatePartial()
         {
             var categories = _context.Ingredients.Select(c => c.Category).Distinct().ToList(); //抓資料庫中的categories
-
             // 利用 Viewbag 傳遞 categories 到 View
             ViewBag.Categories = categories;
             return PartialView("_CreatePartial");
@@ -99,6 +98,18 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (Request.Form.Files["Photo"] != null)
+                {
+                    var file = Request.Form.Files["Photo"];
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    // 更新產品圖片
+                    ingredient.Photo = fileName;
+                }
                 _context.Add(ingredient);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
