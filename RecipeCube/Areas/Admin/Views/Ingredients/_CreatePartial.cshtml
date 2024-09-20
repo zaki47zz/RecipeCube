@@ -1,4 +1,4 @@
-﻿@model RecipeCube.Models.Ingredient
+﻿@model RecipeCube.Areas.Admin.ViewModels.IngredientViewModel
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -46,7 +46,8 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Photo" class="control-label col-lg-6">照片</label>
-                    <partial name="_ShowPhotoPartial" class="col-lg-6" />
+                    <br>
+                    <img id="imgPreview" src="~/img/icon_large.png" asp-append-version="true" title="尚無圖檔" style="width:256px;height:256px" class="mb-3" />
                     <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
@@ -119,11 +120,3 @@
     });
 });
 </script>
-
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
