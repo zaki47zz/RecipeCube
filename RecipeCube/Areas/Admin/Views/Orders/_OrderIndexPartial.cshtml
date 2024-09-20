@@ -55,7 +55,7 @@
                     </td>
                     <td class="text-center">
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.OrderId">編輯訂單</button>
-                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.OrderId">查看訂單細項</button>
+                        <button class="detailOrder btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.OrderId">查看訂單細項</button>
                     </td>
                 </tr>
             }
@@ -78,7 +78,7 @@
         </div>
     </div>
 </div>
-
+@* 
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -92,7 +92,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
@@ -123,3 +123,57 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        test()
+        
+    })
+    function test() {
+        $(".detailOrder.btn.bg-gradient-secondary.btn-sm").on('click', function (e) {
+            $("ul.navbar-nav .nav-link").removeClass("active");
+            $("#OrderItem").children(".nav-link").addClass("active");
+
+            $('#dynamic-content').html('<div>Loading...</div>');
+
+            $.ajax({
+                url: `/Admin/OrderItems/OrderItemIndexPartial`,
+                type: 'GET',
+                success: function (data) {
+                    $('#dynamic-content').html(data);
+                    initializeDataTableWithFilter(1);
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + error);
+                }
+            });
+        });
+    }
+    function initializeDataTableWithFilter(columnIndex) {
+        new DataTable("table", {
+            initComplete: function () {
+                if (columnIndex !== null) {
+                    var column = this.api().column(columnIndex);
+                    let label = document.createElement('label');
+                    label.innerHTML = '篩選:';
+                    label.classList.add('ms-5');
+                    let select = document.createElement('select');
+                    select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+                    select.add(new Option(''));
+                    select.addEventListener('change', function () {
+                        column.search(this.value).draw();
+                    });
+                    $("div.dt-length").css('white-space', 'nowrap');
+                    $("div.dt-length label").after(label, select);
+                    column.data().unique().sort().each(function (d) {
+                        select.add(new Option(d));
+                    });
+                }
+            },
+            language: {
+                url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+            },
+        });
+    }
+    
+</script>
