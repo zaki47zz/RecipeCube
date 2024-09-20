@@ -26,7 +26,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 UserId = pantry.UserId,
                 IngredientId = pantry.IngredientId,
                 Quantity = pantry.Quantity,
-                OutOfStock = pantry.OutOfStock,
                 Action = pantry.Action,
                 Time = pantry.Time
             }).ToList();
@@ -51,7 +50,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 UserId = pantry.UserId,
                 IngredientId = pantry.IngredientId,
                 Quantity = pantry.Quantity,
-                OutOfStock = pantry.OutOfStock,
                 Action = pantry.Action,
                 Time = pantry.Time
             };

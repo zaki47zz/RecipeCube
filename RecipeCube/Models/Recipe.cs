@@ -1,4 +1,7 @@
-﻿namespace RecipeCube.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RecipeCube.Models;
 
 public partial class Recipe
 {
@@ -6,7 +9,7 @@ public partial class Recipe
 
     public string? RecipeName { get; set; }
 
-    public int? UserId { get; set; }
+    public string? UserId { get; set; }
 
     public bool? IsCustom { get; set; }
 

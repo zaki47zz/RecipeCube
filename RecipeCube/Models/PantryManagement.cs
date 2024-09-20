@@ -1,4 +1,7 @@
-﻿namespace RecipeCube.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RecipeCube.Models;
 
 public partial class PantryManagement
 {
@@ -6,13 +9,11 @@ public partial class PantryManagement
 
     public int? GroupId { get; set; }
 
-    public int? UserId { get; set; }
+    public string? UserId { get; set; }
 
     public int? IngredientId { get; set; }
 
     public decimal? Quantity { get; set; }
-
-    public bool? OutOfStock { get; set; }
 
     public string? Action { get; set; }
 
