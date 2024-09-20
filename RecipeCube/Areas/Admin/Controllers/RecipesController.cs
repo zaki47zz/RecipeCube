@@ -19,10 +19,8 @@ namespace RecipeCube.Areas.Admin.Controllers
         //取得食材
         public async Task<IActionResult> GetIngredients()
         {
-            var ingredients = await _context.Ingredients
-                                            .Select(
-                i => new { i.IngredientId, i.IngredientName , i.Category})
-                                            .ToListAsync();
+            var ingredients = await _context.Ingredients.Select(
+                i => new { i.IngredientId, i.IngredientName , i.Category , i.Unit }).ToListAsync();
 
             return Json(ingredients);
         }
@@ -136,8 +134,13 @@ namespace RecipeCube.Areas.Admin.Controllers
                     IngredientId = i.IngredientId,
                     IngredientName = i.IngredientName
                 }).ToList(),
+
                 SelectedIngredients = recipeIngredients.Select(ri => ri.IngredientId.Value).ToList(),
-                IngredientQuantities = recipeIngredients.ToDictionary(ri => ri.IngredientId.Value, ri => ri.Quantity.Value)
+
+                IngredientQuantities = recipeIngredients.ToDictionary(ri => ri.IngredientId.Value, ri => ri.Quantity.Value),
+
+                // 保存食材的單位
+                IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit) // 包含食材的單位
             };
 
             return PartialView("_DetailsPartial", viewModel);
@@ -151,13 +154,15 @@ namespace RecipeCube.Areas.Admin.Controllers
                 .Select(i => new IngredientViewModel
                 {
                     IngredientId = i.IngredientId,
-                    IngredientName = i.IngredientName
+                    IngredientName = i.IngredientName,
+                    Unit = i.Unit,
                 }).ToList();
 
             var model = new RecipeViewModel
             {
                 AvailableIngredients = availableIngredients,
-                SelectedIngredients = new List<int>()  // 預設空的選擇清單
+                SelectedIngredients = new List<int>(),  // 預設空的選擇清單
+                IngredientUnits = availableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit) // 將單位放入字典
             };
 
             return PartialView("_CreatePartial", model);
@@ -242,8 +247,10 @@ namespace RecipeCube.Areas.Admin.Controllers
                 .Select(i => new IngredientViewModel
                 {
                     IngredientId = i.IngredientId,
-                    IngredientName = i.IngredientName
+                    IngredientName = i.IngredientName,
+                    Unit = i.Unit 
                 }).ToList();
+            model.IngredientUnits = model.AvailableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit);
 
             return PartialView("_CreatePartial", model);
         }

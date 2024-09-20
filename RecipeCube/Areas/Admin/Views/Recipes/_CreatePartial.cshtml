@@ -79,6 +79,7 @@
                     <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
                         @foreach (var ingredient in Model.AvailableIngredients)
                         {
+                            var unit = Model.IngredientUnits.ContainsKey(ingredient.IngredientId) ? Model.IngredientUnits[ingredient.IngredientId] : "";  // 檢查單位是否存在
                             <option value="@ingredient.IngredientId">@ingredient.IngredientName</option>
                         }
                     </select>
@@ -87,6 +88,18 @@
                 <!-- 食材數量輸入框 (動態生成) -->
                 <div class="form-group" id="ingredientQuantities">
                     <!-- 當選擇食材時，會在這裡動態生成數量輸入框 -->
+                    @foreach (var selectedIngredient in Model.SelectedIngredients)
+                    {
+                        var ingredientName = Model.AvailableIngredients.FirstOrDefault(i => i.IngredientId == selectedIngredient)?.IngredientName;
+                        var unit = Model.IngredientUnits.ContainsKey(selectedIngredient) ? Model.IngredientUnits[selectedIngredient] : "";
+
+                        <div class="form-group">
+                            <label for="IngredientQuantities_@selectedIngredient" class="control-label">
+                                @ingredientName 的數量 (@unit)
+                            </label>
+                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_@selectedIngredient" name="IngredientQuantities[@selectedIngredient]" value="@Model.IngredientQuantities[selectedIngredient]" />
+                        </div>
+                    }
                 </div>
 
                 <div class="form-group">
@@ -170,6 +183,7 @@
             allowClear: true,
             width: '100%',
             success: function (data) {
+                    console.log(data); // 確認是否包含 ingredientName 和 unit
                 // 初始化 Select2 並加入抓取的資料
                 $('#selectedIngredients').select2({
                     placeholder: '選擇食材',
@@ -193,9 +207,10 @@
                                 if (!categories[ingredient.category]) {
                                     categories[ingredient.category] = [];
                                 }
+                                var unitText = ingredient.unit ? ` (${ingredient.unit})` : ''; // Ensure unit is not null
                                 categories[ingredient.category].push({
                                     id: ingredient.ingredientId,
-                                    text: ingredient.ingredientName // 使用 ingredientName 來顯示選項名稱
+                                    text: ingredient.ingredientName + unitText  // 顯示名稱與單位
                                 });
                             });
 
@@ -250,16 +265,16 @@
             // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱而不是ID
             selectedIngredients.forEach(function (ingredient) {
                 var ingredientId = ingredient.id;
-                var ingredientName = ingredient.text;
+                var ingredientNameWithUnit = ingredient.text;
 
                 // 如果之前已經有這個食材的數量，則保留
                 var quantity = existingQuantities[ingredientId] || '';
 
                 var inputHtml = `
-                <div class="form-group">
-                    <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
-                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
-                </div>`;
+                    <div class="form-group">
+                        <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientNameWithUnit} 的數量</label>
+                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                    </div>`;
                 ingredientQuantitiesDiv.append(inputHtml);
             });
         });

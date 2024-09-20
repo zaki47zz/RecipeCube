@@ -43,5 +43,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public List<int> SelectedIngredients { get; set; } = new List<int>(); // 這裡保存已選擇食材的ID
         [Display(Name = "食材數量")]
         public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();
+        // 新增一個屬性來儲存食材的單位
+        public Dictionary<int, string> IngredientUnits { get; set; } = new Dictionary<int, string>(); // 保存食材的單位
     }
 }
