@@ -1,0 +1,111 @@
+﻿@model RecipeCube.Models.Ingredient
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <form id="createForm" asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="IngredientName" class="control-label" style="font-size: large;">食材名稱</label>
+                    <input asp-for="IngredientName" class="form-control" />
+                    <span asp-validation-for="IngredientName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Category" class="control-label" style="font-size: large;">類別</label>
+                    <input asp-for="Category" list="Categories" class="form-control" id="categoryInput" />
+                    <datalist id="Categories">
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category"></option>
+                            }
+                        }
+                    </datalist>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Synonym" class="control-label" style="font-size: large;">別稱</label>
+                    <input asp-for="Synonym" class="form-control" />
+                    <span asp-validation-for="Synonym" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ExpireDay" class="control-label" style="font-size: large;">預設過期天數</label>
+                    <input asp-for="ExpireDay" class="form-control" id="expireDayInput" />
+                    <span asp-validation-for="ExpireDay" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Unit" class="control-label" style="font-size: large;">單位</label>
+                    <input asp-for="Unit" class="form-control" />
+                    <span asp-validation-for="Unit" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Gram" class="control-label" style="font-size: large;">克數</label>
+                    <input asp-for="Gram" class="form-control" />
+                    <span asp-validation-for="Gram" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Photo" class="control-label" style="font-size: large;">照片</label>
+                    <input asp-for="Photo" class="form-control" />
+                    <span asp-validation-for="Photo" class="text-danger"></span>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <input type="submit" value="新增" class="btn btn-info me-3" />
+                    <a asp-action="Index" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 在局部檢視內包含腳本 -->
+<script>
+    $(document).ready(function () {
+            // 重新解析驗證規則
+            $.validator.unobtrusive.parse('#createForm');
+
+            // 當分類選項改變時，設定對應的過期天數
+            $('#categoryInput').on('change', function () {
+                let category = $(this).val();
+                if (category) {
+                    let defaultExpireDay;
+                    switch(category) {
+                            case '中藥類': defaultExpireDay = 30; break;
+                            case '水果類': defaultExpireDay = 7; break;
+                            case '蔬菜類': defaultExpireDay = 5; break;
+                            case '牛肉類': defaultExpireDay = 5; break;
+                            case '羊肉類': defaultExpireDay = 5; break;
+                            case '雞肉類': defaultExpireDay = 5; break;
+                            case '豬肉類': defaultExpireDay = 5; break;
+                            case '豆類': defaultExpireDay = 7; break;
+                            case '海鮮類': defaultExpireDay = 3; break;
+                            case '澱粉類': defaultExpireDay = 60; break;
+                            case '堅果類': defaultExpireDay = 21; break;
+                            case '蛋奶類': defaultExpireDay = 5; break;
+                            case '菌菇類': defaultExpireDay = 14; break;
+                            case '加工類': defaultExpireDay = 14; break;
+                            case '高湯類': defaultExpireDay = 7; break;
+                            case '液體類': defaultExpireDay = 7; break;
+                            case '零食類': defaultExpireDay = 30; break;
+                            case '調料類': defaultExpireDay = 90; break;
+                            case '其他類': defaultExpireDay = 90; break;
+                            default: defaultExpireDay = 5; break;
+                        }
+
+                            // 更新到顯示過期天數的元素中，例如 input 或 span
+                            $('#expireDayInput').val(defaultExpireDay);
+                        }
+                    });
+
+                    // 初始載入時觸發 change 事件，確保選項選擇後自動更新過期天數
+                    $('#categoryInput').trigger('change');
+            });
+</script>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
