@@ -565,10 +565,7 @@
 
             $(document).on('click', '.edit', function () {
                 let id = $(this).data('id');
-                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal', function () {
-                    Image();
-
-                });
+                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal');
             });
 
             $(document).on('click', '.detail', function () {

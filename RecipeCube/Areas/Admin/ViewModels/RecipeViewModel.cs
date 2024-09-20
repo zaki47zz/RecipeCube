@@ -44,5 +44,4 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "食材數量")]
         public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();
     }
-
 }

@@ -1,4 +1,4 @@
-﻿@model RecipeCube.Models.Recipe
+﻿@model RecipeCube.Areas.Admin.ViewModels.RecipeViewModel
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -45,22 +45,71 @@
                     <span asp-validation-for="WestEast" class="text-danger"></span>
                 </div>
 
+                                <!-- 種類 -->
                 <div class="form-group">
                     <label asp-for="Category" class="control-label"></label>
-                    <input asp-for="Category" class="form-control" />
+                    <select asp-for="Category" class="form-control" id="categorySelect">
+                        <option value="主餐">主餐</option>
+                        <option value="副餐">副餐</option>
+                        <option value="湯品">湯品</option>
+                        <option value="甜點">甜點</option>
+                    </select>
                     <span asp-validation-for="Category" class="text-danger"></span>
                 </div>
 
+                <!-- 種類細項 -->
                 <div class="form-group">
                     <label asp-for="DetailedCategory" class="control-label"></label>
-                    <input asp-for="DetailedCategory" class="form-control" />
+                    <select asp-for="DetailedCategory" class="form-control" id="detailedCategorySelect">
+                        <!-- 根據選擇的種類自動更新 -->
+                    </select>
                     <span asp-validation-for="DetailedCategory" class="text-danger"></span>
                 </div>
+
+                
 
                 <div class="form-group">
                     <label asp-for="Steps" class="control-label"></label>
                     <textarea asp-for="Steps" class="form-control" rows="5"></textarea>
                     <span asp-validation-for="Steps" class="text-danger"></span>
+                </div>
+
+                <!-- 食材選擇 -->
+                <div class="form-group">
+                    <label asp-for="SelectedIngredients" class="control-label">選擇食材</label>
+                            <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
+                                @foreach (var ingredient in Model.AvailableIngredients)
+                                {
+                                    var isSelected = Model.SelectedIngredients.Contains(ingredient.IngredientId);
+                                    if (isSelected)
+                                    {
+                                        <option value="@ingredient.IngredientId" selected>
+                                            @ingredient.IngredientName
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@ingredient.IngredientId">
+                                            @ingredient.IngredientName
+                                        </option>
+                                    }
+                                }
+                            </select>
+                    <span asp-validation-for="SelectedIngredients" class="text-danger"></span>
+                </div>
+
+                <!-- 食材數量輸入框 (動態生成) -->
+                <div class="form-group" id="ingredientQuantities">
+                    <!-- 當選擇食材時，會在這裡動態生成數量輸入框 -->
+                    @foreach (var selectedIngredient in Model.SelectedIngredients)
+                    {
+                        <div class="form-group">
+                            <label for="IngredientQuantities_@selectedIngredient" class="control-label">
+                                @Model.AvailableIngredients.FirstOrDefault(i => i.IngredientId == selectedIngredient)?.IngredientName 的數量
+                            </label>
+                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_@selectedIngredient" name="IngredientQuantities[@selectedIngredient]" value="@Model.IngredientQuantities[selectedIngredient]" />
+                        </div>
+                    }
                 </div>
 
                 <div class="form-group">
@@ -103,10 +152,102 @@
 </div>
 <script>
     $(document).ready(function () {
+        initEditForm();
+    });
+
+    function initEditForm() {
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#editForm');
-    });
+
+        // 設定種類和細項類別選項
+        var categoryOptions = {
+            "主餐": ["麵食", "飯食", "粥", "排餐", "鹹派", "火鍋", "焗烤"],
+            "副餐": ["肉類料理", "青菜料理", "海鮮料理"],
+            "湯品": ["無"],
+            "甜點": ["甜", "鹹"]
+        };
+
+        // 初始化時根據已有的 Category 和 DetailedCategory 設置選項
+        var currentCategory = $('#categorySelect').val();
+        var currentDetailedCategory = decodeHtmlEntity('@Model.DetailedCategory'); // 使用解碼函數
+        // 檢查目前的 Category 和 DetailedCategory
+        console.log("Current Category:", currentCategory);
+        console.log("Current DetailedCategory:", currentDetailedCategory);
+        // 直接調用該方法來設置初始的細項類別選項，而不是觸發 change 事件
+        updateDetailedCategoryOptions(currentCategory, currentDetailedCategory);
+
+        // 當用戶手動改變種類時，才觸發更新細項類別選項的邏輯
+        $('#categorySelect').change(function () {
+            var selectedCategory = $(this).val();
+            console.log("Category changed to:", selectedCategory);
+            updateDetailedCategoryOptions(selectedCategory, null);
+        });
+
+        function updateDetailedCategoryOptions(category, selectedOption) {
+            var detailedCategorySelect = $('#detailedCategorySelect');
+            detailedCategorySelect.empty();
+
+            if (categoryOptions[category]) {
+                console.log("Available Detailed Categories for", category, ":", categoryOptions[category]);
+
+                categoryOptions[category].forEach(function (option) {
+                    detailedCategorySelect.append(new Option(option, option));
+                });
+
+                // 設定選擇的細項類別
+                if (selectedOption) {
+                    detailedCategorySelect.val(selectedOption);
+                    console.log("DetailedCategory set to:", selectedOption);
+                }
+            }
+        }
+
+        // 初始化 Select2
+        $('#selectedIngredients').select2({
+            placeholder: '選擇食材',
+            allowClear: true,
+            width: '100%'
+        });
+
+        // 動態生成食材數量輸入框
+        var initialIngredients = @Html.Raw(Json.Serialize(Model.SelectedIngredients)); // 初始已選擇的食材
+        var initialQuantities = @Html.Raw(Json.Serialize(Model.IngredientQuantities)); // 初始數量
+
+        generateIngredientQuantityInputs(initialIngredients, initialQuantities);
+
+        $('#selectedIngredients').on('change', function () {
+            var selectedIngredients = $(this).val();
+            generateIngredientQuantityInputs(selectedIngredients, initialQuantities);
+        });
+
+        // 函數：生成食材數量輸入框
+        function generateIngredientQuantityInputs(selectedIngredients, quantities) {
+            var ingredientQuantitiesDiv = $('#ingredientQuantities');
+            ingredientQuantitiesDiv.empty();
+
+            selectedIngredients.forEach(function (ingredientId) {
+                var ingredientName = $('#selectedIngredients option[value="' + ingredientId + '"]').text();
+                var quantity = quantities[ingredientId] || '';
+
+                var inputHtml = `
+                    <div class="form-group">
+                        <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
+                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                    </div>`;
+                ingredientQuantitiesDiv.append(inputHtml);
+            });
+        };
+
+
+    };
+    // 解決 HTML 編碼的字元無法透過js顯示
+    function decodeHtmlEntity(str) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = str;
+        return txt.value;
+    }
 </script>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

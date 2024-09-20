@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
+using System.Linq;
 
 namespace RecipeCube.Areas.Admin.Controllers
 {
@@ -203,12 +204,60 @@ namespace RecipeCube.Areas.Admin.Controllers
         // GET: Admin/Recipes/Edit/5
         public async Task<IActionResult> EditPartial(int id)
         {
-            var recipe = await _context.Recipes.FindAsync(id);
+            // 查詢 Recipe
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.RecipeId == id);
+
             if (recipe == null)
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial", recipe);
+
+            // 手動查詢與該 Recipe 關聯的 RecipeIngredients
+            var recipeIngredients = await _context.RecipeIngredients
+                .Where(ri => ri.RecipeId == id)
+                .ToListAsync();
+
+            // 手動查詢對應的食材
+            var ingredientIds = recipeIngredients.Select(ri => ri.IngredientId).ToList();
+            var ingredients = await _context.Ingredients
+                .Where(i => ingredientIds.Contains(i.IngredientId))
+                .ToListAsync();
+
+            // 創建 ViewModel
+            var viewModel = new RecipeViewModel
+            {
+                RecipeId = recipe.RecipeId,
+                RecipeName = recipe.RecipeName,
+                UserId = recipe.UserId,
+                IsCustom = recipe.IsCustom,
+                Restriction = recipe.Restriction,
+                WestEast = recipe.WestEast,
+                Category = recipe.Category,
+                DetailedCategory = recipe.DetailedCategory,
+                Steps = recipe.Steps,
+                Seasoning = recipe.Seasoning,
+                Visibility = recipe.Visibility,
+                Photo = recipe.Photo,
+                Status = recipe.Status,
+
+                // 使用 SelectedIngredients 保存選擇的食材ID
+                SelectedIngredients = recipeIngredients.Select(ri => ri.IngredientId.GetValueOrDefault()).ToList(),
+
+
+                // 使用 IngredientQuantities 保存選擇的食材和數量對應關係
+                IngredientQuantities = recipeIngredients.ToDictionary(ri => ri.IngredientId.GetValueOrDefault(), ri => ri.Quantity.GetValueOrDefault()),
+
+            }; 
+
+            // 查詢所有可用的食材以供選擇
+            viewModel.AvailableIngredients = await _context.Ingredients
+                .Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName
+                }).ToListAsync();
+
+            return PartialView("_EditPartial", viewModel);
         }
 
         // POST: Admin/Recipes/Edit/5
@@ -217,24 +266,93 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Edit(int id, [Bind("RecipeId,RecipeName,UserId,IsCustom,Restriction,WestEast,Category,DetailedCategory,Steps,Seasoning,Visibility,Photo,Status")] Recipe recipe)
+        public async Task<JsonResult> Edit(int id, [Bind("RecipeId,RecipeName,UserId,IsCustom,Restriction,WestEast,Category,DetailedCategory,Steps,Seasoning,Visibility,Photo,Status,SelectedIngredients,IngredientQuantities")] RecipeViewModel model)
         {
-            if (id != recipe.RecipeId)
+            if (id != model.RecipeId)
             {
-                return new JsonResult(new { success = false, error = "ID不符合!" });
+                return new JsonResult(new { success = false, error = "ID 不符合!" });
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // 查找原本的食譜
+                    var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.RecipeId == id);
+
+                    if (recipe == null)
+                    {
+                        return new JsonResult(new { success = false, error = "找不到該食譜!" });
+                    }
+
+                    // 更新食譜的屬性
+                    recipe.RecipeName = model.RecipeName;
+                    recipe.UserId = model.UserId;
+                    recipe.IsCustom = model.IsCustom;
+                    recipe.Restriction = model.Restriction;
+                    recipe.WestEast = model.WestEast;
+                    recipe.Category = model.Category;
+                    recipe.DetailedCategory = model.DetailedCategory;
+                    recipe.Steps = model.Steps;
+                    recipe.Seasoning = model.Seasoning;
+                    recipe.Visibility = model.Visibility;
+                    recipe.Photo = model.Photo;
+                    recipe.Status = model.Status;
+
+                    // 查詢與該食譜關聯的 RecipeIngredients
+                    var existingRecipeIngredients = await _context.RecipeIngredients
+                        .Where(ri => ri.RecipeId == id)
+                        .ToListAsync();
+
+                    // 更新選擇的食材
+                    foreach (var selectedIngredientId in model.SelectedIngredients)
+                    {
+                        // 查找是否已有這個食材的關聯
+                        var existingIngredient = existingRecipeIngredients
+                            .FirstOrDefault(ri => ri.IngredientId.HasValue && ri.IngredientId.Value == selectedIngredientId);
+
+                        // 如果該食材有被選擇，則查找對應的數量
+                        var quantity = model.IngredientQuantities.ContainsKey(selectedIngredientId)
+                            ? model.IngredientQuantities[selectedIngredientId]
+                            : 0; // 如果數量未提供，設為 0 或其他預設值
+
+                        if (existingIngredient != null)
+                        {
+                            // 更新數量
+                            existingIngredient.Quantity = quantity;
+                        }
+                        else
+                        {
+                            // 如果這個食材尚未關聯，則添加新關聯
+                            var newIngredient = new RecipeIngredient
+                            {
+                                RecipeId = recipe.RecipeId,
+                                IngredientId = selectedIngredientId,
+                                Quantity = quantity
+                            };
+                            await _context.RecipeIngredients.AddAsync(newIngredient);
+                        }
+                    }
+
+                    // 刪除已被移除的食材
+                    var removedIngredients = existingRecipeIngredients
+                        .Where(ri => !model.SelectedIngredients.Contains(ri.IngredientId.Value))
+                        .ToList();
+
+                    foreach (var removedIngredient in removedIngredients)
+                    {
+                        _context.RecipeIngredients.Remove(removedIngredient);
+                    }
+
+                    // 保存變更
                     _context.Update(recipe);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
+
                     return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    return new JsonResult(new { success = false, error = "發生錯誤!" });
+                    return new JsonResult(new { success = false, error = "發生錯誤，更新失敗!" });
                 }
             }
 
@@ -245,9 +363,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
-
-
-
 
 
         // GET: Admin/Recipes/Delete/5
