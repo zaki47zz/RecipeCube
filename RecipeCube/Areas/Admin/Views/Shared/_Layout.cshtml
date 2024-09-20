@@ -529,7 +529,10 @@
 
             $(document).on('click', '.edit', function () {
                 let id = $(this).data('id');
-                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal');
+                loadModalData(`/Admin/${controller}/EditPartial/` + id, '#editModal', function () {
+                    Image();
+
+                });
             });
 
             $(document).on('click', '.detail', function () {
@@ -538,7 +541,9 @@
             });
 
             $(document).on('click', '.create', function () {
-                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal');
+                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal', function () { 
+                    Image();
+                });
             });
 
             $(document).on('click', '.delete', function () {

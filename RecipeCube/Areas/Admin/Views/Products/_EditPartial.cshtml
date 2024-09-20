@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Edit" enctype="multipart/form-data" asp-route-id="@Model.ProductId">
+        <form id="editForm" asp-action="Edit" method="post" enctype="multipart/form-data" asp-route-id="@Model.ProductId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProductId" />
             <div class="form-group">
@@ -62,6 +62,44 @@
         </form>
     </div>
 </div>
+
+
+<script>
+    function Image() {
+    @*圖檔預覽*@
+            function previewImage(inputFile) {
+                if (inputFile.files[0]) {
+                    var allowTypes = "image.*";
+                    var file = inputFile.files[0];
+                    if (file.type.match(allowTypes)) {
+    @*預覽*@
+                                            var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $("#Photo").prev().attr("src", e.target.result);
+                            $("#Photo").prev().attr("title", file.name);
+                        };
+                        reader.readAsDataURL(file);
+                        $(".btn.btn-primary").prop("disabled", false);
+                    }
+                    else {
+                        alert("不允許的檔案上傳類型")
+                        $(".btn.btn-primary").prop("disabled", true);
+                        inputFile.value = "";
+                        $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
+                        $("#Photo").prev().attr("title", "尚無圖檔");
+                    }
+                }
+            }
+
+        $("#Photo").on("change", function () {
+            previewImage(this);
+
+        })
+    }
+
+
+</script>
+
 
 @section Scripts {
     @{
