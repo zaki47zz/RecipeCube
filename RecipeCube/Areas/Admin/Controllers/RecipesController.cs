@@ -140,23 +140,26 @@ namespace RecipeCube.Areas.Admin.Controllers
                 };
 
                 _context.Add(recipe);
-                await _context.SaveChangesAsync(); // 一次保存食譜
+                await _context.SaveChangesAsync(); // // 確保 RecipeId 已經生成
 
                 // 處理選擇的食材和數量
                 if (model.SelectedIngredients != null && model.IngredientQuantities != null)
                 {
-                    foreach (var ingredientId in model.SelectedIngredients)
+                    var ingredientIds = model.SelectedIngredients.Distinct().ToList(); // 確保選中的食材是唯一的
+
+                    foreach (var ingredientId in ingredientIds)
                     {
                         if (model.IngredientQuantities.ContainsKey(ingredientId))
                         {
                             var quantity = model.IngredientQuantities[ingredientId];
 
-                            // 確保不會重複插入相同的關聯
-                            var existingIngredient = _context.RecipeIngredients
-                                .FirstOrDefault(ri => ri.RecipeId == recipe.RecipeId && ri.IngredientId == ingredientId);
+                            // 檢查是否已經存在該 Recipe 和 Ingredient 的關聯
+                            var existingIngredient = await _context.RecipeIngredients
+                                .FirstOrDefaultAsync(ri => ri.RecipeId == recipe.RecipeId && ri.IngredientId == ingredientId);
 
                             if (existingIngredient == null)
                             {
+                                // 如果關聯不存在，新增一條新的記錄
                                 var recipeIngredient = new RecipeIngredient
                                 {
                                     RecipeId = recipe.RecipeId,
@@ -165,11 +168,16 @@ namespace RecipeCube.Areas.Admin.Controllers
                                 };
                                 _context.RecipeIngredients.Add(recipeIngredient);
                             }
+                            else
+                            {
+                                // 如果已經存在，更新數量
+                                existingIngredient.Quantity = quantity;
+                            }
                         }
                     }
                 }
 
-                await _context.SaveChangesAsync(); // 最後只保存一次所有改變
+                await _context.SaveChangesAsync();  // 保存 RecipeIngredients 的變更
                 return Json(new { success = true });
             }
 

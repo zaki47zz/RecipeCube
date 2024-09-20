@@ -476,18 +476,31 @@
             }
             // 處理Form的Submit
             function handleFormSubmit(formSelector, modalSelector) {
+                let isSubmitting = false;  // 增加一個標誌位防止重複提交
                 $(document).on('submit', formSelector, function (e) {
                     e.preventDefault();
 
+                    if (isSubmitting) {
+                        return;  // 如果正在提交，則阻止重複提交
+                    }
+
+                    isSubmitting = true;  // 設置標誌位
                     var formData;
 
                     // 根據 controller 或 parentId 決定是否需要處理 Select2 的食材數據
                     if (controller === 'Recipes' || parentId === 'Recipe') {
-                        // 如果需要處理 Select2，使用 serializeArray()
+                        // 如果需要處理 Select2，使用 serializeArray();
                         formData = $(this).serializeArray();
 
-                        // 獲取 Select2 選中的食材
-                        if ($('#selectedIngredients').length) {
+                        // 檢查是否已經包含 SelectedIngredients，不再手動添加
+                        console.log('初始的formData', formData);
+
+                        var existingSelectedIngredients = formData.some(function (item) {
+                            return item.name === 'SelectedIngredients';
+                        });
+
+                        // 如果 formData 中沒有 SelectedIngredients，才手動添加
+                        if (!existingSelectedIngredients && $('#selectedIngredients').length) {
                             var selectedIngredients = $('#selectedIngredients').val();
                             selectedIngredients.forEach(function (ingredientId) {
                                 formData.push({ name: 'SelectedIngredients', value: ingredientId });
@@ -498,12 +511,15 @@
                         formData = $(this).serialize();
                     }
 
+                    console.log('最終的formData', formData);
+
                     $.ajax({
                         url: $(this).attr('action'),
                         type: 'POST',
                         data: formData,
                         traditional: true,
                         success: function (response) {
+                            isSubmitting = false;  // 成功後，恢復標誌位
                             if (response.success) {
                                 $(modalSelector).modal('hide');
                                 loadPartial();
@@ -512,6 +528,7 @@
                             }
                         },
                         error: function () {
+                            isSubmitting = false;  // 錯誤後，恢復標誌位
                             alert('發生錯誤，無法保存');
                         }
                     });
