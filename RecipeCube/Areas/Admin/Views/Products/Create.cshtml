@@ -66,6 +66,42 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<script>
+    function Image() {
+    @*圖檔預覽*@
+            function previewImage(inputFile) {
+                if (inputFile.files[0]) {
+                    var allowTypes = "image.*";
+                    var file = inputFile.files[0];
+                    if (file.type.match(allowTypes)) {
+    @*預覽*@
+                                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $("#Photo").prev().attr("src", e.target.result);
+                            $("#Photo").prev().attr("title", file.name);
+                        };
+                        reader.readAsDataURL(file);
+                        $(".btn.btn-primary").prop("disabled", false);
+                    }
+                    else {
+                        alert("不允許的檔案上傳類型")
+                        $(".btn.btn-primary").prop("disabled", true);
+                        inputFile.value = "";
+                        $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
+                        $("#Photo").prev().attr("title", "尚無圖檔");
+                    }
+                }
+            }
+
+        $("#Photo").on("change", function () {
+            previewImage(this);
+
+        })
+    }
+    
+
+</script>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
