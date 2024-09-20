@@ -1,13 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace RecipeCube.Models;
 
 public partial class RecipeCubeContext : DbContext
 {
-    public RecipeCubeContext()
-    {
-    }
-
     public RecipeCubeContext(DbContextOptions<RecipeCubeContext> options)
         : base(options)
     {
@@ -33,13 +31,23 @@ public partial class RecipeCubeContext : DbContext
 
     public virtual DbSet<RecipeIngredient> RecipeIngredients { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<RoleClaim> RoleClaims { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserClaim> UserClaims { get; set; }
 
     public virtual DbSet<UserGroup> UserGroups { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=RecipeCube;TrustServerCertificate=True;Integrated Security=true");
+    public virtual DbSet<UserIdMapping> UserIdMappings { get; set; }
+
+    public virtual DbSet<UserLogin> UserLogins { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
+
+    public virtual DbSet<UserToken> UserTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,7 +57,9 @@ public partial class RecipeCubeContext : DbContext
 
             entity.Property(e => e.ExclusiveIngredientId).HasColumnName("exclusive_ingredient_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<Ingredient>(entity =>
@@ -88,21 +98,23 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.Quantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("quantity");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
             entity.Property(e => e.Visibility).HasColumnName("visibility");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__46596229A34EEA39");
-
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()
                 .HasColumnName("order_id");
             entity.Property(e => e.OrderTime).HasColumnName("order_time");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
@@ -128,12 +140,13 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("action");
             entity.Property(e => e.GroupId).HasColumnName("group_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity.Property(e => e.OutOfStock).HasColumnName("out_of_stock");
             entity.Property(e => e.Quantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("quantity");
             entity.Property(e => e.Time).HasColumnName("time");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<PreferedIngredient>(entity =>
@@ -144,7 +157,9 @@ public partial class RecipeCubeContext : DbContext
 
             entity.Property(e => e.PerferIngredientId).HasColumnName("perfer_ingredient_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -184,7 +199,9 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("seasoning");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Steps).HasColumnName("steps");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("user_id");
             entity.Property(e => e.Visibility).HasColumnName("visibility");
             entity.Property(e => e.WestEast).HasColumnName("west_east");
         });
@@ -201,29 +218,49 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
+                .IsUnique()
+                .HasFilter("([NormalizedName] IS NOT NULL)");
+
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.NormalizedName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<RoleClaim>(entity =>
+        {
+            entity.HasIndex(e => e.RoleId, "IX_RoleClaims_RoleId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.RoleClaims).HasForeignKey(d => d.RoleId);
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.ToTable("User");
+
+            entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+
+            entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex")
+                .IsUnique()
+                .HasFilter("([NormalizedUserName] IS NOT NULL)");
+
             entity.Property(e => e.DietaryRestrictions).HasColumnName("dietary_restrictions");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("email");
+            entity.Property(e => e.Email).HasMaxLength(256);
             entity.Property(e => e.ExclusiveChecked).HasColumnName("exclusive_checked");
             entity.Property(e => e.GroupId).HasColumnName("group_id");
-            entity.Property(e => e.Password)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("password");
-            entity.Property(e => e.Phone)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("phone");
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
             entity.Property(e => e.PreferredChecked).HasColumnName("preferred_checked");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Username)
-                .HasMaxLength(255)
-                .HasColumnName("username");
+            entity.Property(e => e.UserName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<UserClaim>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_UserClaims_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserClaims).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<UserGroup>(entity =>
@@ -233,11 +270,46 @@ public partial class RecipeCubeContext : DbContext
             entity.ToTable("User_Groups");
 
             entity.Property(e => e.GroupId).HasColumnName("group_id");
-            entity.Property(e => e.GroupAdmin).HasColumnName("group_admin");
+            entity.Property(e => e.GroupAdmin)
+                .HasMaxLength(450)
+                .HasColumnName("group_admin");
             entity.Property(e => e.GroupInvite).HasColumnName("group_invite");
             entity.Property(e => e.GroupName)
                 .HasMaxLength(255)
                 .HasColumnName("group_name");
+        });
+
+        modelBuilder.Entity<UserIdMapping>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("UserIdMapping");
+
+            entity.Property(e => e.NewUserId)
+                .HasMaxLength(450)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<UserLogin>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+
+            entity.HasIndex(e => e.UserId, "IX_UserLogins_UserId");
+
+            entity.Property(e => e.LoginProvider).HasMaxLength(128);
+            entity.Property(e => e.ProviderKey).HasMaxLength(128);
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserLogins).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasNoKey();
+        });
+
+        modelBuilder.Entity<UserToken>(entity =>
+        {
+            entity.HasNoKey();
         });
         modelBuilder.HasSequence<int>("InventoryIDSeq");
 

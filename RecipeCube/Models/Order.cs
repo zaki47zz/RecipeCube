@@ -1,10 +1,13 @@
-﻿namespace RecipeCube.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RecipeCube.Models;
 
 public partial class Order
 {
     public long OrderId { get; set; }
 
-    public int? UserId { get; set; }
+    public string? UserId { get; set; }
 
     public DateTime? OrderTime { get; set; }
 

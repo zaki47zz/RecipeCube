@@ -1,4 +1,7 @@
-﻿namespace RecipeCube.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RecipeCube.Models;
 
 public partial class UserGroup
 {
@@ -6,7 +9,7 @@ public partial class UserGroup
 
     public string? GroupName { get; set; }
 
-    public int? GroupAdmin { get; set; }
+    public string? GroupAdmin { get; set; }
 
     public int? GroupInvite { get; set; }
 }

@@ -9,11 +9,17 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "群組ID")]
         public int? GroupId { get; set; }
 
+        [Display(Name = "群組名稱")]
+        public string? GroupName { get; set; }
+
         [Display(Name = "使用者ID")]
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
 
         [Display(Name = "食材ID")]
         public int? IngredientId { get; set; }
+
+        [Display(Name = "食材名稱")]
+        public string? IngredientName { get; set; }
 
         [Display(Name = "數量")]
         public decimal? Quantity { get; set; }

@@ -25,23 +25,33 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         public async Task<IActionResult> InventoryIndexPartial()
         {
-            var Inventories = await _context.Inventories.ToListAsync();
+            // 直接獲取所有需要的資料
+            var inventories = await _context.Inventories.ToListAsync();
+            var userGroups = await _context.UserGroups.ToListAsync();
+            var ingredients = await _context.Ingredients.ToListAsync();
 
-            var viewmodel = Inventories.Select(inventory => new InventoryViewModel
+            // 將 userGroups 和 ingredients 轉換為字典以加速查找
+            var userGroupDict = userGroups.ToDictionary(g => g.GroupId, g => g.GroupName);
+            var ingredientDict = ingredients.ToDictionary(i => i.IngredientId, i => i.IngredientName);
+
+            // 使用字典來快速查找資料
+            var viewmodel = inventories.Select(inventory => new InventoryViewModel
             {
                 InventoryId = inventory.InventoryId,
                 GroupId = inventory.GroupId,
+                GroupName = userGroupDict.TryGetValue(inventory.GroupId ?? 0, out var groupName) ? groupName : null,
                 UserId = inventory.UserId,
                 IngredientId = inventory.IngredientId,
+                IngredientName = ingredientDict.TryGetValue(inventory.IngredientId ?? 0, out var ingredientName) ? ingredientName : null,
                 Quantity = inventory.Quantity,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
             }).ToList();
 
-
             return PartialView("_InventoryIndexPartial", viewmodel);
         }
+
 
         // GET: Admin/Inventories/Details/5
         //public async Task<IActionResult> Details(int? id)
