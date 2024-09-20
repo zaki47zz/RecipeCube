@@ -75,11 +75,11 @@
                         reader.readAsDataURL(file);
 
                         // 啟用提交按鈕
-                        $(".btn.btn-primary").prop("disabled", false);
+                        $("input[type='submit']").prop("disabled", false);
                     } else {
                         // 如果檔案類型不符合，提示錯誤並重設預覽
                         alert("不允許的檔案上傳類型");
-                        $(".btn.btn-primary").prop("disabled", true);
+                        $("input[type='submit']").prop("disabled", false);
                         inputFile.value = "";  // 重設檔案選擇
                         $("#Photo").prev().attr("src", '@Url.Content("/img/icon_large.png")');  // 重設預覽圖片
                         $("#Photo").prev().attr("title", "尚無圖檔");  // 重設圖片標題

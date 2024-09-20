@@ -10,7 +10,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "食譜名稱")]
         public string? RecipeName { get; set; }
         [Display(Name = "使用者ID")]
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         [Display(Name = "自訂食譜")]
         public bool? IsCustom { get; set; }
         [Display(Name = "葷素")]

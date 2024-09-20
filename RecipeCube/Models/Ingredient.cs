@@ -1,4 +1,7 @@
-﻿namespace RecipeCube.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RecipeCube.Models;
 
 public partial class Ingredient
 {
