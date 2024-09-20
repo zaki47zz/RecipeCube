@@ -24,6 +24,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "每單位克數")]
         public decimal? Gram { get; set; }
 
+        [Display(Name = "照片")]
         public string? Photo { get; set; }
     }
 }

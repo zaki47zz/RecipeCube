@@ -27,10 +27,12 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             // 直接獲取所有需要的資料
             var inventories = await _context.Inventories.ToListAsync();
+            var users = await _context.Users.ToListAsync();
             var userGroups = await _context.UserGroups.ToListAsync();
             var ingredients = await _context.Ingredients.ToListAsync();
 
             // 將 userGroups 和 ingredients 轉換為字典以加速查找
+            var userDict = users.ToDictionary(u => u.Id, u => u.UserName);
             var userGroupDict = userGroups.ToDictionary(g => g.GroupId, g => g.GroupName);
             var ingredientDict = ingredients.ToDictionary(i => i.IngredientId, i => i.IngredientName);
 
@@ -41,6 +43,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 GroupId = inventory.GroupId,
                 GroupName = userGroupDict.TryGetValue(inventory.GroupId ?? 0, out var groupName) ? groupName : null,
                 UserId = inventory.UserId,
+                UserName = userDict.TryGetValue(inventory.UserId ?? string.Empty, out var username) ? username : null,
                 IngredientId = inventory.IngredientId,
                 IngredientName = ingredientDict.TryGetValue(inventory.IngredientId ?? 0, out var ingredientName) ? ingredientName : null,
                 Quantity = inventory.Quantity,
@@ -73,24 +76,33 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         public async Task<IActionResult> DetailsPartial(int id)
         {
-            var Inventory = await _context.Inventories
-                .FirstOrDefaultAsync(m => m.InventoryId == id);
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(m => m.InventoryId == id);
+            if (inventory == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == inventory.UserId);
+            var userGroup = await _context.UserGroups.FirstOrDefaultAsync(g => g.GroupId == inventory.GroupId);
+            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(i => i.IngredientId == inventory.IngredientId);
 
-            if (Inventory == null)
+            if (user == null || userGroup == null || ingredient == null)
             {
                 return NotFound();
             }
 
             var viewmodel = new InventoryViewModel
             {
-                InventoryId = Inventory.InventoryId,
-                GroupId = Inventory.GroupId,
-                UserId = Inventory.UserId,
-                IngredientId = Inventory.IngredientId,
-                Quantity = Inventory.Quantity,
-                ExpiryDate = Inventory.ExpiryDate,
-                IsExpiring = Inventory.IsExpiring,
-                Visibility = Inventory.Visibility
+                InventoryId = inventory.InventoryId,
+                GroupId = inventory.GroupId,
+                GroupName = userGroup.GroupName,
+                UserId = inventory.UserId,
+                UserName = user.UserName,
+                IngredientId = inventory.IngredientId,
+                IngredientName = ingredient.IngredientName,
+                Quantity = inventory.Quantity,
+                ExpiryDate = inventory.ExpiryDate,
+                IsExpiring = inventory.IsExpiring,
+                Visibility = inventory.Visibility
             };
 
             return PartialView("_DetailsPartial", viewmodel);
@@ -137,8 +149,16 @@ namespace RecipeCube.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> EditPartial(int id)
         {
-            var inventory = await _context.Inventories.FindAsync(id);
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(m => m.InventoryId == id);
             if (inventory == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == inventory.UserId);
+            var userGroup = await _context.UserGroups.FirstOrDefaultAsync(g => g.GroupId == inventory.GroupId);
+            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(i => i.IngredientId == inventory.IngredientId);
+
+            if (user == null || userGroup == null || ingredient == null)
             {
                 return NotFound();
             }
@@ -147,8 +167,11 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 InventoryId = inventory.InventoryId,
                 GroupId = inventory.GroupId,
+                GroupName = userGroup.GroupName,
                 UserId = inventory.UserId,
+                UserName = user.UserName,
                 IngredientId = inventory.IngredientId,
+                IngredientName = ingredient.IngredientName,
                 Quantity = inventory.Quantity,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
@@ -200,9 +223,16 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var inventory = await _context.Inventories
-                .FirstOrDefaultAsync(m => m.InventoryId == id);
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(m => m.InventoryId == id);
             if (inventory == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == inventory.UserId);
+            var userGroup = await _context.UserGroups.FirstOrDefaultAsync(g => g.GroupId == inventory.GroupId);
+            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(i => i.IngredientId == inventory.IngredientId);
+
+            if (user == null || userGroup == null || ingredient == null)
             {
                 return NotFound();
             }
@@ -211,8 +241,11 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 InventoryId = inventory.InventoryId,
                 GroupId = inventory.GroupId,
+                GroupName = userGroup.GroupName,
                 UserId = inventory.UserId,
+                UserName = user.UserName,
                 IngredientId = inventory.IngredientId,
+                IngredientName = ingredient.IngredientName,
                 Quantity = inventory.Quantity,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,

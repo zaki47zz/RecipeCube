@@ -423,7 +423,7 @@
                             label.innerHTML = '篩選:';
                             label.classList.add('ms-5');
                             let select = document.createElement('select');
-                            select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+                            select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-50');
                             select.add(new Option(''));
                             select.addEventListener('change', function () {
                                 column.search(this.value).draw();
@@ -560,7 +560,7 @@
                     case 'Group': controller = 'UserGroups'; filterRow = null; break;
                     case 'PreferedFood': controller = 'PreferedIngredients'; filterRow = null; break;
                     case 'ExclusiveFood': controller = 'ExclusiveIngredients'; filterRow = null; break;
-                    case 'Inventory': controller = 'Inventories'; filterRow = null; break;
+                    case 'Inventory': controller = 'Inventories'; filterRow = 0; break;
                     case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
                     case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
                     case 'RecipeIngredient': controller = 'RecipeIngredients'; filterRow = 1; break;

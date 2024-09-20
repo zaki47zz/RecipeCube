@@ -19,7 +19,7 @@
                     @Html.DisplayNameFor(model => model.GroupName)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.UserId)
+                    @Html.DisplayNameFor(model => model.UserName)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.IngredientName)
@@ -31,10 +31,10 @@
                     @Html.DisplayNameFor(model => model.ExpiryDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.IsExpiring)
+                    @Html.DisplayNameFor(model => model.IsExpiringStr)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Visibility)
+                    @Html.DisplayNameFor(model => model.VisibilityStr)
                 </th>
                 <th></th>
             </tr>
@@ -47,7 +47,7 @@
                         @Html.DisplayFor(modelItem => item.GroupName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.UserId)
+                        @Html.DisplayFor(modelItem => item.UserName)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.IngredientName)
@@ -59,10 +59,10 @@
                         @Html.DisplayFor(modelItem => item.ExpiryDate)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.IsExpiring)
+                        @Html.DisplayFor(modelItem => item.IsExpiringStr)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Visibility)
+                        @Html.DisplayFor(modelItem => item.VisibilityStr)
                     </td>
                     <td>
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.InventoryId">編輯</button>
