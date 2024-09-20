@@ -76,7 +76,7 @@
     // 當分類選項改變時，設定對應的過期天數
     $('#categoryInput').on('change', function () {
         const category = $(this).val();
-        const defaultExpireDay = categoryExpireDays[category] || 5;
+        const defaultExpireDay = categoryExpireDays[category] || 7;
         $('#expireDayInput').val(defaultExpireDay);
     }).trigger('change');
 
@@ -84,7 +84,7 @@
     function previewImage(inputFile) {
         const file = inputFile.files[0];
         if (file) {
-            const allowTypes = "image.*";
+            const allowTypes = /^image\//;
             if (allowTypes.test(file.type)) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
