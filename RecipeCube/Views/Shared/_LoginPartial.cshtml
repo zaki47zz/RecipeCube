@@ -6,7 +6,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <a class="nav-link text-dark" href="" onclick="event.preventDefault();  window.location.href = '/Identity/Account/Manage/Name';">
+    <a class="nav-link text-dark" href="" onclick="event.preventDefault();  window.location.href = '/Identity/Account/Manage';">
         @if (User.IsInRole("Admin"))
         {
             <i class="fa-solid fa-user-gear me-1"></i>
