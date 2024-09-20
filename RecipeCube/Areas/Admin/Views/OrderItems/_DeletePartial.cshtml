@@ -1,4 +1,48 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model RecipeCube.Models.OrderItem
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <dl class="row">
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.OrderId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.OrderId)
+                    </dd>
+                    </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.ProductId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.ProductId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Quantity)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Price)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Price)
+                    </dd>
+                </div>
+            </dl>
+            <div class="d-flex justify-content-center">
+                <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.OrderItemId" method="post">
+                    <input type="submit" class="btn btn-danger mx-3" id="" data-id="@Model.OrderItemId" value="刪除" />
+                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

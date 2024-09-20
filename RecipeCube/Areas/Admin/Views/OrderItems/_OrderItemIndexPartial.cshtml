@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<RecipeCube.Models.OrderItem>
 
 @section Styles {
-    @* <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" /> *@
     <style>
         .table th, .table td {
             text-align: center !important; /* 強制所有表格內容置中 */
@@ -13,13 +12,14 @@
     ViewData["Title"] = "訂單明細";
 }
 
-<h1>訂單明細</h1>
+<h1>訂單明細檢視</h1>
 
-<p>
-    <a asp-action="Create" class="btn bg-gradient-info" role="button">加入新細項</a>
+
+<p class="mt-1">
+    <button type="button" class="create btn bg-gradient-info">加入新細項</button>
 </p>
 <div class="card-body">
-    <table class="table" id="table_orderItem">
+    <table id="table" class="table table-hover w-100">
         <thead>
             <tr>
                 <th>
@@ -54,9 +54,8 @@
                         @Html.DisplayFor(modelItem => item.Price)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.OrderItemId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.OrderItemId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.OrderItemId">Delete</a>
+                        <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.OrderItemId">編輯</button>
+                        <button class="delete btn bg-gradient-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.OrderItemId">刪除</button>
                     </td>
                 </tr>
             }
@@ -64,6 +63,67 @@
     </table>
 
 </div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">新增食材</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">刪除訂單細項</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/lib/datatables/datatables.min.js"></script>
     <script>

@@ -20,6 +20,76 @@ namespace RecipeCube.Areas.Admin.Controllers
             return PartialView("_OrderIndexPartial", orders);
         }
 
+        // GET: Admin/Orders/CreatePartial
+        public IActionResult CreatePartial()
+        {
+            return PartialView("_CreatePartial");
+        }
+
+        // POST: Admin/Orders/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(order);
+                await _context.SaveChangesAsync();
+                //return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
+            }
+            return PartialView("_CreatePartial",order);
+        }
+
+        // GET: Admin/Orders/EditPartial/5
+        public async Task<IActionResult> EditPartial(long id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+            return PartialView("_EditPartial",order);
+        }
+
+        // POST: Admin/Orders/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Edit(long id, [Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        {
+            if (id != order.OrderId)
+            {
+                return new JsonResult(new { success = false, error = "ID不符合!" });
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(order);
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
+                }
+                
+            }
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
+        }
+
+
         // GET: Admin/Orders
         public async Task<IActionResult> Index()
         {
@@ -46,78 +116,78 @@ namespace RecipeCube.Areas.Admin.Controllers
 
 
 
-        // GET: Admin/Orders/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        //// GET: Admin/Orders/Create
+        //public IActionResult Create()
+        //{
+        //    return View();
+        //}
 
-        // POST: Admin/Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(order);
-        }
+        //// POST: Admin/Orders/Create
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(order);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(order);
+        //}
 
         // GET: Admin/Orders/Edit/5
-        public async Task<IActionResult> Edit(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(long? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            return View(order);
-        }
+        //    var order = await _context.Orders.FindAsync(id);
+        //    if (order == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(order);
+        //}
 
-        // POST: Admin/Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
-        {
-            if (id != order.OrderId)
-            {
-                return NotFound();
-            }
+        //// POST: Admin/Orders/Edit/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(long id, [Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        //{
+        //    if (id != order.OrderId)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.OrderId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(order);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(order);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!OrderExists(order.OrderId))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(order);
+        //}
 
         // GET: Admin/Orders/Delete/5
         public async Task<IActionResult> Delete(long? id)
