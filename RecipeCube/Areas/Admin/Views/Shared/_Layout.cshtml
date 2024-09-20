@@ -560,7 +560,10 @@
             });
 
             $(document).on('click', '.create', function () {
-                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal');
+                loadModalData(`/Admin/${controller}/CreatePartial`, '#createModal', function () {
+                    Image();
+
+                });
             });
 
             $(document).on('click', '.delete', function () {
