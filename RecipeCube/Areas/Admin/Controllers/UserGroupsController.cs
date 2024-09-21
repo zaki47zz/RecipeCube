@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
@@ -23,34 +18,35 @@ namespace RecipeCube.Areas.Admin.Controllers
         // GET: Admin/UserGroups
         public async Task<IActionResult> GroupIndexPartial()
         {
-            var usergroups =  await _context.UserGroups.ToListAsync();
+            var usergroups = await _context.UserGroups.ToListAsync();
 
-            var viewModel = usergroups.Select(usergroup => new GroupVIewModel
+            var viewModel = usergroups.Select(usergroup => new GroupViewModel
             {
                 GroupId = usergroup.GroupId,
                 GroupName = usergroup.GroupName,
                 GroupAdmin = usergroup.GroupAdmin,
                 GroupInvite = usergroup.GroupInvite
-            });
+            }).ToList();
             return PartialView("_GroupIndexPartial", viewModel);
         }
 
         // GET: Admin/UserGroups/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            if (id == null)
+            var usergroup = await _context.UserGroups.FirstOrDefaultAsync(m => m.GroupId == id);
+            if (usergroup == null)
             {
                 return NotFound();
             }
 
-            var userGroup = await _context.UserGroups
-                .FirstOrDefaultAsync(m => m.GroupId == id);
-            if (userGroup == null)
+            var viewmodel = new GroupViewModel
             {
-                return NotFound();
-            }
-
-            return View(userGroup);
+                GroupId = usergroup.GroupId,
+                GroupName = usergroup.GroupName,
+                GroupAdmin = usergroup.GroupAdmin,
+                GroupInvite = usergroup.GroupInvite
+            };
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         // GET: Admin/UserGroups/Create
@@ -76,31 +72,33 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/UserGroups/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(int? id)
         {
-            if (id == null)
+            var usergroup = await _context.UserGroups.FindAsync(id);
+            if (usergroup == null)
             {
                 return NotFound();
             }
-
-            var userGroup = await _context.UserGroups.FindAsync(id);
-            if (userGroup == null)
+            var viewModel = new GroupViewModel
             {
-                return NotFound();
-            }
-            return View(userGroup);
+                GroupId = usergroup.GroupId,
+                GroupName = usergroup.GroupName,
+                GroupAdmin = usergroup.GroupAdmin,
+                GroupInvite = usergroup.GroupInvite
+            };
+            return PartialView("_EditPartial", viewModel);
         }
-
         // POST: Admin/UserGroups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GroupId,GroupName,GroupAdmin,GroupInvite")] UserGroup userGroup)
+        public JsonResult Edit(int id, [Bind("GroupId,GroupName,GroupAdmin,GroupInvite")] UserGroup userGroup)
         {
             if (id != userGroup.GroupId)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -108,22 +106,20 @@ namespace RecipeCube.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(userGroup);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserGroupExists(userGroup.GroupId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(userGroup);
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
         }
 
         // GET: Admin/UserGroups/Delete/5

@@ -2,7 +2,7 @@
 
 namespace RecipeCube.Areas.Admin.ViewModels
 {
-    public class GroupVIewModel
+    public class GroupViewModel
     {
         
         public int GroupId { get; set; }

@@ -29,26 +29,27 @@ namespace RecipeCube.Areas.Admin.Controllers
                 ExclusiveIngredientId = exclusivefood.ExclusiveIngredientId,
                 UserId = exclusivefood.UserId,
                 IngredientId = exclusivefood.IngredientId
-            });
+            }).ToList(); 
             return PartialView("_ExclusiveFoodIndexPartial", viewModel);
         }
 
         // GET: Admin/ExclusiveIngredients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var exclusiveIngredient = await _context.ExclusiveIngredients
+            var exclusivefood = await _context.ExclusiveIngredients
                 .FirstOrDefaultAsync(m => m.ExclusiveIngredientId == id);
-            if (exclusiveIngredient == null)
+            if (exclusivefood == null)
             {
                 return NotFound();
             }
 
-            return View(exclusiveIngredient);
+            var viewmodel = new ExclusiveFoodViewModel
+            {
+                ExclusiveIngredientId = exclusivefood.ExclusiveIngredientId,
+                UserId = exclusivefood.UserId,
+                IngredientId = exclusivefood.IngredientId
+            };
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         // GET: Admin/ExclusiveIngredients/Create
@@ -74,19 +75,21 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/ExclusiveIngredients/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(int? id)
         {
-            if (id == null)
+            var exclusivefood = await _context.ExclusiveIngredients.FindAsync(id);
+            if (exclusivefood == null)
             {
                 return NotFound();
             }
-
-            var exclusiveIngredient = await _context.ExclusiveIngredients.FindAsync(id);
-            if (exclusiveIngredient == null)
+            var viewModel =  new ExclusiveFoodViewModel
             {
-                return NotFound();
-            }
-            return View(exclusiveIngredient);
+                ExclusiveIngredientId = exclusivefood.ExclusiveIngredientId,
+                UserId = exclusivefood.UserId,
+                IngredientId = exclusivefood.IngredientId
+            };
+            return PartialView("_EditPartial", viewModel);
         }
 
         // POST: Admin/ExclusiveIngredients/Edit/5
@@ -94,11 +97,11 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExclusiveIngredientId,UserId,IngredientId")] ExclusiveIngredient exclusiveIngredient)
+        public JsonResult Edit(int id, [Bind("ExclusiveIngredientId,UserId,IngredientId")] ExclusiveIngredient exclusiveIngredient)
         {
             if (id != exclusiveIngredient.ExclusiveIngredientId)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -106,22 +109,20 @@ namespace RecipeCube.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(exclusiveIngredient);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ExclusiveIngredientExists(exclusiveIngredient.ExclusiveIngredientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(exclusiveIngredient);
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
         }
 
         // GET: Admin/ExclusiveIngredients/Delete/5

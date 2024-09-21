@@ -1,0 +1,30 @@
+﻿@model RecipeCube.Areas.Admin.ViewModels.ExclusiveFoodViewModel
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <dl class="row">
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.UserId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.UserId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.IngredientId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.IngredientId)
+                    </dd>
+                </div>
+            </dl>
+            <div class="d-flex justify-content-center">
+                <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+            </div>
+        </div>
+    </div>
+</div>
+

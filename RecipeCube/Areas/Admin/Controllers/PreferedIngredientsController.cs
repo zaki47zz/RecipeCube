@@ -29,26 +29,27 @@ namespace RecipeCube.Areas.Admin.Controllers
                 PerferIngredientId = preferefdood.PerferIngredientId,
                 UserId = preferefdood.UserId,
                 IngredientId = preferefdood.IngredientId
-            });
+            }).ToList(); 
             return PartialView("_PreferedFoodIndexPartial", viewModel);
         }
 
         // GET: Admin/PreferedIngredients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var preferedIngredient = await _context.PreferedIngredients
+            var preferefdood = await _context.PreferedIngredients
                 .FirstOrDefaultAsync(m => m.PerferIngredientId == id);
-            if (preferedIngredient == null)
+            if (preferefdood == null)
             {
                 return NotFound();
             }
 
-            return View(preferedIngredient);
+            var viewmodel = new PreferedFoodViewModel
+            {
+                PerferIngredientId = preferefdood.PerferIngredientId,
+                UserId = preferefdood.UserId,
+                IngredientId = preferefdood.IngredientId
+            };
+            return PartialView("_DetailsPartial", viewmodel);
         }
 
         // GET: Admin/PreferedIngredients/Create
@@ -74,19 +75,21 @@ namespace RecipeCube.Areas.Admin.Controllers
         }
 
         // GET: Admin/PreferedIngredients/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(int? id)
         {
-            if (id == null)
+            var preferefdood = await _context.PreferedIngredients.FindAsync(id);
+            if (preferefdood == null)
             {
                 return NotFound();
             }
-
-            var preferedIngredient = await _context.PreferedIngredients.FindAsync(id);
-            if (preferedIngredient == null)
+            var viewModel = new PreferedFoodViewModel
             {
-                return NotFound();
-            }
-            return View(preferedIngredient);
+                PerferIngredientId = preferefdood.PerferIngredientId,
+                UserId = preferefdood.UserId,
+                IngredientId = preferefdood.IngredientId
+            };
+            return PartialView("_EditPartial", viewModel);
         }
 
         // POST: Admin/PreferedIngredients/Edit/5
@@ -94,11 +97,11 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PerferIngredientId,UserId,IngredientId")] PreferedIngredient preferedIngredient)
+        public JsonResult Edit(int id, [Bind("PerferIngredientId,UserId,IngredientId")] PreferedIngredient preferedIngredient)
         {
             if (id != preferedIngredient.PerferIngredientId)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, error = "ID不符合!" });
             }
 
             if (ModelState.IsValid)
@@ -106,22 +109,20 @@ namespace RecipeCube.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(preferedIngredient);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PreferedIngredientExists(preferedIngredient.PerferIngredientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(preferedIngredient);
+            return new JsonResult(new
+            {
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
         }
 
         // GET: Admin/PreferedIngredients/Delete/5

@@ -8,6 +8,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public string Id { get; set; }
         [Display(Name = "使用者名稱")]
         public string? UserName { get; set; }
+        public string? NormalizedUserName { get; set; }
         public string? Email { get; set; }
         public string? NormalizedEmail { get; set; }
 
