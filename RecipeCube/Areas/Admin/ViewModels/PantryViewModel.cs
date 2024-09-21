@@ -24,6 +24,9 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "食材名稱")]
         public string? IngredientName { get; set; }
 
+        [Display(Name = "食材單位")]
+        public string? IngredientUnit { get; set; }
+
         [Display(Name = "數量")]
         public decimal? Quantity { get; set; }
 

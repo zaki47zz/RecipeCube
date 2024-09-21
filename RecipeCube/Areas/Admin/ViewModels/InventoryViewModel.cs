@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace RecipeCube.Areas.Admin.ViewModels
 {
@@ -24,7 +25,12 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "食材名稱")]
         public string? IngredientName { get; set; }
 
+        [Display(Name = "食材單位")]
+        public string? IngredientUnit { get; set; }
+
         [Display(Name = "數量")]
+        [Range(0.1, 10000.00, ErrorMessage = "數量需介在0.1到10000之間")]
+        [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)] // 格式化為一位小數
         public decimal? Quantity { get; set; }
 
         private DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
@@ -65,7 +71,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         }
 
         [Display(Name = "可見性")]
-        public bool? Visibility { get; set; }
+        public bool? Visibility { get; set; } = true;
 
         [Display(Name = "可見性")]
         public string? VisibilityStr
@@ -101,5 +107,23 @@ namespace RecipeCube.Areas.Admin.ViewModels
                 IsExpiring = daysUntilExpiry <= 3;
             }
         }
+
+        // 新增一個屬性來儲存所有食材
+        [BindNever]
+        [Display(Name = "可供選擇的食材")]
+        public List<IngredientViewModel>? AvailableIngredients { get; set; }
+
+        // 使用者選擇的食材清單
+        [Display(Name = "選擇食材")]
+        public List<int> SelectedIngredients { get; set; } = new List<int>();
+
+        // 食材數量
+        [Display(Name = "食材數量")]
+        public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();
+
+        // 保存食材的單位
+        [BindNever]
+        [Display(Name = "食材單位")]
+        public Dictionary<int, string> IngredientUnits { get; set; } = new Dictionary<int, string>();
     }
 }

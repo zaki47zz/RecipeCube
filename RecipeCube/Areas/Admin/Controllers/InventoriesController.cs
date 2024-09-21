@@ -35,6 +35,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             var userDict = users.ToDictionary(u => u.Id, u => u.UserName);
             var userGroupDict = userGroups.ToDictionary(g => g.GroupId, g => g.GroupName);
             var ingredientDict = ingredients.ToDictionary(i => i.IngredientId, i => i.IngredientName);
+            var ingredientUnitDict = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit);
 
             // 使用字典來快速查找資料
             var viewmodel = inventories.Select(inventory => new InventoryViewModel
@@ -46,6 +47,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 UserName = userDict.TryGetValue(inventory.UserId ?? string.Empty, out var username) ? username : null,
                 IngredientId = inventory.IngredientId,
                 IngredientName = ingredientDict.TryGetValue(inventory.IngredientId ?? 0, out var ingredientName) ? ingredientName : null,
+                IngredientUnit = ingredientUnitDict.TryGetValue(inventory.IngredientId ?? 0, out var ingredientUnit) ? ingredientUnit : null,
                 Quantity = inventory.Quantity,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
@@ -100,6 +102,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 IngredientId = inventory.IngredientId,
                 IngredientName = ingredient.IngredientName,
                 Quantity = inventory.Quantity,
+                IngredientUnit = ingredient.Unit,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
@@ -111,7 +114,51 @@ namespace RecipeCube.Areas.Admin.Controllers
         // GET: Admin/Inventories/Create
         public IActionResult CreatePartial()
         {
-            return PartialView("_CreatePartial");
+            var groups = _context.UserGroups.ToList();
+            var users = _context.Users.ToList();
+            var availableIngredients = _context.Ingredients
+            .Select(i => new IngredientViewModel
+            {
+                IngredientId = i.IngredientId,
+                IngredientName = i.IngredientName,
+                Unit = i.Unit,
+            })
+            .ToList();
+
+            // 創建 RecipeViewModel 並初始化 AvailableIngredients 和 IngredientUnits
+            var model = new InventoryViewModel
+            {
+                AvailableIngredients = availableIngredients,
+                IngredientUnits = availableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit)
+            };
+            ViewBag.Groups = groups;
+            ViewBag.Users = users;
+            return PartialView("_CreatePartial", model);
+        }
+
+        // 搜尋食材 (供前端使用的 AJAX API)
+        public IActionResult SearchIngredients(string query)
+        {
+            var ingredients = _context.Ingredients.AsQueryable();
+
+            // 如果有查詢關鍵字，根據名稱和同義詞進行搜尋
+            if (!string.IsNullOrEmpty(query))
+            {
+                ingredients = ingredients.Where(i => i.IngredientName.Contains(query) || i.Synonym.Contains(query));
+            }
+            // 只選擇需要的欄位
+            var result = ingredients
+                .Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName,
+                    Category = i.Category,  // 顯示食材的分類
+                    Unit = i.Unit           // 顯示食材的單位
+                })
+                .ToList();
+
+            // 返回 JSON 格式的搜尋結果
+            return Json(result);
         }
 
         // POST: Admin/Inventories/Create
@@ -173,6 +220,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 IngredientId = inventory.IngredientId,
                 IngredientName = ingredient.IngredientName,
                 Quantity = inventory.Quantity,
+                IngredientUnit = ingredient.Unit,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
@@ -247,6 +295,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 IngredientId = inventory.IngredientId,
                 IngredientName = ingredient.IngredientName,
                 Quantity = inventory.Quantity,
+                IngredientUnit = ingredient.Unit,
                 ExpiryDate = inventory.ExpiryDate,
                 IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
