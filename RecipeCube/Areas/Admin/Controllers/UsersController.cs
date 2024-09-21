@@ -116,9 +116,9 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Edit(string id, [Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount,DietaryRestrictions,ExclusiveChecked,GroupId,PreferredChecked,Status")] User user)
+        public async Task<JsonResult> Edit(string id, [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,DietaryRestrictions,ExclusiveChecked,GroupId,PreferredChecked")] UserViewModel userViewModel)
         {
-            if (id != user.Id)
+            if (id != userViewModel.Id)
             {
                 return new JsonResult(new { success = false, error = "ID不符合!" });
             }
@@ -127,8 +127,34 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(user);
-                    _context.SaveChanges();
+                    // 取得原始資料
+                    var user = await _context.Users.FindAsync(id);
+                    if (user == null)
+                    {
+                        return new JsonResult(new { success = false, error = "找不到使用者!" });
+                    }
+
+                    // 更新指定的欄位
+                    user.UserName = userViewModel.UserName;
+                    user.Email = userViewModel.Email;
+                    user.EmailConfirmed = userViewModel.EmailConfirmed;
+                    user.PhoneNumber = userViewModel.PhoneNumber;
+                    user.DietaryRestrictions = userViewModel.DietaryRestrictions;
+                    user.ExclusiveChecked = userViewModel.ExclusiveChecked;
+                    user.GroupId = userViewModel.GroupId;
+                    user.PreferredChecked = userViewModel.PreferredChecked;
+
+                    // 標記已修改的欄位
+                    _context.Entry(user).Property(u => u.UserName).IsModified = true;
+                    _context.Entry(user).Property(u => u.Email).IsModified = true;
+                    _context.Entry(user).Property(u => u.EmailConfirmed).IsModified = true;
+                    _context.Entry(user).Property(u => u.PhoneNumber).IsModified = true;
+                    _context.Entry(user).Property(u => u.DietaryRestrictions).IsModified = true;
+                    _context.Entry(user).Property(u => u.ExclusiveChecked).IsModified = true;
+                    _context.Entry(user).Property(u => u.GroupId).IsModified = true;
+                    _context.Entry(user).Property(u => u.PreferredChecked).IsModified = true;
+
+                    await _context.SaveChangesAsync();
                     return new JsonResult(new { success = true });
                 }
                 catch (DbUpdateConcurrencyException)
@@ -144,16 +170,11 @@ namespace RecipeCube.Areas.Admin.Controllers
             });
         }
 
+
         // GET: Admin/Users/Delete/5
         public async Task<IActionResult> DeletePartial(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -178,23 +199,46 @@ namespace RecipeCube.Areas.Admin.Controllers
         // POST: Admin/Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public JsonResult DeleteConfirmed(string id)
+        public async Task<JsonResult> Delete(string id, [Bind("Id,Status")] UserViewModel userViewModel)
         {
-            try
+            if (id != userViewModel.Id)
             {
-                var user =  _context.Users.Find(id);
-                if (user != null)
+                return new JsonResult(new { success = false, error = "ID不符合!" });
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    _context.Users.Remove(user);
+                    // 取得原始資料
+                    var user = await _context.Users.FindAsync(id);
+                    if (user == null)
+                    {
+                        return new JsonResult(new { success = false, error = "找不到使用者!" });
+                    }
+
+                    // 更新指定的欄位
+                    user.Status = userViewModel.Status;
+
+                    // 標記已修改的欄位
+                    _context.Entry(user).Property(u => u.Status).IsModified = true;
+
+                    await _context.SaveChangesAsync();
+                    return new JsonResult(new { success = true });
                 }
-                _context.SaveChanges();
-                return new JsonResult(new { success = true, error = "成功刪除!" });
+                catch (DbUpdateConcurrencyException)
+                {
+                    return new JsonResult(new { success = false, error = "發生錯誤!" });
+                }
             }
-            catch (DbUpdateConcurrencyException)
+            return new JsonResult(new
             {
-                return new JsonResult(new { success = false, error = "發生錯誤!" });
-            }
+                success = false,
+                error = "資料無效!",
+                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
         }
+
 
         private bool UserExists(string id)
         {

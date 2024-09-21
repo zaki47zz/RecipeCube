@@ -1,168 +1,33 @@
 ﻿@model RecipeCube.Areas.Admin.ViewModels.UserViewModel
 
+
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
         <div class="w-100">
-            <dl class="row">
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.UserName)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.UserName)
-                    </dd>
+            <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="Status" /> @Html.DisplayNameFor(model => model.Status)
+                    </label>
                 </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.NormalizedUserName)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.NormalizedUserName)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Email)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.Email)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.NormalizedEmail)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.NormalizedEmail)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.EmailConfirmed)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.EmailConfirmed)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.PasswordHash)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.PasswordHash)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.SecurityStamp)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.SecurityStamp)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        Html.DisplayNameFor(model => model.ConcurrencyStamp)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.ConcurrencyStamp)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.PhoneNumber)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.PhoneNumber)
-                    </dd>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.PhoneNumberConfirmed)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.PhoneNumberConfirmed)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.TwoFactorEnabled)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.TwoFactorEnabled)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.LockoutEnd)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.LockoutEnd)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.LockoutEnabled)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.LockoutEnabled)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.AccessFailedCount)
-                    </dt>
-                    <dd class="col-12">
-                        <@Html.DisplayFor(model => model.AccessFailedCount)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.DietaryRestrictions)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.DietaryRestrictions)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.ExclusiveChecked)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.ExclusiveChecked)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.GroupId)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.GroupId)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.PreferredChecked)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.PreferredChecked)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Status)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.Status)
-                    </dd>
-                </div>
-            </dl>
-            <div class="d-flex justify-content-center">
-                <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.Id" method="post">
-                    <input type="hidden" asp-for="Id" />
-                    <input type="submit" class="btn btn-danger me-3" id="" data-id="@Model.Id" value="刪除" />
+                <div class="d-flex justify-content-center">
+                    <input type="submit" value="儲存" class="btn btn-info mx-3" />
                     <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
-                </form>
-            </div>
+                </div>
+            </form>
+            <div />
         </div>
     </div>
-</div>
+
+    <script>
+        $(document).ready(function () {
+            $.validator.unobtrusive.parse('#deleteForm');
+        });
+    </script>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
