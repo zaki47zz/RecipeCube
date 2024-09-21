@@ -33,6 +33,8 @@ namespace RecipeCube.Areas.Identity.Pages.Account
                 return RedirectToPage("/Index");
             }
 
+
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -42,6 +44,14 @@ namespace RecipeCube.Areas.Identity.Pages.Account
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+
+            // 讓點選email驗證後讓status屬性轉為true
+            if (result.Succeeded)
+            {
+                user.status = true;
+                await _userManager.UpdateAsync(user);
+            }
+
             return Page();
         }
     }
