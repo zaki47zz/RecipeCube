@@ -24,7 +24,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public int? ExpireDay { get; set; } = 7; //預設到期日
 
         [Display(Name = "單位")]
-        public string? Unit { get; set; } = "克";
+        public string? Unit { get; set; }
 
         [Display(Name = "每單位克數")]
         [Range(0.1, 10000.00, ErrorMessage = "單位克數必須在0.01到10000之間")]

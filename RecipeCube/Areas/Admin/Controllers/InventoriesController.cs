@@ -122,17 +122,16 @@ namespace RecipeCube.Areas.Admin.Controllers
                 IngredientId = i.IngredientId,
                 IngredientName = i.IngredientName,
                 Unit = i.Unit,
+                Category = i.Category
             })
             .ToList();
 
-            // 創建 RecipeViewModel 並初始化 AvailableIngredients 和 IngredientUnits
             var model = new InventoryViewModel
             {
-                AvailableIngredients = availableIngredients,
-                IngredientUnits = availableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit)
+                Groups = groups,
+                Users = users,
+                AvailableIngredients = availableIngredients
             };
-            ViewBag.Groups = groups;
-            ViewBag.Users = users;
             return PartialView("_CreatePartial", model);
         }
 
@@ -152,46 +151,64 @@ namespace RecipeCube.Areas.Admin.Controllers
                 {
                     IngredientId = i.IngredientId,
                     IngredientName = i.IngredientName,
-                    Category = i.Category,  // 顯示食材的分類
-                    Unit = i.Unit           // 顯示食材的單位
+                    Category = i.Category, 
+                    Unit = i.Unit,
                 })
                 .ToList();
 
             // 返回 JSON 格式的搜尋結果
-            return Json(result);
+            return Json(ingredients);
         }
 
-        // POST: Admin/Inventories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InventoryId,GroupId,UserId,IngredientId,Quantity,ExpiryDate,IsExpiring,Visibility")] Inventory inventory)
+        public async Task<IActionResult> Create([Bind("InventoryId,GroupId,UserId,SelectedIngredients,IngredientQuantities,IngredientExpiryDate,IngredientIsExpiring,IngredientVisibility")] InventoryViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(inventory);
+                if (model.SelectedIngredients != null && model.IngredientQuantities != null)
+                {
+                    var ingredientIds = model.SelectedIngredients.Distinct().ToList();
+
+                    // 把所有食材分開寫成一個新庫存加入資料庫
+                    foreach (var ingredientId in ingredientIds)
+                    {
+                        if (model.IngredientQuantities.ContainsKey(ingredientId) && model.IngredientExpiryDate.ContainsKey(ingredientId) && model.IngredientIsExpiring.ContainsKey(ingredientId) && model.IngredientVisibility.ContainsKey(ingredientId))
+                        {
+                            var quantity = model.IngredientQuantities[ingredientId];
+                            var expireDate = model.IngredientExpiryDate[ingredientId];
+                            var isExpiring = model.IngredientIsExpiring[ingredientId];
+                            var visibility = model.IngredientVisibility[ingredientId];
+
+                            var invnetory = new Inventory
+                            {
+                                GroupId = model.GroupId,
+                                UserId = model.UserId,
+                                IngredientId = ingredientId,
+                                Quantity = quantity,
+                                ExpiryDate = expireDate,
+                                IsExpiring = isExpiring,
+                                Visibility = visibility,
+                            };
+                            _context.Add(invnetory);
+                        }
+                    }
+                }
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
             }
-            return PartialView("_CreatePartial", inventory);
+            // 如果 ModelState 無效，重新載入partial
+            model.AvailableIngredients = _context.Ingredients
+                .Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName,
+                    Unit = i.Unit
+                }).ToList();
+            model.IngredientUnits = model.AvailableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit);
+
+            return PartialView("_CreatePartial", model);
         }
-
-        // GET: Admin/Inventories/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var inventory = await _context.Inventories.FindAsync(id);
-        //    if (inventory == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(inventory);
-        //}
 
         [HttpGet]
         public async Task<IActionResult> EditPartial(int id)
