@@ -1,0 +1,26 @@
+﻿@page
+@model GroupModel
+@{
+    ViewData["Title"] = "Profiles";
+    ViewData["ActivePage"] = ManageNavPages.Group;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+            <form id="profiles-form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.group_id" class="form-control" placeholder="Please enter your group_idr." />
+                    <label asp-for="Input.group_id" class="form-label"></label>
+                    <span asp-validation-for="Input.group_id" class="text-danger"></span>
+                </div>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
