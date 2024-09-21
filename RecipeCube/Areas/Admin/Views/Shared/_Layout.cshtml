@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="/img/icon_small.png" asp-append-version="true">
     <link rel="icon" type="image/png" href="/img/favicon.ico" asp-append-version="true">
-    <title>
-        @ViewData["Title"] - 食譜魔方
-    </title>
+        <title>
+            @ViewData["Title"] - 食譜魔方
+        </title>
     <!--     字型跟圖標     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -450,6 +450,11 @@
                     success: function (data) {
                         $('#dynamic-content').html(data);
                         initializeDataTableWithFilter(filterRow);
+                        // 根據每個局部檢視返回的標題設置頁面標題
+                        var newTitle = $('#dynamic-content').find('h1').text();
+                        console.log(newTitle);
+                        document.title = newTitle + ' - 食譜魔方';  // 設置頁面標題
+                        console.log(document.title);
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
