@@ -124,135 +124,82 @@
     </div>
 </div>
 <script>
-    // $(document).ready(function(){
-    //     getOrderId();
-    // })
-    // function getOrderId() {
-    //     $(".detailOrder.btn.bg-gradient-secondary.btn-sm").on('click', function (e) {
-    //         e.preventDefault(); // 阻止默認行為
 
-    //         $("ul.navbar-nav .nav-link").removeClass("active");
-    //         $("#OrderItem").children(".nav-link").addClass("active");
+    $(document).ready(function () {
+        getOrderId(); // 初始化点击事件
+    });
 
-    //         $('#dynamic-content').html('<div>Loading...</div>');
+    // 點擊獲取 orderid 並進行跳轉和數據加載
+    function getOrderId() {
+        $(".detailOrder.btn.bg-gradient-secondary.btn-sm").on('click', function (e) {
+            e.preventDefault(); // 阻止默認行為
 
-    //         let id = $(this).data('id'); // 獲取按鈕的 data-id
+            $("ul.navbar-nav .nav-link").removeClass("active");
+            $("#OrderItem").children(".nav-link").addClass("active");
 
-    //         $.ajax({
-    //             url: '@Url.Action("OrderItemIndexPartial", "OrderItems")',
-    //             type: 'POST',
-    //             data: { orderid: id }, // 傳遞 orderid
-    //             success: function (data) {
-    //                 $('#dynamic-content').html(data); // 更新 DOM
-    //                 initializeDataTableWithFilter(1); // 在這裡初始化 DataTable
-    //             },
-    //             error: function (xhr, status, error) {
-    //                 alert("Error: " + error);
-    //             }
-    //         });
-    //     });
-    // }
-    // function initializeDataTableWithFilter(columnIndex) {
-    //     new DataTable("table", {
-    //         initComplete: function () {
-    //             if (columnIndex !== null) {
-    //                 var column = this.api().column(columnIndex);
-    //                 let label = document.createElement('label');
-    //                 label.innerHTML = '篩選:';
-    //                 label.classList.add('ms-5');
-    //                 let select = document.createElement('select');
-    //                 select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
-    //                 select.add(new Option(''));
-    //                 select.addEventListener('change', function () {
-    //                     column.search(this.value).draw();
-    //                 });
-    //                 $("div.dt-length").css('white-space', 'nowrap');
-    //                 $("div.dt-length label").after(label, select);
-    //                 column.data().unique().sort().each(function (d) {
-    //                     select.add(new Option(d));
-    //                 });
-    //             }
-    //         },
-    //         language: {
-    //             url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-    //             paginate: { first: "«", previous: "‹", next: "›", last: "»" },
-    //         },
-    //     });
-    // }
+            $('#dynamic-content').html('<div>Loading...</div>'); // 顯示加載中
 
+            let id = $(this).data('id'); // 獲取按鈕的 data-id (即 orderid)
 
-    // ====================================================================================================
-$(document).ready(function(){
-    getOrderId(); // 初始化点击事件
-});
+            // AJAX 發送請求到 OrderItemIndexPartial
+            $.ajax({
+                url: '@Url.Action("OrderItemIndexPartial", "OrderItems")',
+                type: 'POST',
+                data: { orderid: id }, // 傳遞 orderid
+                success: function (data) {
+                    $('#dynamic-content').html(data); // 更新 DOM 為加載回來的部分視圖
 
-// 點擊獲取 orderid 並進行跳轉和數據加載
-function getOrderId() {
-    $(".detailOrder.btn.bg-gradient-secondary.btn-sm").on('click', function (e) {
-        e.preventDefault(); // 阻止默認行為
-
-        $("ul.navbar-nav .nav-link").removeClass("active");
-        $("#OrderItem").children(".nav-link").addClass("active");
-
-        $('#dynamic-content').html('<div>Loading...</div>'); // 顯示加載中
-
-        let id = $(this).data('id'); // 獲取按鈕的 data-id (即 orderid)
-
-        // AJAX 發送請求到 OrderItemIndexPartial
-        $.ajax({
-            url: '@Url.Action("OrderItemIndexPartial", "OrderItems")',
-            type: 'POST',
-            data: { orderid: id }, // 傳遞 orderid
-            success: function (data) {
-                $('#dynamic-content').html(data); // 更新 DOM 為加載回來的部分視圖
-
-                // 初始化 DataTable
-                var table = new DataTable("table", {
-                    initComplete: function () {
-                        // 在這裡可以設定篩選
-                        initializeFilters(this, id); // 傳遞 orderid 作為預設值
-                    },
-                    language: {
-                        url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-                        paginate: { first: "«", previous: "‹", next: "›", last: "»" },
-                    },
-                });
-            },
-            error: function (xhr, status, error) {
-                alert("Error: " + error);
-            }
+                    // 初始化 DataTable
+                    var table = new DataTable("table", {
+                        initComplete: function () {
+                            // 在這裡可以設定篩選
+                            initializeFilters(this, id); // 傳遞 orderid 作為預設值
+                        },
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                            paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+                        },
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + error);
+                }
+            });
         });
-    });
-}
-
-// 初始化篩選選項
-function initializeFilters(dtInstance, defaultValue) {
-    var columnIndex = 0; // 假設你想要篩選的列索引 (設置為 orderid 所在的列索引)
-    var column = dtInstance.api().column(columnIndex);
-    let label = document.createElement('label');
-    label.innerHTML = '篩選:';
-    label.classList.add('ms-5');
-    let select = document.createElement('select');
-    select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
-    select.add(new Option('')); // 添加空選項
-
-    // 添加可選項
-    column.data().unique().sort().each(function (d) {
-        select.add(new Option(d));
-    });
-
-    // 設置預設值為 orderid
-    select.value = defaultValue; // 將選擇框的值設為 orderid
-    select.addEventListener('change', function () {
-        column.search(this.value).draw(); // 當選擇改變時，進行篩選
-    });
-
-    // 觸發篩選
-    if (defaultValue) {
-        column.search(defaultValue).draw(); // 直接觸發篩選
     }
 
-    $("div.dt-length").css('white-space', 'nowrap');
-    $("div.dt-length label").after(label, select);
-}
+    // 初始化篩選選項
+    function initializeFilters(dtInstance, defaultValue) {
+        var columnIndex = 0; // 假設你想要篩選的列索引 (設置為 orderid 所在的列索引)
+        var column = dtInstance.api().column(columnIndex);
+        let label = document.createElement('label');
+        label.innerHTML = '篩選:';
+        label.classList.add('ms-5');
+        let select = document.createElement('select');
+        select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+        select.add(new Option('')); // 添加空選項
+
+        // 添加可選項
+        column.data().unique().sort().each(function (d) {
+            select.add(new Option(d));
+        });
+
+
+        setTimeout(() => {
+            select.value = defaultValue; // 將選擇框的值設為 orderid
+            select.addEventListener('change', function () {
+                column.search(this.value).draw(); // 當選擇改變時，進行篩選
+            });
+        }, 500); // 1000 毫秒的延遲
+
+        // 觸發篩選
+        if (defaultValue) {
+            setTimeout(() => {
+                column.search(defaultValue).draw(); // 直接觸發篩選
+            }, 500); // 300毫秒的延遲
+        }
+
+        $("div.dt-length").css('white-space', 'nowrap');
+        $("div.dt-length label").after(label, select);
+    }
 </script>
