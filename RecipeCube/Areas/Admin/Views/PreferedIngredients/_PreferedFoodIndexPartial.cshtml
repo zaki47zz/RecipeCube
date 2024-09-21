@@ -1,0 +1,41 @@
+﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.PreferedFoodViewModel>
+
+@{
+    ViewData["Title"] = "偏好食材";
+}
+
+<h1>偏好食材</h1>
+
+<div class="card-body">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IngredientId)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IngredientId)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.PerferIngredientId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.PerferIngredientId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.PerferIngredientId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
