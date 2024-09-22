@@ -1,66 +1,45 @@
-﻿@model RecipeCube.Areas.Admin.ViewModels.RecipeIngredientViewModel
+﻿@model RecipeCube.Models.RecipeIngredient
+<!-- 這裡改成你的model -->
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
         <div class="w-100">
             <form id="createForm" asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                <!-- 食譜選擇 -->
-                <div class="form-group row">
-                    <label asp-for="RecipeId" class="control-label col-md-3">選擇食譜</label>
-                    <div class="col-md-9">
-                        <select asp-for="RecipeId" class="form-control select2">
-                            @foreach (var recipe in ViewBag.Recipes)
-                            {
-                                <option value="@recipe.RecipeId">@recipe.RecipeName</option>
-                            }
-                        </select>
-                    </div>
+                <!-- 這裡貼你Create裡的內容，從第一個formGroup類別開始到倒數第二個formGroup為止 -->
+                <div class="form-group">
+                    <label asp-for="RecipeId" class="control-label"></label>
+                    <input asp-for="RecipeId" class="form-control" />
                     <span asp-validation-for="RecipeId" class="text-danger"></span>
                 </div>
-
-                <!-- 食材選擇 -->
-                <div class="form-group row">
-                    <label asp-for="IngredientId" class="control-label col-md-3">選擇食材</label>
-                    <div class="col-md-9">
-                        <select asp-for="IngredientId" class="form-control select2">
-                            @foreach (var ingredient in ViewBag.Ingredients)
-                            {
-                                <option value="@ingredient.IngredientId">@ingredient.IngredientName</option>
-                            }
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label asp-for="IngredientId" class="control-label"></label>
+                    <input asp-for="IngredientId" class="form-control" />
                     <span asp-validation-for="IngredientId" class="text-danger"></span>
                 </div>
-
-                <!-- 數量 -->
-                <div class="form-group row">
-                    <label asp-for="Quantity" class="control-label col-md-3">食材數量</label>
-                    <div class="col-md-9">
-                        <input asp-for="Quantity" class="form-control" />
-                    </div>
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" class="form-control" />
                     <span asp-validation-for="Quantity" class="text-danger"></span>
                 </div>
-
-                <div class="d-flex justify-content-center mt-4">
+                <div class="d-flex justify-content-center">
                     <input type="submit" value="新增" class="btn btn-info me-3" />
-                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+                    <a asp-action="Index" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- 在局部檢視內直接調用腳本 -->
 <script>
     $(document).ready(function () {
-
-
         // 重新解析驗證規則
-            $.validator.unobtrusive.parse('#createForm');
-        });
+        $.validator.unobtrusive.parse('#createForm');
+    });
+    //想用的腳本可以放這
 </script>
-
+<!-- 引用驗證 -->
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

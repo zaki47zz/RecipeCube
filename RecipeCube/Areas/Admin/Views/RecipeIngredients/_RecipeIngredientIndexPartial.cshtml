@@ -1,5 +1,4 @@
-﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.RecipeIngredientViewModel>
-
+﻿@model IEnumerable<RecipeCube.Models.RecipeIngredient>
 @{
     ViewData["Title"] = "Index";
 }
@@ -20,13 +19,7 @@
                     @Html.DisplayNameFor(model => model.RecipeId)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.RecipeName)
-                </th>
-                <th>
                     @Html.DisplayNameFor(model => model.IngredientId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IngredientName)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Quantity)
@@ -42,16 +35,10 @@
                         @Html.DisplayFor(modelItem => item.RecipeId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.RecipeName)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.IngredientId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.IngredientName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Quantity) @item.Unit
+                        @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
                     <!-- !!重要!!以下IngredientId請取代成你的主鍵 -->
                     <td class="text-center">
