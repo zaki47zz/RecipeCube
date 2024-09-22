@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RecipeCube.Models;
 
@@ -22,44 +20,37 @@ namespace RecipeCube.Areas.Admin.Controllers
         // GET: Admin/RecipeIngredients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.RecipeIngredients.ToListAsync());
+            var recipeIngredients = await _context.RecipeIngredients.ToListAsync();
+            return View(recipeIngredients);
         }
 
         public async Task<IActionResult> RecipeIngredientIndexPartial()
         {
-            //讀取資料庫內容
             var recipeIngredients = await _context.RecipeIngredients.ToListAsync();
-            //這裡把資列庫內容塞進你的Partial頁面並反還這個頁面給Action調用者
             return PartialView("_RecipeIngredientIndexPartial", recipeIngredients);
         }
 
         // GET: Admin/RecipeIngredients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var recipeIngredient = await _context.RecipeIngredients
                 .FirstOrDefaultAsync(m => m.RecipeIngredientId == id);
+
             if (recipeIngredient == null)
             {
                 return NotFound();
             }
 
-            return View(recipeIngredient);
+            return PartialView("_DetailsPartial", recipeIngredient);
         }
 
-        // GET: Admin/RecipeIngredients/Create
-        public IActionResult Create()
+        // GET: Admin/RecipeIngredients/CreatePartial
+        public IActionResult CreatePartial()
         {
-            return View();
+            return PartialView("_CreatePartial");
         }
 
         // POST: Admin/RecipeIngredients/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RecipeIngredientId,RecipeId,IngredientId,Quantity")] RecipeIngredient recipeIngredient)
@@ -68,64 +59,69 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 _context.Add(recipeIngredient);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
             }
-            return View(recipeIngredient);
+
+            return PartialView("_CreatePartial", recipeIngredient);
         }
 
-        // GET: Admin/RecipeIngredients/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Admin/RecipeIngredients/EditPartial/5
+        public async Task<IActionResult> EditPartial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var recipeIngredient = await _context.RecipeIngredients.FindAsync(id);
+
             if (recipeIngredient == null)
             {
                 return NotFound();
             }
-            return View(recipeIngredient);
+
+            return PartialView("_EditPartial", recipeIngredient);
         }
 
-        // POST: Admin/RecipeIngredients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Admin/RecipeIngredients/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("RecipeIngredientId,RecipeId,IngredientId,Quantity")] RecipeIngredient recipeIngredient)
         {
+            int showid = id;
+            int showRid = recipeIngredient.RecipeIngredientId;
+            Console.WriteLine(showid);
+            Console.WriteLine(showRid);
+
             if (id != recipeIngredient.RecipeIngredientId)
             {
-                return NotFound();
+                return Json(new { success = false, error = "ID不符合!" });
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return Json(new
+                {
+                    success = false,
+                    error = "資料無效!",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(recipeIngredient);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RecipeIngredientExists(recipeIngredient.RecipeIngredientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(recipeIngredient);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true });
             }
-            return View(recipeIngredient);
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Json(new { success = false, error = "資料更新失敗，請稍後再試!", exception = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = "發生未知錯誤!", exception = ex.Message });
+            }
         }
 
-        // GET: Admin/RecipeIngredients/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+
+        // GET: Admin/RecipeIngredients/DeletePartial/5
+        public async Task<IActionResult> DeletePartial(int? id)
         {
             if (id == null)
             {
@@ -139,7 +135,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            return View(recipeIngredient);
+            return PartialView("_DeletePartial", recipeIngredient);
         }
 
         // POST: Admin/RecipeIngredients/Delete/5
@@ -147,14 +143,21 @@ namespace RecipeCube.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var recipeIngredient = await _context.RecipeIngredients.FindAsync(id);
-            if (recipeIngredient != null)
+            try
             {
-                _context.RecipeIngredients.Remove(recipeIngredient);
+                var recipeIngredient = await _context.RecipeIngredients.FindAsync(id);
+                if (recipeIngredient != null)
+                {
+                    _context.RecipeIngredients.Remove(recipeIngredient);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "成功刪除!" });
+                }
+                return Json(new { success = false, error = "資料不存在!" });
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateConcurrencyException)
+            {
+                return Json(new { success = false, error = "發生錯誤!" });
+            }
         }
 
         private bool RecipeIngredientExists(int id)
