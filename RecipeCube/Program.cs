@@ -24,7 +24,7 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
+builder.Services.AddDistributedMemoryCache();
 
 builder
     .Services.AddDefaultIdentity<ApplicationUser>(options =>
