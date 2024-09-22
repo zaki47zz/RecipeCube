@@ -7,38 +7,37 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <!-- 食譜選擇 -->
-                <div class="form-group row">
+                <div class="form-group">
                     <label asp-for="RecipeId" class="control-label col-md-3">選擇食譜</label>
-                    <div class="col-md-9">
                         <select asp-for="RecipeId" class="form-control select2">
                             @foreach (var recipe in ViewBag.Recipes)
                             {
                                 <option value="@recipe.RecipeId">@recipe.RecipeName</option>
                             }
                         </select>
-                    </div>
                     <span asp-validation-for="RecipeId" class="text-danger"></span>
                 </div>
 
                 <!-- 食材選擇 -->
-                <div class="form-group row">
+                <div class="form-group">
                     <label asp-for="IngredientId" class="control-label col-md-3">選擇食材</label>
-                    <div class="col-md-9">
-                        <select asp-for="IngredientId" class="form-control select2">
+                        <select asp-for="IngredientId" class="form-control select2" id="ingredientSelect">
                             @foreach (var ingredient in ViewBag.Ingredients)
                             {
-                                <option value="@ingredient.IngredientId">@ingredient.IngredientName</option>
+                                <option value="@ingredient.IngredientId" data-unit="@ingredient.Unit">@ingredient.IngredientName</option>
                             }
                         </select>
-                    </div>
                     <span asp-validation-for="IngredientId" class="text-danger"></span>
                 </div>
 
-                <!-- 數量 -->
-                <div class="form-group row">
+                <!-- 數量和單位 -->
+                <div class="form-group">
                     <label asp-for="Quantity" class="control-label col-md-3">食材數量</label>
-                    <div class="col-md-9">
+                    <div class="input-group">
                         <input asp-for="Quantity" class="form-control" />
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="unitDisplay"></span> <!-- 顯示單位 -->
+                        </div>
                     </div>
                     <span asp-validation-for="Quantity" class="text-danger"></span>
                 </div>
@@ -52,17 +51,20 @@
     </div>
 </div>
 
+<!-- 在局部檢視內直接調用腳本 -->
 <script>
     $(document).ready(function () {
+        // 當選擇不同的食材時，更新顯示的單位
+            $('#ingredientSelect').on('change', function () {
+                var selectedUnit = $(this).find(':selected').data('unit');
+                $('#unitDisplay').text(selectedUnit || '');  // 如果沒有單位，顯示空白
+            });
 
+            // 初始化時顯示第一個食材的單位
+            var initialUnit = $('#ingredientSelect').find(':selected').data('unit');
+            $('#unitDisplay').text(initialUnit || '');
 
-        // 重新解析驗證規則
+            // 重新解析驗證規則
             $.validator.unobtrusive.parse('#createForm');
         });
 </script>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
