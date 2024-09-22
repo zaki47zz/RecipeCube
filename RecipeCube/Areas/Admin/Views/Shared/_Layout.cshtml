@@ -457,6 +457,9 @@
                         console.log(newTitle);
                         document.title = newTitle + ' - 食譜魔方';  // 設置頁面標題
                         console.log(document.title);
+                        // 讓導覽列內容跟著標題更新
+                        $('ol.breadcrumb li.breadcrumb-item.text-sm.text-dark.active').text(newTitle);
+                        $('nav h6.font-weight-bolder.mb-0').text(newTitle);
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
