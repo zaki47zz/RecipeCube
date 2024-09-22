@@ -100,7 +100,8 @@
 
                 var inputHtml_Quantity = `
                             <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
-                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]"/>`;
+                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]"/>
+                            <span class="text-danger" id="IngredientQuantitySpan_${ingredientId}"></span>`;
 
                 var inputHtml_ExpiryDate = `
                             <label for="IngredientExpiryDate_${ingredientId}" class="control-label">${ingredientName} 的到期日</label>
@@ -124,6 +125,20 @@
                 $('#ingredientExpiryDates').append(inputHtml_ExpiryDate);
                 $('#ingredientIsExpiring').append(inputHtml_IsExpiring);
                 $('#ingredientVisibility').append(inputHtml_Visibility);
+
+                $(`#IngredientQuantities_${ingredientId}`).on('change', function () {
+                    const quantityInput = parseFloat($(`#IngredientQuantities_${ingredientId}`).val());  // 將輸入值轉換為數字
+                    const quantitySpan = $(`#IngredientQuantitySpan_${ingredientId}`);
+
+                    // 檢查數量是否在範圍內，以及小數位是否僅為1位
+                    if (isNaN(quantityInput) || quantityInput < 0.1 || quantityInput > 10000 || !/^\d+(\.\d{1})?$/.test(quantityInput)) {
+                        $(this).val('');  // 清空輸入框
+                        quantitySpan.html('數量必須在0.1到10000之間，且只能有一位小數');
+                    } else {
+                        $(this).val(quantityInput.toFixed(1));  // 限制為一位小數
+                        quantitySpan.html('');  // 清空錯誤訊息
+                    }
+                });
 
                 $(`#IngredientExpiryDate_${ingredientId}`).on('change', function () {
                     const today = new Date();
