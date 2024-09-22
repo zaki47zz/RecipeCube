@@ -9,12 +9,14 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public int InventoryId { get; set; }
 
         [Display(Name = "群組ID")]
+        [Required(ErrorMessage = "群組為必填欄位")]
         public int? GroupId { get; set; }
 
         [Display(Name = "群組名稱")]
         public string? GroupName { get; set; }
 
         [Display(Name = "使用者ID")]
+        [Required(ErrorMessage = "使用者為必填欄位")]
         public string? UserId { get; set; }
 
         [Display(Name = "使用者名稱")]
