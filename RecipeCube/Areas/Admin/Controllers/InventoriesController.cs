@@ -199,21 +199,20 @@ namespace RecipeCube.Areas.Admin.Controllers
 
             // 如果 ModelState 無效，返回錯誤信息
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            return Json(new { success = false, errors = errors , Model = model});
 
-            //model.AvailableIngredients = _context.Ingredients
-            //    .Select(i => new IngredientViewModel
-            //    {
-            //        IngredientId = i.IngredientId,
-            //        IngredientName = i.IngredientName,
-            //        Category = i.Category,
-            //        Unit = i.Unit
-            //    }).ToList();
-            //var groups = _context.UserGroups.ToList();
-            //var users = _context.Users.ToList();
-            //model.Groups = groups;
-            //model.Users = users;
-            //return PartialView("_CreatePartial", model);
+            model.AvailableIngredients = _context.Ingredients
+                .Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName,
+                    Category = i.Category,
+                    Unit = i.Unit
+                }).ToList();
+            var groups = _context.UserGroups.ToList();
+            var users = _context.Users.ToList();
+            model.Groups = groups;
+            model.Users = users;
+            return PartialView("_CreatePartial", model);
         }
 
         [HttpGet]
