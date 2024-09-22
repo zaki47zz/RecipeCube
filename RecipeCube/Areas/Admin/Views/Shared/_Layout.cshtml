@@ -625,7 +625,7 @@
                     data: { orderid: orderId },  // 傳遞 orderId 作為參數
                     success: function (data) {
                         $('#dynamic-content').html(data);  // 更新 DOM 為返回的部分檢視
-                        initializeDataTableWithFilter(1);  // 初始化 DataTable
+                        initializeDataTableWithFilter(0);  // 初始化 DataTable
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
