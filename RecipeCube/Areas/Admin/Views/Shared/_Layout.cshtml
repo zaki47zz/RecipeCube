@@ -24,6 +24,8 @@
     <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
     <!-- select2插件 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <!-- animate -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- 連結View內style -->
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -601,6 +603,36 @@
                 }
                 loadPartial();
             });
+
+            //給訂單跳轉到訂單詳細時用的Code
+            $(document).on('click', '.detailOrder', function (e) {
+                e.preventDefault();  // 阻止預設行為
+
+                $("ul.navbar-nav .nav-link").removeClass("active");  // 清除其他項目的 active 狀態
+                $("#OrderItem").children(".nav-link").addClass("active");  // 設定訂單明細項目為 active
+
+                let orderId = $(this).data('id');  // 獲取按鈕的 data-id (即 orderId)
+                controller = 'OrderItems';  // 切換 controller 為 'OrderItems'
+                filterRow = 1;  // 這裡設置篩選的行號
+
+                // 更新動態內容
+                $('#dynamic-content').html('<div>Loading...</div>');
+
+                // 發送 AJAX 請求載入 OrderItems 的部分檢視
+                $.ajax({
+                    url: '/Admin/OrderItems/OrderItemIndexPartial',  // 設定目標 URL，指向 OrderItems 的局部檢視
+                    type: 'POST',
+                    data: { orderid: orderId },  // 傳遞 orderId 作為參數
+                    success: function (data) {
+                        $('#dynamic-content').html(data);  // 更新 DOM 為返回的部分檢視
+                        initializeDataTableWithFilter(1);  // 初始化 DataTable
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error: " + error);
+                    }
+                });
+            });
+
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

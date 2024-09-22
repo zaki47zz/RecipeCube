@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-//using AspNetCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Admin.Controllers
@@ -24,7 +23,21 @@ namespace RecipeCube.Areas.Admin.Controllers
         public async Task<IActionResult> ProductIndexPartial()
         {
             var products = await _context.Products.ToListAsync();
-            return PartialView("_ProductIndexPartial", products);
+
+            // 將 Product 列表轉換為 ProductViewModel 列表
+            var viewModel = products.Select(product => new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            }).ToList();
+
+            // 傳遞 ViewModle 列表到 PartialView
+            return PartialView("_ProductIndexPartial", viewModel);
         }
 
         // GET: Admin/Products/DetailsPartial
@@ -35,8 +48,18 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
 
-            return PartialView("_DetailsPartial",product);
+            return PartialView("_DetailsPartial",viewModel);
         }
 
         // GET: Admin/Products/CreatePartial
@@ -86,7 +109,17 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial",product);
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
+            return PartialView("_EditPartial",viewModel);
         }
 
         // POST:Admin/Products/Edit
@@ -162,8 +195,18 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
 
-            return PartialView("_ShowPhotoPartial", product);
+            return PartialView("_ShowPhotoPartial", viewModel);
         }
 
         // GET: Admin/Products
@@ -229,7 +272,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         //    return View(product);
         //}
 
-        // GET: Admin/Products/Edit/5
+        //GET: Admin/Products/Edit/5
         //public async Task<IActionResult> Edit(int? id)
         //{
         //    if (id == null)
@@ -304,7 +347,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         //        }
         //        return RedirectToAction(nameof(Index));
         //    }
-            
+
         //    return View(product);
         //}
 

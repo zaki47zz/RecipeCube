@@ -1,4 +1,4 @@
-﻿@model RecipeCube.Models.Product
+﻿@model RecipeCube.Areas.Admin.ViewModels.ProductViewModel
 
 @{
     ViewData["Title"] = "編輯商品";
@@ -41,11 +41,6 @@
                 </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-            @*  <div class="form-group">
-            <label asp-for="Photo" class="control-label"></label>
-            <input asp-for="Photo" class="form-control" />
-            <span asp-validation-for="Photo" class="text-danger"></span>
-            </div> *@
 
             @* 呼叫圖片局部檢視，新增圖片上傳欄位_僅允許(jpg,jpeg,png) *@
             <div>
@@ -57,7 +52,7 @@
 
             <div class="form-group">
                 <input type="submit" value="儲存" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">回到列表</a>
+                <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
             </div>
         </form>
     </div>

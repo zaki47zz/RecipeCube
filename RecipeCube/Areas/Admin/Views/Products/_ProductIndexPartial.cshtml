@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RecipeCube.Models.Product>
+﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.ProductViewModel>
 
 @section Styles {
 
@@ -40,7 +40,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Photo)
                 </th>
-                <th></th>
+                <th>動作</th>
             </tr>
         </thead>
         <tbody >
