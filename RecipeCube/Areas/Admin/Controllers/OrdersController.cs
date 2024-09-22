@@ -63,7 +63,15 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial",order);
+            var viewModel = new OrderViewModel
+            {
+                OrderId = order.OrderId,
+                UserId = order.UserId,
+                OrderTime = order.OrderTime,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status,
+            };
+            return PartialView("_EditPartial",viewModel);
         }
 
         // POST: Admin/Orders/Edit/5

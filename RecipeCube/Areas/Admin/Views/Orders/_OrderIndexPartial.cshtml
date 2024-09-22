@@ -50,8 +50,13 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.TotalAmount)
                     </td>
-                    <td>
+                    @* <td>
                         @Html.DisplayFor(modelItem => item.Status)
+                    </td> *@
+                    <td>
+                    <span class="badge @(item.Status.GetValueOrDefault() ? "bg-success" : "bg-danger")">
+                        @(item.Status.GetValueOrDefault() ? "已付款" : "未付款")
+                    </span>
                     </td>
                     <td class="text-center">
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.OrderId">編輯訂單</button>
@@ -99,7 +104,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createLabel">新增食材</h5>
+                <h5 class="modal-title" id="createLabel">新增訂單</h5>
                 <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
             </div>
             <div class="modal-body">
