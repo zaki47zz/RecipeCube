@@ -31,7 +31,9 @@
                         @Html.DisplayNameFor(model => model.IsCustom)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.IsCustom)
+                        <span class="badge @(Model.IsCustom == true ? "bg-success" : Model.IsCustom == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.IsCustom == true ? "自訂" : Model.IsCustom == false ? "系統預設" : "未知")
+                        </span>
                     </dd>
                 </div>
 
@@ -41,7 +43,9 @@
                         @Html.DisplayNameFor(model => model.Restriction)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Restriction)
+                        <span class="badge @(Model.Restriction == true ? "bg-success" : Model.Restriction == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.Restriction == true ? "素食" : Model.Restriction == false ? "葷食" : "未知")
+                        </span>
                     </dd>
                 </div>
 
@@ -51,7 +55,9 @@
                         @Html.DisplayNameFor(model => model.WestEast)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.WestEast)
+                        <span class="badge @(Model.WestEast == true ? "bg-success" : Model.WestEast == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.WestEast == true ? "中式" : Model.WestEast == false ? "西式" : "未知")
+                        </span>
                     </dd>
                 </div>
 
@@ -105,6 +111,7 @@
                         </ul>
                     </dd>
                 </div>
+
                 <!-- 調味料 -->
                 <div class="mb-3">
                     <dt class="col-12">
@@ -121,7 +128,9 @@
                         @Html.DisplayNameFor(model => model.Visibility)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Visibility)
+                        <span class="badge @(Model.Visibility == true ? "bg-success" : Model.Visibility == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.Visibility == true ? "私有" : Model.Visibility == false ? "群組" : "未知")
+                        </span>
                     </dd>
                 </div>
 
@@ -130,10 +139,6 @@
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Photo)
                     </dt>
-@*                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Photo)
-                    </dd> *@
-                    @* 呼叫圖片局部檢視 *@
                     <dd>
                         @await Html.PartialAsync("_ShowPhotoPartial", Model)
                     </dd>
@@ -145,13 +150,14 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Status)
+                        <span class="badge @(Model.Status == true ? "bg-success" : Model.Status == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.Status == true ? "啟用" : Model.Status == false ? "停用" : "未知")
+                        </span>
                     </dd>
                 </div>
-
-               
             </dl>
-            <div class="form-group d-flex justify-content-center">
+
+            <div class="form-group">
                 <a href="javascript:void(0)" class="btn btn-info me-5" id="openeditModal" data-id="@Model.RecipeId">編輯</a>
                 <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
             </div>
