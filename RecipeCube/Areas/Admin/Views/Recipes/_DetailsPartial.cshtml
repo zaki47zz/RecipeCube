@@ -130,8 +130,12 @@
                     <dt class="col-12">
                         @Html.DisplayNameFor(model => model.Photo)
                     </dt>
-                    <dd class="col-12">
+@*                     <dd class="col-12">
                         @Html.DisplayFor(model => model.Photo)
+                    </dd> *@
+                    @* 呼叫圖片局部檢視 *@
+                    <dd>
+                        @await Html.PartialAsync("_ShowPhotoPartial", Model)
                     </dd>
                 </div>
 
