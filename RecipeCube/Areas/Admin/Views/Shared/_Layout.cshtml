@@ -32,11 +32,13 @@
         .nav-link i {
             color: #333; /* 沒有點擊時的顏色 */
         }
-
-        /* 點擊或懸停時的顏色 */
-        .nav-link.active i,
+        /* 點擊時的顏色 */
+        .nav-link.active i {
+            color:#FFFFFF;
+        }
+        /* 懸停時的顏色 */
         .nav-link:hover i {
-            color: #333;
+            color:#FF9224;
         }
     </style>
     <!-- 連結View內style -->
@@ -59,7 +61,7 @@
                 <li id="Home" class="nav-item">
                     <a class="nav-link  active" asp-area="Admin" asp-controller="Home" asp-action="Index">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-house-chimney" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">總覽</span>
                     </a>
@@ -67,7 +69,7 @@
                 <li id="User" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-user" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">使用者</span>
                     </a>
@@ -75,7 +77,7 @@
                 <li id="Group" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-users" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">群組</span>
                     </a>
@@ -83,7 +85,7 @@
                 <li id="PreferedFood" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-hand-holding-heart" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">使用者偏好食材</span>
                     </a>
@@ -91,7 +93,7 @@
                 <li id="ExclusiveFood" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-skull" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">使用者不可食用食材</span>
                     </a>
@@ -99,7 +101,7 @@
                 <li id="Inventory" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-box-open" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">庫存</span>
                     </a>
@@ -107,7 +109,7 @@
                 <li id="Pantry" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-file-lines" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">庫存管理紀錄</span>
                     </a>
@@ -115,7 +117,7 @@
                 <li id="Ingredient" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-utensils" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">食材</span>
                     </a>
@@ -123,7 +125,7 @@
                 <li id="RecipeIngredient" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-right-left" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">食材食譜關聯</span>
                     </a>
@@ -131,7 +133,7 @@
                 <li id="Recipe" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-book-bookmark" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">食譜</span>
                     </a>
@@ -139,7 +141,7 @@
                 <li id="Product" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-brands fa-product-hunt" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">商品</span>
                     </a>
@@ -147,7 +149,7 @@
                 <li id="Order" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-home"></i>
+                            <i class="fa-solid fa-file-import" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">訂單</span>
                     </a>
@@ -155,7 +157,7 @@
                 <li id="OrderItem" class="nav-item">
                     <a class="nav-link" href="javascript:void(0)">
                         <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-user"></i>
+                            <i class="fa-solid fa-file-lines" style="font-size: 0.9rem;"></i>
                         </div>
                         <span class="nav-link-text ms-1">訂單明細</span>
                     </a>
