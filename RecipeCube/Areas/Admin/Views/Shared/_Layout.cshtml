@@ -405,7 +405,9 @@
             let controller = '';
             let parentId = '';
             let filterRow = null;
-            let previousContent = null;
+            // 定義一個全局的 orderId 變數
+            let orderId = null;
+            let orderpass = false;
 
             // 初始化Sidebar卷軸
             if (navigator.userAgent.indexOf('Win') > -1 && document.querySelector('#sidenav-scrollbar')) {
@@ -454,9 +456,12 @@
                         initializeDataTableWithFilter(filterRow);
                         // 根據每個局部檢視返回的標題設置頁面標題
                         var newTitle = $('#dynamic-content').find('h1').text();
-                        console.log(newTitle);
+                        //console.log(newTitle);
                         document.title = newTitle + ' - 食譜魔方';  // 設置頁面標題
-                        console.log(document.title);
+                        //console.log(document.title);
+                        // 更新麵包屑
+                        $('ol.breadcrumb .breadcrumb-item.active').text(newTitle);
+                        $('h6.font-weight-bolder').text(newTitle);
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
@@ -466,7 +471,6 @@
 
             // 載入Modal
             function loadModalData(url, modalSelector, successCallback) {
-                previousContent = $('#dynamic-content').html();
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -514,7 +518,12 @@
                         success: function (response) {
                             if (response.success) {
                                 $(modalSelector).modal('hide');
-                                loadPartial();
+                                if (controller === "OrderItems" && orderId && orderpass == true) {
+                                    // 使用帶有 orderId 的載入方法
+                                    loadPartialWithOrderId(orderId);
+                                } else {
+                                    loadPartial();
+                                }
                             } else {
                                 $(modalSelector + ' .modal-body').html(response);
                             }
@@ -549,7 +558,7 @@
                     case 'Recipe': controller = 'Recipes'; filterRow = 2; break;
                     case 'Product': controller = 'Products'; filterRow = null; break;
                     case 'Order': controller = 'Orders'; filterRow = null; break;
-                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
+                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; orderpass = false; break;
                     default: console.error('Controller 未定義或 parentId 為 Home'); return;
                 }
                 loadPartial();
@@ -598,10 +607,12 @@
                 $("ul.navbar-nav .nav-link").removeClass("active");  // 清除其他項目的 active 狀態
                 $("#OrderItem").children(".nav-link").addClass("active");  // 設定訂單明細項目為 active
 
-                let orderId = $(this).data('id');  // 獲取按鈕的 data-id (即 orderId)
+                orderId = $(this).data('id');  // 獲取按鈕的 data-id (即 orderId)
+                orderpass = true;
                 controller = 'OrderItems';  // 切換 controller 為 'OrderItems'
-                filterRow = 1;  // 這裡設置篩選的行號
-
+                parentId = 'OrderItem';
+                filterRow = 0;  // 設置篩選的列索引，這裡假設 orderId 是第一列 (索引 0)
+                
                 // 更新動態內容
                 $('#dynamic-content').html('<div>Loading...</div>');
 
@@ -612,13 +623,82 @@
                     data: { orderid: orderId },  // 傳遞 orderId 作為參數
                     success: function (data) {
                         $('#dynamic-content').html(data);  // 更新 DOM 為返回的部分檢視
-                        initializeDataTableWithFilter(0);  // 初始化 DataTable
+
+                        // 初始化 DataTable 並直接篩選
+                        var table = new DataTable("table", {
+                            initComplete: function () {
+                                // 自動篩選與 orderId 相關的訂單
+                                initializeFilters(this, orderId);  // 傳遞 orderId 作為預設篩選值
+                            },
+                            language: {
+                                url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                                paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+                            },
+                        });
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
                     }
                 });
+                // 使用自定義的 loadPartialWithOrderId 來處理包含 orderId 的部分檢視跳轉
+                loadPartialWithOrderId(orderId);
             });
+
+            // 初始化篩選選項
+            function initializeFilters(dtInstance, orderId) {
+                var columnIndex = 0;  // 假設 orderId 在第一列 (index = 0)
+                var column = dtInstance.api().column(columnIndex);
+                let label = document.createElement('label');
+                label.innerHTML = '篩選:';
+                label.classList.add('ms-5');
+                let select = document.createElement('select');
+                select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-50');
+                select.add(new Option('')); // 添加空選項
+
+                // 添加可選項
+                column.data().unique().sort().each(function (d) {
+                    select.add(new Option(d));
+                });
+
+                // 設置預設值為 orderId 並自動觸發篩選
+                select.value = orderId;  // 將選擇框的值設為 orderId
+                select.addEventListener('change', function () {
+                    column.search(this.value).draw();  // 當選擇改變時，進行篩選
+                });
+
+                // 自動觸發篩選
+                column.search(orderId).draw();  // 直接觸發篩選
+                $("div.dt-length").css('white-space', 'nowrap');
+                $("div.dt-length label").after(label, select);
+            }
+            // 給特定情況的 loadPartial 函數，處理包含 orderId 的跳轉
+            function loadPartialWithOrderId(orderId) {
+                // 使用全局變數 controller 來判斷當前控制器
+                $.ajax({
+                    url: `/Admin/${controller}/${parentId}IndexPartial`,  // 動態控制器和局部檢視路徑
+                    type: 'GET',
+                    data: { orderid: orderId },  // 傳遞 orderId 作為參數
+                    success: function (data) {
+                        $('#dynamic-content').html(data);  // 更新 DOM
+
+                        // 初始化 DataTable 並應用篩選條件
+                        var table = new DataTable("table", {
+                            initComplete: function () {
+                                initializeFilters(this, orderId);  // 將 orderId 作為篩選條件
+                            },
+                            language: {
+                                url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                                paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+                            },
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error: " + error);
+                    }
+                });
+            }
+
+
 
         });
     </script>
