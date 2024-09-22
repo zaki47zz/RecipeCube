@@ -97,7 +97,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             var viewModel = await GetInventoryViewModel(id);
             if (viewModel == null)
             {
-                return NotFound($"Inventory with ID {id} not found.");
+                return NotFound($"找不到這個庫存ID {id}。");
             }
             return PartialView("_DetailsPartial", viewModel);
         }
@@ -185,7 +185,20 @@ namespace RecipeCube.Areas.Admin.Controllers
                 return Json(new { success = true });
             }
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            return Json(new { success = false, errors });
+            model.AvailableIngredients = _context.Ingredients
+                .AsNoTracking()
+                .Select(i => new IngredientViewModel
+                {
+                    IngredientId = i.IngredientId,
+                    IngredientName = i.IngredientName,
+                    Category = i.Category,
+                    Unit = i.Unit
+                }).ToList();
+            var groups = _context.UserGroups.AsNoTracking().ToList();
+            var users = _context.Users.AsNoTracking().ToList();
+            model.Groups = groups;
+            model.Users = users;
+            return PartialView("_CreatePartial", model);
         }
 
         [HttpGet]
@@ -194,7 +207,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             var viewModel = await GetInventoryViewModel(id);
             if (viewModel == null)
             {
-                return NotFound($"Inventory with ID {id} not found.");
+                return NotFound($"找不到這個庫存ID {id}。");
             }
             return PartialView("_EditPartial", viewModel);
         }
@@ -234,13 +247,13 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                return NotFound("Inventory ID is null.");
+                return NotFound("庫存ID是空值");
             }
 
             var viewModel = await GetInventoryViewModel(id.Value);
             if (viewModel == null)
             {
-                return NotFound($"Inventory with ID {id} not found.");
+                return NotFound($"找不到這個庫存ID {id}。");
             }
 
             return PartialView("_DeletePartial", viewModel);
