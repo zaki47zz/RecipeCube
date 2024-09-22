@@ -42,11 +42,8 @@
             </dl>
             <!-- IngredientId改成你的主鍵 -->
             <div class="d-flex justify-content-center">
-                <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.RecipeIngredientId" method="post">
-                    <input type="hidden" asp-for="RecipeIngredientId" />
-                    <input type="submit" class="btn btn-danger me-3" id="" data-id="@Model.RecipeIngredientId" value="刪除" />
-                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
-                </form>
+                    <a href="javascript:void(0)" class="btn btn-info me-5" id="openeditModal" data-id="@Model.RecipeId">編輯</a>
+                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
             </div>
         </div>
     </div>
