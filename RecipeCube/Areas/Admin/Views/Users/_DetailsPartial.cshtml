@@ -1,0 +1,85 @@
+﻿@model RecipeCube.Areas.Admin.ViewModels.UserViewModel
+
+<div class="row">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
+            <dl class="row">
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.UserName)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Email)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.EmailConfirmed)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.EmailConfirmed)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.PhoneNumber)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.PhoneNumber)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.DietaryRestrictions)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.DietaryRestrictions)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.ExclusiveChecked)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.ExclusiveChecked)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.GroupId)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.GroupId)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.PreferredChecked)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.PreferredChecked)
+                    </dd>
+                </div>
+                <div class="mb-3">
+                    <dt class="col-12">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+                    <dd class="col-12">
+                        @Html.DisplayFor(model => model.Status)
+                        </dd>
+                    </div>
+            </dl>
+            <div class="d-flex justify-content-center">
+                <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -84,7 +84,6 @@ namespace RecipeCube.Areas.Admin.Controllers
         public IActionResult CreatePartial()
         {
             var categories = _context.Ingredients.Select(c => c.Category).Distinct().ToList(); //抓資料庫中的categories
-
             // 利用 Viewbag 傳遞 categories 到 View
             ViewBag.Categories = categories;
             return PartialView("_CreatePartial");
@@ -99,6 +98,18 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (Request.Form.Files["Photo"] != null)
+                {
+                    var file = Request.Form.Files["Photo"];
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "ingredient", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    // 更新產品圖片
+                    ingredient.Photo = fileName;
+                }
                 _context.Add(ingredient);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
@@ -147,6 +158,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Photo = ingredient.Photo
             };
 
+            var categories = _context.Ingredients.Select(c => c.Category).Distinct().ToList();
+            ViewBag.Categories = categories;
             return PartialView("_EditPartial", viewmodel);
         }
 
@@ -155,9 +168,9 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] Ingredient ingredient)
+        public JsonResult Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] IngredientViewModel ingredientModel)
         {
-            if (id != ingredient.IngredientId)
+            if (id != ingredientModel.IngredientId)
             {
                 return new JsonResult(new { success = false, error = "ID不符合!" });
             }
@@ -166,7 +179,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
-                    Ingredient ingredientInDB = _context.Ingredients.Find(ingredient.IngredientId);
+                    Ingredient? ingredientInDB = _context.Ingredients.Find(ingredientModel.IngredientId);
                     if (Request.Form.Files["Photo"] != null)
                     {
                         var file = Request.Form.Files["Photo"];
@@ -177,15 +190,15 @@ namespace RecipeCube.Areas.Admin.Controllers
                             file.CopyTo(stream);
                         }
                         // 更新產品圖片
-                        ingredient.Photo = fileName;
+                        ingredientModel.Photo = fileName;
                     }
                     else
                     {
-                        ingredient.Photo = ingredientInDB.Photo;
+                        ingredientModel.Photo = ingredientInDB.Photo;
                     }
                     _context.Entry(ingredientInDB).State = EntityState.Detached;
 
-                    _context.Update(ingredient);
+                    _context.Update(ingredientModel);
                     _context.SaveChanges();
                     return new JsonResult(new { success = true });
                 }

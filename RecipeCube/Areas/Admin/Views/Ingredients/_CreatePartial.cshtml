@@ -1,4 +1,4 @@
-﻿@model RecipeCube.Models.Ingredient
+﻿@model RecipeCube.Areas.Admin.ViewModels.IngredientViewModel
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -45,8 +45,10 @@
                     <span asp-validation-for="Gram" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Photo" class="control-label" style="font-size: large;">照片</label>
-                    <input asp-for="Photo" class="form-control" />
+                    <label asp-for="Photo" class="control-label col-lg-6">照片</label>
+                    <br>
+                    <img id="imgPreview" src="~/img/icon_large.png" asp-append-version="true" title="尚無圖檔" style="width:256px;height:256px" class="mb-3" />
+                    <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -61,51 +63,60 @@
 <!-- 在局部檢視內包含腳本 -->
 <script>
     $(document).ready(function () {
-            // 重新解析驗證規則
-            $.validator.unobtrusive.parse('#createForm');
+    // 重新解析驗證規則
+    $.validator.unobtrusive.parse('#createForm');
 
-            // 當分類選項改變時，設定對應的過期天數
-            $('#categoryInput').on('change', function () {
-                let category = $(this).val();
-                if (category) {
-                    let defaultExpireDay;
-                    switch(category) {
-                            case '中藥類': defaultExpireDay = 30; break;
-                            case '水果類': defaultExpireDay = 7; break;
-                            case '蔬菜類': defaultExpireDay = 5; break;
-                            case '牛肉類': defaultExpireDay = 5; break;
-                            case '羊肉類': defaultExpireDay = 5; break;
-                            case '雞肉類': defaultExpireDay = 5; break;
-                            case '豬肉類': defaultExpireDay = 5; break;
-                            case '豆類': defaultExpireDay = 7; break;
-                            case '海鮮類': defaultExpireDay = 3; break;
-                            case '澱粉類': defaultExpireDay = 60; break;
-                            case '堅果類': defaultExpireDay = 21; break;
-                            case '蛋奶類': defaultExpireDay = 5; break;
-                            case '菌菇類': defaultExpireDay = 14; break;
-                            case '加工類': defaultExpireDay = 14; break;
-                            case '高湯類': defaultExpireDay = 7; break;
-                            case '液體類': defaultExpireDay = 7; break;
-                            case '零食類': defaultExpireDay = 30; break;
-                            case '調料類': defaultExpireDay = 90; break;
-                            case '其他類': defaultExpireDay = 90; break;
-                            default: defaultExpireDay = 5; break;
-                        }
+    // 定義類別和對應的過期天數
+    const categoryExpireDays = {
+        '中藥類': 30, '水果類': 7, '蔬菜類': 5, '牛肉類': 5, '羊肉類': 5,
+        '雞肉類': 5, '豬肉類': 5, '豆類': 7, '海鮮類': 3, '澱粉類': 60,
+        '堅果類': 21, '蛋奶類': 5, '菌菇類': 14, '加工類': 14, '高湯類': 7,
+        '液體類': 7, '零食類': 30, '調料類': 90, '其他類': 90
+    };
 
-                            // 更新到顯示過期天數的元素中，例如 input 或 span
-                            $('#expireDayInput').val(defaultExpireDay);
-                        }
+    // 當分類選項改變時，設定對應的過期天數
+    $('#categoryInput').on('change', function () {
+        const category = $(this).val();
+        const defaultExpireDay = categoryExpireDays[category] || 7;
+        $('#expireDayInput').val(defaultExpireDay);
+    }).trigger('change');
+
+    // 預覽圖片的功能
+    function previewImage(inputFile) {
+        const file = inputFile.files[0];
+        if (file) {
+            const allowTypes = /^image\//;
+            if (allowTypes.test(file.type)) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const $preview = $("#Photo").prev();
+                    $preview.attr({
+                        "src": e.target.result,
+                        "title": file.name
                     });
-
-                    // 初始載入時觸發 change 事件，確保選項選擇後自動更新過期天數
-                    $('#categoryInput').trigger('change');
-            });
-</script>
-
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                };
+                reader.readAsDataURL(file);
+                $("input[type='submit']").prop("disabled", false);
+            } else {
+                alert("不允許的檔案上傳類型");
+                resetImagePreview(inputFile);
+            }
+        }
     }
-}
+
+    function resetImagePreview(inputFile) {
+        inputFile.value = "";
+        const $preview = $("#Photo").prev();
+        $preview.attr({
+            "src": '/img/icon_large.png',
+            "title": "尚無圖檔"
+        });
+        $("input[type='submit']").prop("disabled", false);
+    }
+
+    // 當使用者選擇檔案時，觸發預覽功能
+    $("#Photo").on("change", function () {
+        previewImage(this);
+    });
+});
+</script>

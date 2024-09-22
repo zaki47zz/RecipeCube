@@ -6,40 +6,46 @@
             <form id="createForm" asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="GroupId" class="control-label"></label>
-                    <input asp-for="GroupId" class="form-control" />
-                    <span asp-validation-for="GroupId" class="text-danger"></span>
+                    <label asp-for="GroupName" class="control-label"></label>
+                    <select asp-for="GroupId" class="form-control mb-3" id="groupId">
+                        <option value="">-- 選擇群組 --</option>
+                        @foreach (var item in Model.Groups)
+                        {
+                            <option value="@item.GroupId">@item.GroupName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="GroupId" class="text-danger" id="groupIdSpan"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="UserId" class="control-label"></label>
-                    <input asp-for="UserId" class="form-control" />
-                    <span asp-validation-for="UserId" class="text-danger"></span>
+                    <label asp-for="UserName" class="control-label"></label>
+                    <select asp-for="UserId" class="form-control mb-3" id="userId" disabled>
+                        <option value="">-- 選擇用戶 --</option>
+                    </select>
+                    <span asp-validation-for="UserName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="IngredientId" class="control-label"></label>
-                    <input asp-for="IngredientId" class="form-control" />
-                    <span asp-validation-for="IngredientId" class="text-danger"></span>
+                    <label asp-for="SelectedIngredients" class="control-label"></label>
+                    <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
+                        @foreach (var categoryGroup in Model.AvailableIngredients.GroupBy(i => i.Category))
+                        {
+                            <optgroup label="@categoryGroup.Key">
+                                @foreach (var ingredient in categoryGroup)
+                                {
+                                    <option value="@ingredient.IngredientId">@ingredient.IngredientName (@ingredient.Unit)</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                    <span asp-validation-for="SelectedIngredients" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Quantity" class="control-label"></label>
-                    <input asp-for="Quantity" class="form-control" />
-                    <span asp-validation-for="Quantity" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ExpiryDate" class="control-label"></label>
-                    <input asp-for="ExpiryDate" class="form-control" />
-                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="IsExpiring" class="control-label"></label>
-                    <input asp-for="IsExpiring" class="form-control" />
-                    <span asp-validation-for="IsExpiring" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Visibility" class="control-label"></label>
-                    <input asp-for="Visibility" class="form-control" />
-                    <span asp-validation-for="Visibility" class="text-danger"></span>
-                </div>
+                <!-- 食材數量輸入框 (動態生成) -->
+                <div class="form-group" id="ingredientQuantities"></div>
+                <!-- 食材到期日輸入框 (動態生成) -->
+                <div class="form-group" id="ingredientExpiryDates"></div>
+                <!-- 食材即將到期 (動態生成) -->
+                <div class="form-group" id="ingredientIsExpiring"></div>
+                <!-- 食材可見性 (動態生成) -->
+                <div class="form-group" id="ingredientVisibility"></div>
                 <div class="d-flex justify-content-center">
                     <input type="submit" value="新增" class="btn btn-info me-3" />
                     <a asp-action="Index" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
@@ -52,9 +58,99 @@
 <!-- 在局部檢視內包含腳本 -->
 <script>
     $(document).ready(function () {
-            // 重新解析驗證規則
-            $.validator.unobtrusive.parse('#createForm');
+        // 重新解析驗證規則
+        $.validator.unobtrusive.parse('#createForm');
+
+        // 根據所選群組更改User select內容
+        $('#groupId').on('change', function () {
+            $('#userId').prop('disabled', false);
+            let selectedGroup = $(this).val();
+            $('#userId').empty().append('<option value="">-- 選擇用戶 --</option>');
+                @foreach (var item in Model.Users)
+                {
+                    <text>
+                        if (selectedGroup == '@item.GroupId') {
+                            $('#userId').append('<option value="@item.Id">@item.UserName</option>');
+                        };
+                    </text>
+                }
+        }).trigger('change');
+
+        // 搜尋
+        $('#selectedIngredients').select2({
+            placeholder: '選擇食材',
+            allowClear: true,
+            width: '100%'
+        });
+
+        // 當使用者選擇食材時，動態生成對應的數量輸入框
+        $('#selectedIngredients').on('change', function () {
+            var selectedIngredients = $(this).select2('data');  // 獲取已選擇的食材
+
+            // 清空原有的數量輸入框
+            $('#ingredientQuantities').empty();
+            $('#ingredientExpiryDates').empty();
+            $('#ingredientIsExpiring').empty();
+            $('#ingredientVisibility').empty();
+
+            // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱而不是ID
+            selectedIngredients.forEach(function (ingredient) {
+                var ingredientId = ingredient.id;
+                var ingredientName = ingredient.text.split(' ')[0];
+
+                var inputHtml_Quantity = `
+                            <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
+                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]"/>`;
+
+                var inputHtml_ExpiryDate = `
+                            <label for="IngredientExpiryDate_${ingredientId}" class="control-label">${ingredientName} 的到期日</label>
+                            <input type="date" class="form-control" id="IngredientExpiryDate_${ingredientId}" name="IngredientExpiryDate[${ingredientId}]"/>
+                            <span class="text-danger" id="IngredientExpiryDateSpan_${ingredientId}"></span>`;
+
+                var inputHtml_IsExpiring = `
+                            <label for="IngredientIsExpiring_${ingredientId}" class="control-label">${ingredientName} 即將到期</label>
+                            <input class="form-control" id="IngredientIsExpiring_${ingredientId}" name="IngredientIsExpiring[${ingredientId}]" readonly/>
+                            <span class="text-danger" id="IngredientIsExpiringSpan_${ingredientId}"></span>`;
+
+                var inputHtml_Visibility = `
+                            <label for="IngredientVisibility_${ingredientId}" class="control-label">${ingredientName} 的可見性</label>
+                            <select class="form-control mb-3" id="IngredientVisibility_${ingredientId}" name="IngredientVisibility[${ingredientId}]" />
+                                <option value="true">群組可見</option>
+                                <option value="false">僅本人可見</option>
+                            </select>
+                            <span class="text-danger" id="IngredientVisibilitySpan_${ingredientId}"></span>`;
+
+                $('#ingredientQuantities').append(inputHtml_Quantity);
+                $('#ingredientExpiryDates').append(inputHtml_ExpiryDate);
+                $('#ingredientIsExpiring').append(inputHtml_IsExpiring);
+                $('#ingredientVisibility').append(inputHtml_Visibility);
+
+                $(`#IngredientExpiryDate_${ingredientId}`).on('change', function () {
+                    const today = new Date();
+                    const selectedDate = new Date($(this).val());
+                    const isExpiringInput = $(`#IngredientIsExpiring_${ingredientId}`);
+                    const expiryDateSpan = $(`#IngredientExpiryDateSpan_${ingredientId}`);
+
+                    if (selectedDate < today.setHours(0, 0, 0, 0)) {
+                        $(this).val('');
+                        expiryDateSpan.html('日期不能小於今日日期');
+                    } else {
+                        expiryDateSpan.html('');
+
+                        // 計算剩餘天數，並檢查是否小於等於 3 天
+                        const differenceInTime = selectedDate.getTime() - today.getTime();
+                        const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+                        if (differenceInDays <= 3) {
+                            isExpiringInput.val('true');
+                        } else {
+                            isExpiringInput.val('false');
+                        }
+                    }
+                });
             });
+        });
+    });
 </script>
 
 

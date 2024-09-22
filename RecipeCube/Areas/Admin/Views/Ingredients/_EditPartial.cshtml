@@ -13,8 +13,17 @@
                     <span asp-validation-for="IngredientName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Category" class="control-label">類別</label>
-                    <input asp-for="Category" class="form-control" />
+                    <label asp-for="Category" class="control-label" style="font-size: large;">類別</label>
+                    <input asp-for="Category" list="Categories" class="form-control" id="categoryInput" />
+                    <datalist id="Categories">
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category"></option>
+                            }
+                        }
+                    </datalist>
                     <span asp-validation-for="Category" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -24,7 +33,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="ExpireDay" class="control-label">預設過期天數</label>
-                    <input asp-for="ExpireDay" class="form-control" />
+                    <input asp-for="ExpireDay" class="form-control" id="expireDayInput" />
                     <span asp-validation-for="ExpireDay" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -56,6 +65,21 @@
     $(document).ready(function () {
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#editForm');
+
+        // 定義類別和對應的過期天數
+        const categoryExpireDays = {
+            '中藥類': 30, '水果類': 7, '蔬菜類': 5, '牛肉類': 5, '羊肉類': 5,
+            '雞肉類': 5, '豬肉類': 5, '豆類': 7, '海鮮類': 3, '澱粉類': 60,
+            '堅果類': 21, '蛋奶類': 5, '菌菇類': 14, '加工類': 14, '高湯類': 7,
+            '液體類': 7, '零食類': 30, '調料類': 90, '其他類': 90
+        };
+
+        // 當分類選項改變時，設定對應的過期天數
+        $('#categoryInput').on('change', function () {
+            const category = $(this).val();
+            const defaultExpireDay = categoryExpireDays[category] || 7;
+            $('#expireDayInput').val(defaultExpireDay);
+        }).trigger('change');
 
             // 預覽圖片的功能
             function previewImage(inputFile) {

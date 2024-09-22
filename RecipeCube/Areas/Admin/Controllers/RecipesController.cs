@@ -42,7 +42,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 {
                     IngredientId = i.IngredientId,
                     IngredientName = i.IngredientName,
-                    Category = i.Category  // 包含食材的類別
+                    Category = i.Category,  // 包含食材的類別
+                    Unit = i.Unit,
                 })
                 .ToList();
 
@@ -310,7 +311,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 .Select(i => new IngredientViewModel
                 {
                     IngredientId = i.IngredientId,
-                    IngredientName = i.IngredientName
+                    IngredientName = i.IngredientName,
+                    Unit = i.Unit // 傳遞單位
                 }).ToListAsync();
 
             return PartialView("_EditPartial", viewModel);

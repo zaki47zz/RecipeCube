@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="/img/icon_small.png" asp-append-version="true">
     <link rel="icon" type="image/png" href="/img/favicon.ico" asp-append-version="true">
-    <title>
-        @ViewData["Title"] - 食譜魔方
-    </title>
+        <title>
+            @ViewData["Title"] - 食譜魔方
+        </title>
     <!--     字型跟圖標     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,8 @@
     <link href="/lib/datatables/datatables.min.css" rel="stylesheet" asp-append-version="true">
     <!-- select2插件 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <!-- animate -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- 連結View內style -->
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -423,7 +425,7 @@
                             label.innerHTML = '篩選:';
                             label.classList.add('ms-5');
                             let select = document.createElement('select');
-                            select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-25');
+                            select.classList.add('form-select', 'form-select-sm', 'ms-1', 'w-50');
                             select.add(new Option(''));
                             select.addEventListener('change', function () {
                                 column.search(this.value).draw();
@@ -450,6 +452,11 @@
                     success: function (data) {
                         $('#dynamic-content').html(data);
                         initializeDataTableWithFilter(filterRow);
+                        // 根據每個局部檢視返回的標題設置頁面標題
+                        var newTitle = $('#dynamic-content').find('h1').text();
+                        console.log(newTitle);
+                        document.title = newTitle + ' - 食譜魔方';  // 設置頁面標題
+                        console.log(document.title);
                     },
                     error: function (xhr, status, error) {
                         alert("Error: " + error);
@@ -474,74 +481,59 @@
                     }
                 });
             }
+
             // 處理Form的Submit
             function handleFormSubmit(formSelector, modalSelector) {
-                let isSubmitting = false;  // 增加一個標誌位防止重複提交
+                let isSubmitting = false;
+
                 $(document).on('submit', formSelector, function (e) {
                     e.preventDefault();
 
-                    var formData = new FormData(this);
-                    console.log(formData);
+                    if (isSubmitting) return; // 防止重複提交
+                    isSubmitting = true;
 
-                    // 根據 controller 或 parentId 決定是否需要處理 Select2 的食材數據
-                    if (controller === 'Recipes' || parentId === 'Recipe') {
-                        // 如果需要處理 Select2，使用 serializeArray();
-                        formData = $(this).serializeArray();
-                        console.log("2:", formData);
-                        // 獲取 Select2 選中的食材
+                    var form = $(this);
+                    var formData;
+                    var ajaxOptions = {
+                        url: form.attr('action'),
+                        type: 'POST',
+                        traditional: true,
+                        success: function (response) {
+                            if (response.success) {
+                                $(modalSelector).modal('hide');
+                                loadPartial();
+                            } else {
+                                $(modalSelector + ' .modal-body').html(response);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Ajax error:', status, error);
+                            alert('發生錯誤，無法保存：' + error);
+                        },
+                        complete: function () {
+                            isSubmitting = false;
+                        }
+                    };
+
+                    // 檢查是否為 Recipes 控制器或 Recipe 父元素
+                    if (controller === 'Recipes' || parentId === 'Recipe' || controller === 'Inventories' || parentId === 'Inventory') {
+                        formData = form.serializeArray();
+
+                        // 處理 Select2 多選食材
                         if ($('#selectedIngredients').length) {
-                            var selectedIngredients = $('#selectedIngredients').val();
+                            var selectedIngredients = $('#selectedIngredients').val() || [];
                             selectedIngredients.forEach(function (ingredientId) {
                                 formData.push({ name: 'SelectedIngredients', value: ingredientId });
                             });
                         }
-                        // } else {
-                        //     // 不需要 Select2，使用 serialize()
-                        //     formData = $(this).serialize();
-                        console.log("2:", formData);
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            type: 'POST',
-                            data: formData,
-                            // processData: false,// 不處理資料
-                            // contentType: false,// 不設置內容類型
-                            traditional: true,
-                            success: function (response) {
-                                if (response.success) {
-                                    $(modalSelector).modal('hide');
-                                    loadPartial();
-                                } else {
-                                    $(modalSelector + ' .modal-body').html(response);
-                                }
-                            },
-                            error: function () {
-                                alert('發生錯誤，無法保存');
-                            }
-                        });
+                        ajaxOptions.data = formData;
+                    } else {
+                        formData = new FormData(this);
+                        ajaxOptions.data = formData;
+                        ajaxOptions.processData = false;
+                        ajaxOptions.contentType = false;
                     }
-                    else {
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            type: 'POST',
-                            data: formData,
-                            processData: false,// 不處理資料
-                            contentType: false,// 不設置內容類型
-                            traditional: true,
-                            success: function (response) {
-                                if (response.success) {
-                                    $(modalSelector).modal('hide');
-                                    loadPartial();
-                                } else {
-                                    $(modalSelector + ' .modal-body').html(response);
-                                }
-                            },
-                            error: function () {
-                                alert('發生錯誤，無法保存');
-                            }
-                        });
-                    }
-
-
+                    $.ajax(ajaxOptions);
                 });
             }
 
@@ -560,11 +552,11 @@
                     case 'Group': controller = 'UserGroups'; filterRow = null; break;
                     case 'PreferedFood': controller = 'PreferedIngredients'; filterRow = null; break;
                     case 'ExclusiveFood': controller = 'ExclusiveIngredients'; filterRow = null; break;
-                    case 'Inventory': controller = 'Inventories'; filterRow = null; break;
-                    case 'Pantry': controller = 'PantryManagements'; filterRow = null; break;
+                    case 'Inventory': controller = 'Inventories'; filterRow = 0; break;
+                    case 'Pantry': controller = 'PantryManagements'; filterRow = 0; break;
                     case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
                     case 'RecipeIngredient': controller = 'RecipeIngredients'; filterRow = 1; break;
-                    case 'Recipe': controller = 'Recipes'; filterRow = 3; break;
+                    case 'Recipe': controller = 'Recipes'; filterRow = 2; break;
                     case 'Product': controller = 'Products'; filterRow = null; break;
                     case 'Order': controller = 'Orders'; filterRow = null; break;
                     case 'OrderItem': controller = 'OrderItems'; filterRow = null; break;
@@ -603,40 +595,6 @@
             handleFormSubmit('#createForm', '#createModal');
             handleFormSubmit('#deleteForm', '#deleteModal');
 
-            // Create針對Select2的submit
-            // $(document).on('submit', '#createForm', function (e) {
-            //     e.preventDefault();
-            //     var formData = $(this).serializeArray();
-            //     console.log('初始 formData:', formData);
-
-            //     // 獲取 Select2 選中的食材
-            //     if ($('#selectedIngredients').length) {
-            //         var selectedIngredients = $('#selectedIngredients').val();
-            //         selectedIngredients.forEach(function (ingredientId) {
-            //             formData.push({ name: 'SelectedIngredients', value: ingredientId });
-            //         });
-            //     }
-            //     console.log('formData:', formData);
-
-            //     $.ajax({
-            //         url: $(this).attr('action'),
-            //         type: 'POST',
-            //         data: formData,
-            //         traditional: true,
-            //         success: function (response) {
-            //             if (response.success) {
-            //                 $('#createModal').modal('hide');
-            //                 loadPartial();
-            //             } else {
-            //                 $('#createModal .modal-body').html(response);
-            //             }
-            //         },
-            //         error: function () {
-            //             alert('發生錯誤，無法建立');
-            //         }
-            //     });
-            // });
-
             // Modal關閉時的反應
             $('.modal').on('hidden.bs.modal', function () {
                 if (previousContent) {
@@ -645,6 +603,36 @@
                 }
                 loadPartial();
             });
+
+            //給訂單跳轉到訂單詳細時用的Code
+            $(document).on('click', '.detailOrder', function (e) {
+                e.preventDefault();  // 阻止預設行為
+
+                $("ul.navbar-nav .nav-link").removeClass("active");  // 清除其他項目的 active 狀態
+                $("#OrderItem").children(".nav-link").addClass("active");  // 設定訂單明細項目為 active
+
+                let orderId = $(this).data('id');  // 獲取按鈕的 data-id (即 orderId)
+                controller = 'OrderItems';  // 切換 controller 為 'OrderItems'
+                filterRow = 1;  // 這裡設置篩選的行號
+
+                // 更新動態內容
+                $('#dynamic-content').html('<div>Loading...</div>');
+
+                // 發送 AJAX 請求載入 OrderItems 的部分檢視
+                $.ajax({
+                    url: '/Admin/OrderItems/OrderItemIndexPartial',  // 設定目標 URL，指向 OrderItems 的局部檢視
+                    type: 'POST',
+                    data: { orderid: orderId },  // 傳遞 orderId 作為參數
+                    success: function (data) {
+                        $('#dynamic-content').html(data);  // 更新 DOM 為返回的部分檢視
+                        initializeDataTableWithFilter(1);  // 初始化 DataTable
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error: " + error);
+                    }
+                });
+            });
+
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<RecipeCube.Models.OrderItem>
 
 @section Styles {
+    
     <style>
+        
         .table th, .table td {
             text-align: center !important; /* 強制所有表格內容置中 */
         }
@@ -10,6 +12,8 @@
 
 @{
     ViewData["Title"] = "訂單明細";
+    long orderid = ViewBag.OrderId;
+        <text>Order ID: @orderid</text>
 }
 
 <h1>訂單明細檢視</h1>
@@ -124,41 +128,10 @@
     </div>
 </div>
 
-@section Scripts {
-    <script src="~/lib/datatables/datatables.min.js"></script>
-    <script>
-        // $(".sidenav .nav-item a").removeClass("active");
-        // $("#order_item a").addClass("active");
-
-        $(function () {
-            $('#table_orderItem_wrapper').DataTable();
-            var orderId = '@ViewBag.OrderId';
-            // alert('訂單編號:'+orderId);
-
-            // 填入訂單標號至搜索欄位
-            if (orderId != 0) {
-                $('#dt-search-0').val(orderId);
-            }
-            // 觸發input事件
-            $('#dt-search-0').trigger('input');
-
-        });
-
-        @* 套用datatabes套件 *@
-            // new DataTable("table", {
-            //     language: {
-            //         url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-            //         paginate: {
-            //             first: "«",   // 保持圖示化
-            //             previous: "‹", // 保持圖示化
-            //             next: "›",    // 保持圖示化
-            //             last: "»"     // 保持圖示化
-            //         },
-            //     }
-            // })
-
-       
 
 
-    </script>
-}
+<script>
+
+    
+
+</script>

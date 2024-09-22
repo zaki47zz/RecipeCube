@@ -1,0 +1,188 @@
+﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.UserViewModel>
+
+@{
+    ViewData["Title"] = "使用者資料";
+}
+
+<h1>使用者資料</h1>
+
+<div class="card-body">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </th>
+                @* <th>
+                @Html.DisplayNameFor(model => model.NormalizedUserName)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                @*   <th>
+                @Html.DisplayNameFor(model => model.NormalizedEmail)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.EmailConfirmed)
+                </th>
+                @*  <th>
+                @Html.DisplayNameFor(model => model.PasswordHash)
+                </th> *@
+                @*  <th>
+                @Html.DisplayNameFor(model => model.SecurityStamp)
+                </th> *@
+                @*   <th>
+                @Html.DisplayNameFor(model => model.ConcurrencyStamp)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </th>
+                @*  <th>
+                @Html.DisplayNameFor(model => model.PhoneNumberConfirmed)
+                </th> *@
+                @*   <th>
+                @Html.DisplayNameFor(model => model.TwoFactorEnabled)
+                </th> *@
+                @*  <th>
+                @Html.DisplayNameFor(model => model.LockoutEnd)
+                </th> *@
+                @* <th>
+                @Html.DisplayNameFor(model => model.LockoutEnabled)
+                </th> *@
+                @*  <th>
+                @Html.DisplayNameFor(model => model.AccessFailedCount)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.DietaryRestrictions)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExclusiveChecked)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GroupId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PreferredChecked)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.NormalizedUserName)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    @*  <td>
+                @Html.DisplayFor(modelItem => item.NormalizedEmail)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                    </td>
+                    @*   <td>
+                @Html.DisplayFor(modelItem => item.PasswordHash)
+                </td> *@
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.SecurityStamp)
+                </td> *@
+                    @*  <td>
+                @Html.DisplayFor(modelItem => item.ConcurrencyStamp)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.PhoneNumberConfirmed)
+                </td> *@
+                    @*  <td>
+                @Html.DisplayFor(modelItem => item.TwoFactorEnabled)
+                </td> *@
+                    @*  <td>
+                @Html.DisplayFor(modelItem => item.LockoutEnd)
+                </td> *@
+                    @*   <td>
+                @Html.DisplayFor(modelItem => item.LockoutEnabled)
+                </td> *@
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.AccessFailedCount)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DietaryRestrictions)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExclusiveChecked)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GroupId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PreferredChecked)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                   <td class="text-center">
+                        <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id">編輯</button>
+                        <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.Id">詳細</button>
+                        <button class="delete btn bg-gradient-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id">停權</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeLabel">編輯</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsLabel">詳細資訊</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLabel">停權</h5>
+                <i class="fa-solid fa-circle-xmark fs-3" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
