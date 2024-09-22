@@ -119,7 +119,8 @@
 
                 <div class="form-group">
                     <label asp-for="Photo" class="control-label"></label>
-                    <input asp-for="Photo" class="form-control" />
+                    <partial name="_ShowPhotoPartial" class="col-lg-6" />
+                    <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
 
@@ -144,9 +145,9 @@
 
 <!-- 在局部檢視內包含腳本 -->
 <script>
-    // var ingredientUnits = {};  // 全局變數，用於儲存每個食材的單位
     $(document).ready(function () {
         initCreateForm();
+        Image();
     });
     function initCreateForm() {
 
@@ -289,7 +290,37 @@
         });
     }
 
+    function Image() {
+    @*圖檔預覽*@
+        function previewImage(inputFile) {
+            if (inputFile.files[0]) {
+                var allowTypes = "image.*";
+                var file = inputFile.files[0];
+                if (file.type.match(allowTypes)) {
+    @*預覽*@
+                    var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $("#Photo").prev().attr("src", e.target.result);
+                            $("#Photo").prev().attr("title", file.name);
+                        };
+                        reader.readAsDataURL(file);
+                        $(".btn.btn-primary").prop("disabled", false);
+                    }
+                else {
+                    alert("不允許的檔案上傳類型")
+                    $(".btn.btn-primary").prop("disabled", true);
+                    inputFile.value = "";
+                    $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
+                    $("#Photo").prev().attr("title", "尚無圖檔");
+                }
+            }
+        }
 
+        $("#Photo").on("change", function () {
+            previewImage(this);
+
+        })
+    }
 
 </script>
 
