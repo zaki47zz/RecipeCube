@@ -99,7 +99,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed,
                 PhoneNumber = user.PhoneNumber,
                 PreferredChecked = user.PreferredChecked,
                 DietaryRestrictions = user.DietaryRestrictions,
@@ -116,7 +115,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Edit(string id, [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,DietaryRestrictions,ExclusiveChecked,GroupId,PreferredChecked")] UserViewModel userViewModel)
+        public async Task<JsonResult> Edit(string id, [Bind("Id,UserName,Email,PhoneNumber,DietaryRestrictions,ExclusiveChecked,GroupId,PreferredChecked")] UserViewModel userViewModel)
         {
             if (id != userViewModel.Id)
             {
@@ -137,7 +136,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                     // 更新指定的欄位
                     user.UserName = userViewModel.UserName;
                     user.Email = userViewModel.Email;
-                    user.EmailConfirmed = userViewModel.EmailConfirmed;
                     user.PhoneNumber = userViewModel.PhoneNumber;
                     user.DietaryRestrictions = userViewModel.DietaryRestrictions;
                     user.ExclusiveChecked = userViewModel.ExclusiveChecked;
@@ -147,7 +145,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                     // 標記已修改的欄位
                     _context.Entry(user).Property(u => u.UserName).IsModified = true;
                     _context.Entry(user).Property(u => u.Email).IsModified = true;
-                    _context.Entry(user).Property(u => u.EmailConfirmed).IsModified = true;
                     _context.Entry(user).Property(u => u.PhoneNumber).IsModified = true;
                     _context.Entry(user).Property(u => u.DietaryRestrictions).IsModified = true;
                     _context.Entry(user).Property(u => u.ExclusiveChecked).IsModified = true;
