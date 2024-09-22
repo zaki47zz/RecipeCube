@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
 
 namespace RecipeCube.Areas.Admin.Controllers
@@ -18,7 +19,16 @@ namespace RecipeCube.Areas.Admin.Controllers
         public async Task<IActionResult> OrderIndexPartial()
         {
             var orders = await _context.Orders.ToListAsync();
-            return PartialView("_OrderIndexPartial", orders);
+
+            var viewModel =orders.Select(order =>new OrderViewModel
+            {
+                OrderId=order.OrderId,
+                UserId=order.UserId,
+                OrderTime=order.OrderTime,
+                TotalAmount=order.TotalAmount,
+                Status=order.Status,
+            }).ToList();
+            return PartialView("_OrderIndexPartial", viewModel);
         }
 
         // GET: Admin/Orders/CreatePartial

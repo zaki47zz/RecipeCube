@@ -48,8 +48,18 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
 
-            return PartialView("_DetailsPartial",product);
+            return PartialView("_DetailsPartial",viewModel);
         }
 
         // GET: Admin/Products/CreatePartial
@@ -99,7 +109,17 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial",product);
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
+            return PartialView("_EditPartial",viewModel);
         }
 
         // POST:Admin/Products/Edit
@@ -175,8 +195,18 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            var viewModel = new ProductViewModel
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                IngredientId = product.IngredientId,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                Photo = product.Photo,
+            };
 
-            return PartialView("_ShowPhotoPartial", product);
+            return PartialView("_ShowPhotoPartial", viewModel);
         }
 
         // GET: Admin/Products
