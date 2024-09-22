@@ -64,7 +64,15 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            return PartialView("_EditPartial",orderItem);
+            var viewModel = new OrderItemViewModel
+            {
+                OrderItemId = orderItem.OrderItemId,
+                OrderId = orderItem.OrderId,
+                ProductId = orderItem.ProductId,
+                Quantity = orderItem.Quantity,
+                Price = orderItem.Price,
+            };
+            return PartialView("_EditPartial",viewModel);
         }
 
         // POST: Admin/OrderItems/Edit/5
@@ -114,8 +122,16 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            var viewModel = new OrderItemViewModel
+            {
+                OrderItemId = orderItem.OrderItemId,
+                OrderId = orderItem.OrderId,
+                ProductId = orderItem.ProductId,
+                Quantity = orderItem.Quantity,
+                Price = orderItem.Price,
+            };
 
-            return PartialView("_DeletePartial",orderItem);
+            return PartialView("_DeletePartial",viewModel);
         }
 
         // POST: Admin/OrderItems/Delete/5

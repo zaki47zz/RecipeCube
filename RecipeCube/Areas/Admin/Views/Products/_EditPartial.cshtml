@@ -1,15 +1,8 @@
 ﻿@model RecipeCube.Areas.Admin.ViewModels.ProductViewModel
 
-@{
-    ViewData["Title"] = "編輯商品";
-}
-
-<h1>編輯</h1>
-
-<h4>商品</h4>
-<hr />
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
+        <div class="w-100">
         <form id="editForm" asp-action="Edit" method="post" enctype="multipart/form-data" asp-route-id="@Model.ProductId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProductId" />
@@ -19,7 +12,7 @@
                 <span asp-validation-for="ProductName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="IngredientId" class="control-label">食材id</label>
+                <label asp-for="IngredientId" class="control-label">食材編號</label>
                 <input asp-for="IngredientId" class="form-control" />
                 <span asp-validation-for="IngredientId" class="text-danger"></span>
             </div>
@@ -43,7 +36,7 @@
             </div>
 
             @* 呼叫圖片局部檢視，新增圖片上傳欄位_僅允許(jpg,jpeg,png) *@
-            <div>
+            <div class="form-group">
                 <label asp-for="Photo" class="control-label col-lg-6">商品圖</label>
                 <partial name="_ShowPhotoPartial" class="col-lg-6" />
                 @* id="Photo" name="Picture" *@
@@ -55,6 +48,7 @@
                 <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
             </div>
         </form>
+        </div>
     </div>
 </div>
 

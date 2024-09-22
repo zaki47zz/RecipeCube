@@ -4,6 +4,7 @@ namespace RecipeCube.Areas.Admin.ViewModels;
 
 public partial class ProductViewModel
 {
+    [Display(Name ="商品編號")]
     public int ProductId { get; set; }
 
     [Display(Name="商品名稱")]

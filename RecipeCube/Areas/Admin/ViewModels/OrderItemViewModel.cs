@@ -4,6 +4,7 @@ namespace RecipeCube.Areas.Admin.ViewModels;
 
 public partial class OrderItemViewModel
 {
+    [Display(Name ="訂單細項編號")]
     public int OrderItemId { get; set; }
 
     [Display(Name ="訂單編號")]
