@@ -44,7 +44,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         {
             get => _expiryDate; // "=>"是{return xxx} 的簡寫式
             set
-            {
+            { 
                 _expiryDate = value ?? _expiryDate; //沒有值則維持最小值
                 UpdateIsExpiring(); //透過下面的method運算一下有沒有要過期
             }

@@ -6,7 +6,7 @@ namespace RecipeCube.Areas.Admin.ViewModels;
     {
         public long OrderId { get; set; }
 
-        [Display(Name="商品名稱")]
+        [Display(Name="使用者編號")]
         public string? UserId { get; set; }
 
         [Display(Name="訂單時間")]
