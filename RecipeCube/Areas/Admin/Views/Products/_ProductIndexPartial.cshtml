@@ -37,9 +37,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Status)
                 </th>
-                <th>
+               @*  <th>
                     @Html.DisplayNameFor(model => model.Photo)
-                </th>
+                </th> *@
                 <th>動作</th>
             </tr>
         </thead>
@@ -59,12 +59,17 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Stock)
                     </td>
-                    <td>
+                  @*   <td>
                         @Html.DisplayFor(modelItem => item.Status)
-                    </td>
+                    </td> *@
                     <td>
-                        @Html.DisplayFor(modelItem => item.Photo)
+                    <span class="badge @(item.Status.GetValueOrDefault() ? "bg-success" : "bg-danger")">
+                        @(item.Status.GetValueOrDefault() ? "正常供貨" : "停售")
+                    </span>
                     </td>
+                    @* <td>
+                        @Html.DisplayFor(modelItem => item.Photo)
+                    </td> *@
                     <td class="text-center">
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.ProductId">編輯</button>
                         <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.ProductId">詳細</button>
