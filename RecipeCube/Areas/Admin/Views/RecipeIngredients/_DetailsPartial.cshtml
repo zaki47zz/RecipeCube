@@ -1,8 +1,6 @@
-﻿@model RecipeCube.Models.RecipeIngredient
-@{
-    ViewData["Title"] = "Details";
-}
-<!-- 這裡改成你的model -->
+﻿@model RecipeCube.Areas.Admin.ViewModels.RecipeIngredientViewModel
+
+
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -10,40 +8,33 @@
             <dl class="row">
                 <div class="mb-3">
                     <dt class="col-12">
-                        <!-- 第一個dt內的內容 -->
-                        @Html.DisplayNameFor(model => model.RecipeId)
+                        @Html.DisplayNameFor(model => model.RecipeId) - @Html.DisplayNameFor(model => model.RecipeName)
                     </dt>
                     <dd class="col-12">
-                        <!-- 第一個dd內的內容 -->
-                        @Html.DisplayFor(model => model.RecipeId)
+                        @Html.DisplayFor(model => model.RecipeId) - @Html.DisplayFor(model => model.RecipeName) <!-- 顯示食譜名稱 -->
                     </dd>
                 </div>
                 <div class="mb-3">
                     <dt class="col-12">
-                        <!-- 第二個dt內的內容 -->
-                        @Html.DisplayNameFor(model => model.IngredientId)
+                        @Html.DisplayNameFor(model => model.IngredientId) - @Html.DisplayNameFor(model => model.IngredientName)
                     </dt>
                     <dd class="col-12">
-                        <!-- 第二個dt內的內容 -->
-                        @Html.DisplayFor(model => model.IngredientId)
+                        @Html.DisplayFor(model => model.IngredientId) - @Html.DisplayFor(model => model.IngredientName) <!-- 顯示食材名稱 -->
                     </dd>
                 </div>
                 <div class="mb-3">
                     <dt class="col-12">
-                        <!-- 第二個dt內的內容 -->
                         @Html.DisplayNameFor(model => model.Quantity)
                     </dt>
                     <dd class="col-12">
-                        <!-- 第二個dt內的內容 -->
-                        @Html.DisplayFor(model => model.Quantity)
+                        @Html.DisplayFor(model => model.Quantity) - @Html.DisplayFor(model => model.Unit)
                     </dd>
                 </div>
-                <!-- 以此類推，基本上就是用"mb-3"的div來包dt,dd，然後讓他們滿12col換行 -->
             </dl>
-            <!-- IngredientId改成你的主鍵 -->
+
             <div class="d-flex justify-content-center">
-                    <a href="javascript:void(0)" class="btn btn-info me-5" id="openeditModal" data-id="@Model.RecipeId">編輯</a>
-                    <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
+                <a href="javascript:void(0)" class="btn btn-info me-5" id="openeditModal" data-id="@Model.RecipeIngredientId">編輯</a>
+                <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
             </div>
         </div>
     </div>
