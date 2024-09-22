@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RecipeCube.Models.OrderItem>
+﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.OrderItemViewModel>
 
 @section Styles {
     
@@ -38,7 +38,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Price)
                 </th>
-                <th></th>
+                <th>動作</th>
             </tr>
         </thead>
         <tbody>

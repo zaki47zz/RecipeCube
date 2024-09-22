@@ -1,6 +1,7 @@
 ﻿using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCube.Areas.Admin.ViewModels;
 using RecipeCube.Models;
 using System.Diagnostics;
 
@@ -16,18 +17,20 @@ namespace RecipeCube.Areas.Admin.Controllers
             _context = context;
         }
 
-        //public async Task<IActionResult> GetOrderId(int id)
-        //{
-        //    ViewBag.myOrderId = id;
-        //}
-
-
         public async Task<IActionResult> OrderItemIndexPartial(long orderid)
         {
             ViewBag.OrderId = orderid;
             Debug.WriteLine($"IIIIIIDDDDDDD==================={orderid}");
             var orderItems = await _context.OrderItems.ToListAsync();
-            return PartialView("_OrderItemIndexPartial", orderItems);
+            var viewModel = orderItems.Select(orderItem => new OrderItemViewModel
+            {
+                OrderItemId=orderItem.OrderItemId,
+                OrderId=orderItem.OrderId,
+                ProductId=orderItem.ProductId,
+                Quantity=orderItem.Quantity,
+                Price=orderItem.Price,
+            }).ToList();
+            return PartialView("_OrderItemIndexPartial", viewModel);
         }
 
         // GET: Admin/OrderItems/Create
