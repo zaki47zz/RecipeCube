@@ -108,27 +108,25 @@ namespace RecipeCube.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(
-                    Input.Email,
-                    Input.Password,
-                    Input.RememberMe,
-                    lockoutOnFailure: false
-                );
+                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                // 如果會員狀態為false 則拒絕登入，並要求連絡客服
+                if (user.status != true)
+                {
+                    ModelState.AddModelError(string.Empty, "你的帳號已被暫時停用，請聯絡客服人員了解停用原因");
+                    return Page();
+                }
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-
-                    // 檢查該使用者是否具有 Admin 角色
-                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
-                    if (await _signInManager.UserManager.IsInRoleAsync(user, "Admin"))
+                    if (await _signInManager.UserManager.IsInRoleAsync(user, "Admin"))  // 檢查該使用者是否具有 Admin 角色
                     {
-                        // 如果使用者角色是 Admin，則重新導向到 /Admin 頁面
-                        returnUrl = Url.Content("~/Admin");
+                        returnUrl = Url.Content("~/Admin"); // 如果使用者角色是 Admin，則重新導向到 /Admin 頁面
                     }
                     return LocalRedirect(returnUrl);
                 }
+
+
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage(
