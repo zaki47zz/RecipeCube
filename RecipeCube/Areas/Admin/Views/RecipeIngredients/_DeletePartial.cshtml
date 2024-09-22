@@ -1,5 +1,5 @@
-﻿@model RecipeCube.Areas.Admin.ViewModels.IngredientViewModel
-
+﻿@model RecipeCube.Models.RecipeIngredient
+<!-- 這裡改成你的model -->
 
 <div class="row">
     <div class="col-xl-8 col-lg-9 col-md-10 mx-auto">
@@ -7,65 +7,41 @@
             <dl class="row">
                 <div class="mb-3">
                     <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.IngredientName)
+                        <!-- 第一個dt內的內容 -->
+                        @Html.DisplayNameFor(model => model.RecipeId)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.IngredientName)
+                        <!-- 第一個dd內的內容 -->
+                        @Html.DisplayFor(model => model.RecipeId)
                     </dd>
                 </div>
                 <div class="mb-3">
                     <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Category)
+                        <!-- 第二個dt內的內容 -->
+                        @Html.DisplayNameFor(model => model.IngredientId)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Category)
+                        <!-- 第二個dt內的內容 -->
+                        @Html.DisplayFor(model => model.IngredientId)
                     </dd>
                 </div>
                 <div class="mb-3">
                     <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Synonym)
+                        <!-- 第二個dt內的內容 -->
+                        @Html.DisplayNameFor(model => model.Quantity)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Synonym)
+                        <!-- 第二個dt內的內容 -->
+                        @Html.DisplayFor(model => model.Quantity)
                     </dd>
                 </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.ExpireDay)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.ExpireDay)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Unit)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.Unit)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Gram)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.Gram)
-                    </dd>
-                </div>
-                <div class="mb-3">
-                    <dt class="col-12">
-                        @Html.DisplayNameFor(model => model.Photo)
-                    </dt>
-                    <dd class="col-12">
-                        @Html.DisplayFor(model => model.Photo)
-                    </dd>
-                </div>
+                <!-- 以此類推，基本上就是用"mb-3"的div來包dt,dd，然後讓他們滿12col換行 -->
             </dl>
+            <!-- IngredientId改成你的主鍵 -->
             <div class="d-flex justify-content-center">
                 <form asp-action="Delete" id="deleteForm" asp-route-id="@Model.IngredientId" method="post">
                     <input type="hidden" asp-for="IngredientId" />
-                    <input type="submit" class="btn btn-danger mx-3" id="" data-id="@Model.IngredientId" value="刪除" />
+                    <input type="submit" class="btn btn-danger me-3" id="" data-id="@Model.IngredientId" value="刪除" />
                     <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
                 </form>
             </div>
