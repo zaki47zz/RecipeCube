@@ -146,6 +146,27 @@
 <!-- 在局部檢視內包含腳本 -->
 <script>
     $(document).ready(function () {
+        $('#editModal, #createModal').on('shown.bs.modal', function () {
+            // 在每次打開模態框之前，清除所有事件綁定，避免重複
+            $('#selectedIngredients').off('change');
+            $('#categorySelect').off('change');
+
+            if ($(this).attr('id') === 'editModal') {
+                initEditForm();
+            } else if ($(this).attr('id') === 'createModal') {
+                initCreateForm();
+            }
+        });
+
+        $('.modal').on('hidden.bs.modal', function () {
+            // 找到模態視窗中的表單並重置，若表單存在才進行重置操作
+            var form = $(this).find('form')[0];
+            if (form) {
+                form.reset();
+            }
+            $(this).find('.modal-body').html('Loading...'); // 清空模態視窗的內容
+        });
+
         initCreateForm();
         Image();
     });
@@ -154,7 +175,6 @@
         //alert("我來自局部檢視");
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#createForm');
-
         var categoryOptions = {
             "主餐": ["麵食", "飯食", "粥", "排餐", "鹹派", "火鍋", "焗烤"],
             "副餐": ["肉類料理", "青菜料理", "海鮮料理"],
@@ -291,35 +311,37 @@
     }
 
     function Image() {
-    @*圖檔預覽*@
+        // 預覽上傳的圖檔
         function previewImage(inputFile) {
-            if (inputFile.files[0]) {
-                var allowTypes = "image.*";
+            if (inputFile.files && inputFile.files[0]) {
                 var file = inputFile.files[0];
+                var allowTypes = "image.*";
+
                 if (file.type.match(allowTypes)) {
-    @*預覽*@
                     var reader = new FileReader();
-                        reader.onload = function (e) {
-                            $("#Photo").prev().attr("src", e.target.result);
-                            $("#Photo").prev().attr("title", file.name);
-                        };
-                        reader.readAsDataURL(file);
-                        $(".btn.btn-primary").prop("disabled", false);
-                    }
-                else {
-                    alert("不允許的檔案上傳類型")
-                    $(".btn.btn-primary").prop("disabled", true);
+
+                    reader.onload = function (e) {
+                        // 使用你指定的 img 元素 id 'Photo'
+                        $("#Photo").attr("src", e.target.result);
+                        $("#Photo").attr("title", file.name);
+                    };
+
+                    reader.readAsDataURL(file);
+                    $(".btn.btn-primary").prop("disabled", false); // 啟用按鈕
+                } else {
+                    alert("不允許的檔案上傳類型");
+                    $(".btn.btn-primary").prop("disabled", true); // 禁用按鈕
                     inputFile.value = "";
-                    $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
-                    $("#Photo").prev().attr("title", "尚無圖檔");
+                    $("#Photo").attr("src", "@Url.Content("~/img/icon_large.png")");
+                    $("#Photo").attr("title", "尚無圖檔");
                 }
             }
         }
 
-        $("#Photo").on("change", function () {
+        // 綁定圖片上傳變更事件，使用 input 元素的 id
+        $("input[type='file'][id='Photo']").on("change", function () {
             previewImage(this);
-
-        })
+        });
     }
 
 </script>

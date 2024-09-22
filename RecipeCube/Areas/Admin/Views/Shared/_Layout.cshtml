@@ -486,10 +486,8 @@
             function handleFormSubmit(formSelector, modalSelector) {
                 $(document).on('submit', formSelector, function (e) {
                     e.preventDefault();
-
                     // 使用 FormData 來處理文件上傳
                     var formData = new FormData(this);
-
                     // 根據 controller 或 parentId 決定是否需要處理 Select2 的食材數據
                     if (controller === 'Recipes' || parentId === 'Recipe') {
                         // 獲取 Select2 選中的食材
@@ -499,7 +497,6 @@
                                 formData.append('SelectedIngredients', ingredientId); // 使用 append 將選擇的食材添加到 FormData 中
                             });
                         }
-
                         // 獲取食材的數量
                         $('input[name^="IngredientQuantities"]').each(function () {
                             var ingredientId = $(this).attr('name').match(/\[(\d+)\]/)[1];
@@ -507,7 +504,6 @@
                             formData.append('IngredientQuantities[' + ingredientId + ']', quantity); // 將數量也加入到 FormData
                         });
                     }
-
                     $.ajax({
                         url: $(this).attr('action'),
                         type: 'POST',
@@ -527,25 +523,9 @@
                             alert('發生錯誤，無法保存');
                         }
                     });
-                            contentType: false,// 不設置內容類型
-                            traditional: true,
-                            success: function (response) {
-                                if (response.success) {
-                                    $(modalSelector).modal('hide');
-                                    loadPartial();
-                                } else {
-                                    $(modalSelector + ' .modal-body').html(response);
-                                }
-                            },
-                            error: function () {
-                                alert('發生錯誤，無法保存');
-                            }
-                        });
-                    }
-
-
                 });
-            }
+            } 
+
 
             // Sidebar的反應
             $("ul.navbar-nav .nav-link").on('click', function (e) {
@@ -607,10 +587,7 @@
 
             // Modal關閉時的反應
             $('.modal').on('hidden.bs.modal', function () {
-                if (previousContent) {
-                    $('#dynamic-content').html(previousContent);
-                    previousContent = null;
-                }
+                $(this).find('.modal-body').html('');  // 清空 modal 內容
                 loadPartial();
             });
 
