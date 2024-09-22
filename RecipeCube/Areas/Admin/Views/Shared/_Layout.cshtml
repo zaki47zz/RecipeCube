@@ -474,74 +474,59 @@
                     }
                 });
             }
+
             // 處理Form的Submit
             function handleFormSubmit(formSelector, modalSelector) {
-                let isSubmitting = false;  // 增加一個標誌位防止重複提交
+                let isSubmitting = false;
+
                 $(document).on('submit', formSelector, function (e) {
                     e.preventDefault();
 
-                    var formData = new FormData(this);
-                    console.log(formData);
+                    if (isSubmitting) return; // 防止重複提交
+                    isSubmitting = true;
 
-                    // 根據 controller 或 parentId 決定是否需要處理 Select2 的食材數據
-                    if (controller === 'Recipes' || parentId === 'Recipe') {
-                        // 如果需要處理 Select2，使用 serializeArray();
-                        formData = $(this).serializeArray();
-                        console.log("2:", formData);
-                        // 獲取 Select2 選中的食材
+                    var form = $(this);
+                    var formData;
+                    var ajaxOptions = {
+                        url: form.attr('action'),
+                        type: 'POST',
+                        traditional: true,
+                        success: function (response) {
+                            if (response.success) {
+                                $(modalSelector).modal('hide');
+                                loadPartial();
+                            } else {
+                                $(modalSelector + ' .modal-body').html(response);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Ajax error:', status, error);
+                            alert('發生錯誤，無法保存：' + error);
+                        },
+                        complete: function () {
+                            isSubmitting = false;
+                        }
+                    };
+
+                    // 檢查是否為 Recipes 控制器或 Recipe 父元素
+                    if (controller === 'Recipes' || parentId === 'Recipe' || controller === 'Inventories' || parentId === 'Inventory') {
+                        formData = form.serializeArray();
+
+                        // 處理 Select2 多選食材
                         if ($('#selectedIngredients').length) {
-                            var selectedIngredients = $('#selectedIngredients').val();
+                            var selectedIngredients = $('#selectedIngredients').val() || [];
                             selectedIngredients.forEach(function (ingredientId) {
                                 formData.push({ name: 'SelectedIngredients', value: ingredientId });
                             });
                         }
-                        // } else {
-                        //     // 不需要 Select2，使用 serialize()
-                        //     formData = $(this).serialize();
-                        console.log("2:", formData);
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            type: 'POST',
-                            data: formData,
-                            // processData: false,// 不處理資料
-                            // contentType: false,// 不設置內容類型
-                            traditional: true,
-                            success: function (response) {
-                                if (response.success) {
-                                    $(modalSelector).modal('hide');
-                                    loadPartial();
-                                } else {
-                                    $(modalSelector + ' .modal-body').html(response);
-                                }
-                            },
-                            error: function () {
-                                alert('發生錯誤，無法保存');
-                            }
-                        });
+                        ajaxOptions.data = formData;
+                    } else {
+                        formData = new FormData(this);
+                        ajaxOptions.data = formData;
+                        ajaxOptions.processData = false;
+                        ajaxOptions.contentType = false;
                     }
-                    else {
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            type: 'POST',
-                            data: formData,
-                            processData: false,// 不處理資料
-                            contentType: false,// 不設置內容類型
-                            traditional: true,
-                            success: function (response) {
-                                if (response.success) {
-                                    $(modalSelector).modal('hide');
-                                    loadPartial();
-                                } else {
-                                    $(modalSelector + ' .modal-body').html(response);
-                                }
-                            },
-                            error: function () {
-                                alert('發生錯誤，無法保存');
-                            }
-                        });
-                    }
-
-
+                    $.ajax(ajaxOptions);
                 });
             }
 
@@ -602,40 +587,6 @@
             handleFormSubmit('#editForm', '#editModal');
             handleFormSubmit('#createForm', '#createModal');
             handleFormSubmit('#deleteForm', '#deleteModal');
-
-            // Create針對Select2的submit
-            // $(document).on('submit', '#createForm', function (e) {
-            //     e.preventDefault();
-            //     var formData = $(this).serializeArray();
-            //     console.log('初始 formData:', formData);
-
-            //     // 獲取 Select2 選中的食材
-            //     if ($('#selectedIngredients').length) {
-            //         var selectedIngredients = $('#selectedIngredients').val();
-            //         selectedIngredients.forEach(function (ingredientId) {
-            //             formData.push({ name: 'SelectedIngredients', value: ingredientId });
-            //         });
-            //     }
-            //     console.log('formData:', formData);
-
-            //     $.ajax({
-            //         url: $(this).attr('action'),
-            //         type: 'POST',
-            //         data: formData,
-            //         traditional: true,
-            //         success: function (response) {
-            //             if (response.success) {
-            //                 $('#createModal').modal('hide');
-            //                 loadPartial();
-            //             } else {
-            //                 $('#createModal .modal-body').html(response);
-            //             }
-            //         },
-            //         error: function () {
-            //             alert('發生錯誤，無法建立');
-            //         }
-            //     });
-            // });
 
             // Modal關閉時的反應
             $('.modal').on('hidden.bs.modal', function () {

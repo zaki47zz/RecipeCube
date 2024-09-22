@@ -12,14 +12,12 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public int? GroupId { get; set; }
 
         [Display(Name = "群組名稱")]
-        [Required(ErrorMessage = "群組名稱為必填欄位")]
         public string? GroupName { get; set; }
 
         [Display(Name = "使用者ID")]
         public string? UserId { get; set; }
 
         [Display(Name = "使用者名稱")]
-        [Required(ErrorMessage = "使用者名稱為必填欄位")]
         public string? UserName { get; set; }
 
         [Display(Name = "食材ID")]
@@ -109,8 +107,8 @@ namespace RecipeCube.Areas.Admin.ViewModels
             }
         }
 
-        public List<UserGroup> Groups { get; set; }
-        public List<User> Users { get; set; }
+        public List<UserGroup>? Groups { get; set; }
+        public List<User>? Users { get; set; }
 
         // 新增一個屬性來儲存所有食材
         [BindNever]
@@ -123,8 +121,6 @@ namespace RecipeCube.Areas.Admin.ViewModels
 
         // 食材數量
         [Display(Name = "食材數量")]
-        [Range(0.1, 10000.00, ErrorMessage = "數量需介在0.1到10000之間")]
-        [DisplayFormat(DataFormatString = "{0:F1}", ApplyFormatInEditMode = true)] // 格式化為一位小數
         public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();
 
         // 食材到期日

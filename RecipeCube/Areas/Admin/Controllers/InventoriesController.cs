@@ -162,25 +162,24 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InventoryId,GroupId,UserId,SelectedIngredients,IngredientQuantities,IngredientExpiryDate,IngredientIsExpiring,IngredientVisibility")] InventoryViewModel model)
+        public async Task<IActionResult> Create([Bind("GroupId,UserId,SelectedIngredients,IngredientQuantities,IngredientExpiryDate,IngredientIsExpiring,IngredientVisibility")] InventoryViewModel model)
         {
+            ModelState.Remove(nameof(model.Users)); //這個欄位會干擾submit，不知道怎麼解
+
             if (ModelState.IsValid)
             {
                 if (model.SelectedIngredients != null && model.IngredientQuantities != null)
                 {
                     var ingredientIds = model.SelectedIngredients.Distinct().ToList();
 
-                    // 把所有食材分開寫成一個新庫存加入資料庫
                     foreach (var ingredientId in ingredientIds)
                     {
-                        if (model.IngredientQuantities.ContainsKey(ingredientId) && model.IngredientExpiryDate.ContainsKey(ingredientId) && model.IngredientIsExpiring.ContainsKey(ingredientId) && model.IngredientVisibility.ContainsKey(ingredientId))
+                        if (model.IngredientQuantities.TryGetValue(ingredientId, out var quantity) &&
+                            model.IngredientExpiryDate.TryGetValue(ingredientId, out var expireDate) &&
+                            model.IngredientIsExpiring.TryGetValue(ingredientId, out var isExpiring) &&
+                            model.IngredientVisibility.TryGetValue(ingredientId, out var visibility))
                         {
-                            var quantity = model.IngredientQuantities[ingredientId];
-                            var expireDate = model.IngredientExpiryDate[ingredientId];
-                            var isExpiring = model.IngredientIsExpiring[ingredientId];
-                            var visibility = model.IngredientVisibility[ingredientId];
-
-                            var invnetory = new Inventory
+                            var inventory = new Inventory
                             {
                                 GroupId = model.GroupId,
                                 UserId = model.UserId,
@@ -190,24 +189,31 @@ namespace RecipeCube.Areas.Admin.Controllers
                                 IsExpiring = isExpiring,
                                 Visibility = visibility,
                             };
-                            _context.Add(invnetory);
+                            _context.Add(inventory);
                         }
                     }
                 }
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
             }
-            // 如果 ModelState 無效，重新載入partial
-            model.AvailableIngredients = _context.Ingredients
-                .Select(i => new IngredientViewModel
-                {
-                    IngredientId = i.IngredientId,
-                    IngredientName = i.IngredientName,
-                    Unit = i.Unit
-                }).ToList();
-            model.IngredientUnits = model.AvailableIngredients.ToDictionary(i => i.IngredientId, i => i.Unit);
 
-            return PartialView("_CreatePartial", model);
+            // 如果 ModelState 無效，返回錯誤信息
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            return Json(new { success = false, errors = errors , Model = model});
+
+            //model.AvailableIngredients = _context.Ingredients
+            //    .Select(i => new IngredientViewModel
+            //    {
+            //        IngredientId = i.IngredientId,
+            //        IngredientName = i.IngredientName,
+            //        Category = i.Category,
+            //        Unit = i.Unit
+            //    }).ToList();
+            //var groups = _context.UserGroups.ToList();
+            //var users = _context.Users.ToList();
+            //model.Groups = groups;
+            //model.Users = users;
+            //return PartialView("_CreatePartial", model);
         }
 
         [HttpGet]

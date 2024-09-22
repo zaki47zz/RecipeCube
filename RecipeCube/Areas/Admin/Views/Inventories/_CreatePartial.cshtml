@@ -8,6 +8,7 @@
                 <div class="form-group">
                     <label asp-for="GroupName" class="control-label"></label>
                     <select asp-for="GroupId" class="form-control mb-3" id="groupId">
+                        <option value="">-- 選擇群組 --</option>
                         @foreach (var item in Model.Groups)
                         {
                             <option value="@item.GroupId">@item.GroupName</option>
@@ -17,7 +18,9 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="UserName" class="control-label"></label>
-                    <select asp-for="UserId" class="form-control mb-3" id="userId" readonly></select>
+                    <select asp-for="UserId" class="form-control mb-3" id="userId" disabled>
+                        <option value="">-- 選擇用戶 --</option>
+                    </select>
                     <span asp-validation-for="UserName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -60,18 +63,18 @@
 
         // 根據所選群組更改User select內容
         $('#groupId').on('change', function () {
-            $('#userId').prop('readonly', false);
+            $('#userId').prop('disabled', false);
             let selectedGroup = $(this).val();
             $('#userId').empty().append('<option value="">-- 選擇用戶 --</option>');
-            @foreach (var item in Model.Users)
-            {
-                <text>
-                    if (selectedGroup == '@item.GroupId') {
-                        $('#userId').append('<option value="@item.Id">@item.UserName</option>');
-                    }
-                </text>
-            }
-            }).trigger('change');
+                @foreach (var item in Model.Users)
+                {
+                    <text>
+                        if (selectedGroup == '@item.GroupId') {
+                            $('#userId').append('<option value="@item.Id">@item.UserName</option>');
+                        };
+                    </text>
+                }
+        }).trigger('change');
 
         // 搜尋
         $('#selectedIngredients').select2({
@@ -97,25 +100,25 @@
 
                 var inputHtml_Quantity = `
                             <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
-                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" />`;
+                            <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]"/>`;
 
                 var inputHtml_ExpiryDate = `
-                        <label for="IngredientExpiryDate_${ingredientId}" class="control-label">${ingredientName} 的到期日</label>
-                        <input type="date" class="form-control" id="IngredientExpiryDate_${ingredientId}" name="IngredientExpiryDate[${ingredientId}]" />
-                        <span class="text-danger" id="IngredientExpiryDateSpan_${ingredientId}"></span>`;
+                            <label for="IngredientExpiryDate_${ingredientId}" class="control-label">${ingredientName} 的到期日</label>
+                            <input type="date" class="form-control" id="IngredientExpiryDate_${ingredientId}" name="IngredientExpiryDate[${ingredientId}]"/>
+                            <span class="text-danger" id="IngredientExpiryDateSpan_${ingredientId}"></span>`;
 
                 var inputHtml_IsExpiring = `
-                        <label for="IngredientIsExpiring_${ingredientId}" class="control-label">${ingredientName} 即將到期</label>
-                        <input class="form-control" id="IngredientIsExpiring_${ingredientId}" name="IngredientIsExpiring[${ingredientId}]" readonly/>
-                        <span class="text-danger" id="IngredientIsExpiringSpan_${ingredientId}"></span>`;
+                            <label for="IngredientIsExpiring_${ingredientId}" class="control-label">${ingredientName} 即將到期</label>
+                            <input class="form-control" id="IngredientIsExpiring_${ingredientId}" name="IngredientIsExpiring[${ingredientId}]" readonly/>
+                            <span class="text-danger" id="IngredientIsExpiringSpan_${ingredientId}"></span>`;
 
                 var inputHtml_Visibility = `
-                        <label for="IngredientVisibility_${ingredientId}" class="control-label">${ingredientName} 的可見性</label>
-                        <select class="form-control mb-3" id="IngredientVisibility_${ingredientId}" name="IngredientVisibility[${ingredientId}]" />
-                            <option value="true">群組可見</option>
-                            <option value="false">僅本人可見</option>
-                        </select>
-                        <span class="text-danger" id="IngredientVisibilitySpan_${ingredientId}"></span>`;
+                            <label for="IngredientVisibility_${ingredientId}" class="control-label">${ingredientName} 的可見性</label>
+                            <select class="form-control mb-3" id="IngredientVisibility_${ingredientId}" name="IngredientVisibility[${ingredientId}]" />
+                                <option value="true">群組可見</option>
+                                <option value="false">僅本人可見</option>
+                            </select>
+                            <span class="text-danger" id="IngredientVisibilitySpan_${ingredientId}"></span>`;
 
                 $('#ingredientQuantities').append(inputHtml_Quantity);
                 $('#ingredientExpiryDates').append(inputHtml_ExpiryDate);
