@@ -130,7 +130,8 @@
 
                 <div class="form-group">
                     <label asp-for="Photo" class="control-label"></label>
-                    <input asp-for="Photo" class="form-control" />
+                    <partial name="_ShowPhotoPartial" class="col-lg-6" />
+                    <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
 
@@ -153,13 +154,34 @@
 </div>
 <script>
     $(document).ready(function () {
-        initEditForm();
+        $('#editModal, #createModal').on('shown.bs.modal', function () {
+            // 在每次打開模態框之前，清除所有事件綁定，避免重複
+            $('#selectedIngredients').off('change');
+            $('#categorySelect').off('change');
+
+            if ($(this).attr('id') === 'editModal') {
+                initEditForm();
+            } else if ($(this).attr('id') === 'createModal') {
+                initCreateForm();
+            }
+        });
+
+        $('.modal').on('hidden.bs.modal', function () {
+            // 找到模態視窗中的表單並重置，若表單存在才進行重置操作
+            var form = $(this).find('form')[0];
+            if (form) {
+                form.reset();
+            }
+            $(this).find('.modal-body').html('Loading...'); // 清空模態視窗的內容
+        });
+        Image();
     });
 
     function initEditForm() {
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#editForm');
-
+        // 初始化 Select2
+        initSelect2('#selectedIngredients');  // 使用自定義函數初始化 Select2
         // 設定種類和細項類別選項
         var categoryOptions = {
             "主餐": ["麵食", "飯食", "粥", "排餐", "鹹派", "火鍋", "焗烤"],
@@ -224,22 +246,33 @@
         // 函數：生成食材數量輸入框
         function generateIngredientQuantityInputs(selectedIngredients, quantities) {
             var ingredientQuantitiesDiv = $('#ingredientQuantities');
+
+            // 清空之前的內容，防止重複生成
             ingredientQuantitiesDiv.empty();
 
+            // 為每個選擇的食材創建數量輸入框
             selectedIngredients.forEach(function (ingredientId) {
                 var ingredientOption = $('#selectedIngredients option[value="' + ingredientId + '"]');
-                var ingredientName = ingredientOption.text();
-                var unit = ingredientOption.data('unit') || ''; // 確保unit是從data-unit獲取的
-                var quantity = quantities[ingredientId] || '';
-                // console.log(unit);
+
+                // 獲取食材名稱並確保沒有重複
+                var ingredientName = ingredientOption.text().trim(); // 使用 trim 去除空白字符
+                console.log("Ingredient Name:", ingredientName); // 檢查 ingredientName 的值
+                var unit = ingredientOption.data('unit') || ''; // 確保單位正確顯示
+                var quantity = quantities[ingredientId] || ''; // 確保數量是已經保存的數據或默認為空
+
+                // 生成輸入框的 HTML
                 var inputHtml = `
-                <div class="form-group">
-                    <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量：${unit}</label>
-                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
-                </div>`;
+            <div class="form-group">
+                <label for="IngredientQuantities_${ingredientId}" class="control-label">
+                    ${ingredientName} 的數量：${unit}
+                </label>
+                <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+            </div>`;
+
                 ingredientQuantitiesDiv.append(inputHtml);
             });
         }
+
 
 
 
@@ -249,6 +282,51 @@
         var txt = document.createElement("textarea");
         txt.innerHTML = str;
         return txt.value;
+    }
+    function Image() {
+        // 預覽上傳的圖檔
+        function previewImage(inputFile) {
+            if (inputFile.files && inputFile.files[0]) {
+                var file = inputFile.files[0];
+                var allowTypes = "image.*";
+
+                if (file.type.match(allowTypes)) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        // 使用你指定的 img 元素 id 'Photo'
+                        $("#Photo").attr("src", e.target.result);
+                        $("#Photo").attr("title", file.name);
+                    };
+
+                    reader.readAsDataURL(file);
+                    $(".btn.btn-primary").prop("disabled", false); // 啟用按鈕
+                } else {
+                    alert("不允許的檔案上傳類型");
+                    $(".btn.btn-primary").prop("disabled", true); // 禁用按鈕
+                    inputFile.value = "";
+                    $("#Photo").attr("src", "@Url.Content("~/img/icon_large.png")");
+                    $("#Photo").attr("title", "尚無圖檔");
+                }
+            }
+        }
+
+        // 綁定圖片上傳變更事件，使用 input 元素的 id
+        $("input[type='file'][id='Photo']").on("change", function () {
+            previewImage(this);
+        });
+    }
+    function initSelect2(selector) {
+        // 每次初始化前，先destroy，避免重複初始化
+        if ($(selector).hasClass("select2-hidden-accessible")) {
+            $(selector).select2('destroy');
+        }
+        $(selector).select2({
+            placeholder: '選擇食材',
+            allowClear: true,
+            width: '100%',
+            // 其他配置...
+        });
     }
 </script>
 

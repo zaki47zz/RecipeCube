@@ -58,8 +58,23 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         public async Task<IActionResult> RecipeIndexPartial()
         {
+            // 從資料庫查詢所有的 Recipe
             var recipes = await _context.Recipes.ToListAsync();
-            return PartialView("_RecipeIndexPartial", recipes);
+
+            // 將 Recipe 轉換為 RecipeViewModel
+            var recipeViewModels = recipes.Select(recipe => new RecipeViewModel
+            {
+                RecipeId = recipe.RecipeId,
+                RecipeName = recipe.RecipeName,
+                UserId = recipe.UserId,
+                Category = recipe.Category,
+                DetailedCategory = recipe.DetailedCategory,
+                Status = recipe.Status,
+                // 添加其他必要的欄位
+            }).ToList();
+
+            // 傳遞 RecipeViewModel 給視圖
+            return PartialView("_RecipeIndexPartial", recipeViewModels);
         }
 
 
@@ -178,6 +193,19 @@ namespace RecipeCube.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (Request.Form.Files["Photo"] != null)
+                {
+                    var file = Request.Form.Files["Photo"];
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "recipe", fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    model.Photo = fileName; // 保存圖片的檔名到模型
+                }
                 // 創建新食譜
                 var recipe = new Recipe
                 {
@@ -342,7 +370,26 @@ namespace RecipeCube.Areas.Admin.Controllers
                     {
                         return new JsonResult(new { success = false, error = "找不到該食譜!" });
                     }
+                    // 檢查是否有上傳新的圖片
+                    if (Request.Form.Files["Photo"] != null)
+                    {
+                        var file = Request.Form.Files["Photo"];
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "recipe", fileName);
 
+                        // 保存新圖片
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        model.Photo = fileName; // 更新模型中的圖片名稱
+                    }
+                    else
+                    {
+                        // 如果沒有上傳新圖片，則保留原有圖片
+                        model.Photo = recipe.Photo;
+                    }
                     // 更新食譜的屬性
                     recipe.RecipeName = model.RecipeName;
                     recipe.UserId = model.UserId;

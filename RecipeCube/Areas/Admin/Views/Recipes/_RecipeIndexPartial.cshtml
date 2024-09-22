@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RecipeCube.Models.Recipe>
+﻿@model IEnumerable<RecipeCube.Areas.Admin.ViewModels.RecipeViewModel>
 
 @{
     ViewData["Title"] = "食譜檢視";
@@ -50,9 +50,15 @@
                 <td class="text-center">
                     @Html.DisplayFor(modelItem => item.DetailedCategory)
                 </td>
-                <td class="text-center">
+@*                 <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Status)
+                </td> *@
+                <td class="text-center">
+                    <span class="badge @(item.Status.GetValueOrDefault() ? "bg-success" : "bg-danger")">
+                            @(item.Status.GetValueOrDefault() ? "啟用" : "停用")
+                    </span>
                 </td>
+
                     <td class="text-center">
                     <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button>
                     <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.RecipeId">詳細</button>
@@ -106,3 +112,16 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    $(document).ready(function () {
+        clear();
+    });
+    function clear() {
+        // 當模態視窗關閉時清空內容
+        $('.modal').on('hidden.bs.modal', function () {
+            $(this).find('.modal-body').html('Loading...'); // 清空模態內容，並顯示 "Loading..."
+        });
+    }
+</script>
