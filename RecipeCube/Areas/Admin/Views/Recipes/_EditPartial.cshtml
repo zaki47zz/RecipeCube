@@ -77,26 +77,27 @@
                 <!-- 食材選擇 -->
                 <div class="form-group">
                     <label asp-for="SelectedIngredients" class="control-label">選擇食材</label>
-                            <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
-                                @foreach (var ingredient in Model.AvailableIngredients)
-                                {
-                                    var isSelected = Model.SelectedIngredients.Contains(ingredient.IngredientId);
-                                    if (isSelected)
-                                    {
-                                        <option value="@ingredient.IngredientId" selected>
-                                            @ingredient.IngredientName
-                                        </option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@ingredient.IngredientId">
-                                            @ingredient.IngredientName
-                                        </option>
-                                    }
-                                }
-                            </select>
+                    <select asp-for="SelectedIngredients" class="form-control select2-multiple" id="selectedIngredients" name="SelectedIngredients" multiple="multiple">
+                        @foreach (var ingredient in Model.AvailableIngredients)
+                        {
+                            var isSelected = Model.SelectedIngredients.Contains(ingredient.IngredientId);
+                            if (isSelected)
+                            {
+                                <option value="@ingredient.IngredientId" selected data-unit="@ingredient.Unit">
+                                    @ingredient.IngredientName
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@ingredient.IngredientId" data-unit="@ingredient.Unit">
+                                    @ingredient.IngredientName
+                                </option>
+                            }
+                        }
+                    </select>
                     <span asp-validation-for="SelectedIngredients" class="text-danger"></span>
                 </div>
+
 
                 <!-- 食材數量輸入框 (動態生成) -->
                 <div class="form-group" id="ingredientQuantities">
@@ -171,15 +172,15 @@
         var currentCategory = $('#categorySelect').val();
         var currentDetailedCategory = decodeHtmlEntity('@Model.DetailedCategory'); // 使用解碼函數
         // 檢查目前的 Category 和 DetailedCategory
-        console.log("Current Category:", currentCategory);
-        console.log("Current DetailedCategory:", currentDetailedCategory);
+        // console.log("Current Category:", currentCategory);
+        // console.log("Current DetailedCategory:", currentDetailedCategory);
         // 直接調用該方法來設置初始的細項類別選項，而不是觸發 change 事件
         updateDetailedCategoryOptions(currentCategory, currentDetailedCategory);
 
         // 當用戶手動改變種類時，才觸發更新細項類別選項的邏輯
         $('#categorySelect').change(function () {
             var selectedCategory = $(this).val();
-            console.log("Category changed to:", selectedCategory);
+            // console.log("Category changed to:", selectedCategory);
             updateDetailedCategoryOptions(selectedCategory, null);
         });
 
@@ -188,7 +189,7 @@
             detailedCategorySelect.empty();
 
             if (categoryOptions[category]) {
-                console.log("Available Detailed Categories for", category, ":", categoryOptions[category]);
+                // console.log("Available Detailed Categories for", category, ":", categoryOptions[category]);
 
                 categoryOptions[category].forEach(function (option) {
                     detailedCategorySelect.append(new Option(option, option));
@@ -226,17 +227,20 @@
             ingredientQuantitiesDiv.empty();
 
             selectedIngredients.forEach(function (ingredientId) {
-                var ingredientName = $('#selectedIngredients option[value="' + ingredientId + '"]').text();
+                var ingredientOption = $('#selectedIngredients option[value="' + ingredientId + '"]');
+                var ingredientName = ingredientOption.text();
+                var unit = ingredientOption.data('unit') || ''; // 確保unit是從data-unit獲取的
                 var quantity = quantities[ingredientId] || '';
-
+                // console.log(unit);
                 var inputHtml = `
-                    <div class="form-group">
-                        <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量</label>
-                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
-                    </div>`;
+                <div class="form-group">
+                    <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量：${unit}</label>
+                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                </div>`;
                 ingredientQuantitiesDiv.append(inputHtml);
             });
-        };
+        }
+
 
 
     };

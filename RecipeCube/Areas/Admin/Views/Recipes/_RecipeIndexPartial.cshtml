@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<RecipeCube.Models.Recipe>
+
 @{
     ViewData["Title"] = "食譜檢視";
 }
@@ -11,24 +12,24 @@
 <table id="table" class="table table-hover w-100">
     <thead>
         <tr>
-            <th>動作</th>
-            <th>
+
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.RecipeName)
             </th>
-            <th style="text-align: left;">
+            <th class="text-center"">
                 @Html.DisplayNameFor(model => model.UserId)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.Category)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.DetailedCategory)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Photo)
-            </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th class="text-center">
+                 操作
             </th>
         </tr>
     </thead>
@@ -36,27 +37,25 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.RecipeId">詳細</button> <br />
-                    <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button>
-                </td>
-                <td>
+
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.RecipeName)
                 </td>
-                <td style="text-align: left;">
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.UserId)
                 </td>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Category)
                 </td>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.DetailedCategory)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Photo)
-                </td>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                    <td class="text-center">
+                    <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.RecipeId">編輯</button>
+                    <button class="detail btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.RecipeId">詳細</button>
                 </td>
             </tr>
         }

@@ -144,10 +144,12 @@
 
 <!-- 在局部檢視內包含腳本 -->
 <script>
+    // var ingredientUnits = {};  // 全局變數，用於儲存每個食材的單位
     $(document).ready(function () {
         initCreateForm();
     });
     function initCreateForm() {
+
         //alert("我來自局部檢視");
         // 初始化表單驗證功能
         $.validator.unobtrusive.parse('#createForm');
@@ -183,61 +185,8 @@
             allowClear: true,
             width: '100%',
             success: function (data) {
-                    console.log(data); // 確認是否包含 ingredientName 和 unit
-                // 初始化 Select2 並加入抓取的資料
-                $('#selectedIngredients').select2({
-                    placeholder: '選擇食材',
-                    allowClear: true,
-                    width: '100%',
-                    ajax: {
-                        url: '/Admin/Recipes/SearchIngredients',  // 後端控制器路徑
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            return {
-                                query: params.term // 搜尋的關鍵字
-                            };
-                        },
-                        processResults: function (data) {
-                            // 分組顯示資料
-                            var categories = {};
-
-                            // 將食材依照類別分類
-                            data.forEach(function (ingredient) {
-                                if (!categories[ingredient.category]) {
-                                    categories[ingredient.category] = [];
-                                }
-                                var unitText = ingredient.unit ? ` (${ingredient.unit})` : ''; // Ensure unit is not null
-                                categories[ingredient.category].push({
-                                    id: ingredient.ingredientId,
-                                    text: ingredient.ingredientName + unitText  // 顯示名稱與單位
-                                });
-                            });
-
-                            // 將分類轉換為 Select2 支援的格式
-                            var results = [];
-                            for (var category in categories) {
-                                results.push({
-                                    text: category,
-                                    children: categories[category]
-                                });
-                            }
-
-                            return {
-                                results: results
-                            };
-                        },
-                        cache: true
-                    }
-                }).on('select2:open', function () {
-                    // 當下拉選單打開時應用 PerfectScrollbar
-                    setTimeout(function () {
-                        var ps = new PerfectScrollbar('.select2-results__options', {
-                            damping: 0.5
-                        });
-                    }, 100);  // 延遲 100ms 確保下拉選單已經完全渲染
-                });
-
+                // console.log(data); // 確認是否包含 ingredientName 和 unit
+                initSelect2(data);  // 初始化 Select2 並傳入 data
             },
             error: function () {
                 alert('無法從資料庫中載入食材');
@@ -262,24 +211,85 @@
             // 清空原有的數量輸入框
             ingredientQuantitiesDiv.empty();
 
-            // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱而不是ID
+            // 為每個選擇的食材創建一個對應的數量輸入框，顯示名稱和單位
             selectedIngredients.forEach(function (ingredient) {
                 var ingredientId = ingredient.id;
-                var ingredientNameWithUnit = ingredient.text;
+                var ingredientName = ingredient.text;
+                var unit = ingredient.unit ? ` ${ingredient.unit}` : '';  // 直接從選項數據中獲取單位
 
                 // 如果之前已經有這個食材的數量，則保留
                 var quantity = existingQuantities[ingredientId] || '';
 
                 var inputHtml = `
-                    <div class="form-group">
-                        <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientNameWithUnit} 的數量</label>
-                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
-                    </div>`;
+                <div class="form-group">
+                    <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量：${unit}</label>
+                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                </div>`;
                 ingredientQuantitiesDiv.append(inputHtml);
             });
         });
-        
+
+
+
     }
+    function initSelect2(ingredients) {
+        $('#selectedIngredients').select2({
+            placeholder: '選擇食材',
+            allowClear: true,
+            width: '100%',
+            data: ingredients.map(function (ingredient) {
+                var unitText = ingredient.unit ? ` (${ingredient.unit})` : ''; // 如果有單位，顯示單位
+                // console.log("前:", ingredient.ingredientName, unitText);
+
+                return {
+                    id: ingredient.ingredientId,
+                    text: ingredient.ingredientName + unitText,
+                    unit: ingredient.unit // 把單位信息綁定到選項的數據上
+                };
+            }),
+            ajax: {
+                url: '/Admin/Recipes/SearchIngredients',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        query: params.term // 搜尋的關鍵字
+                    };
+                },
+                processResults: function (data) {
+                    var categories = {};
+                    data.forEach(function (ingredient) {
+                        if (!categories[ingredient.category]) {
+                            categories[ingredient.category] = [];
+                        }
+                        var unitText = ingredient.unit ? ` (${ingredient.unit})` : ''; // 確認單位存在
+                        // console.log("後:", ingredient.ingredientName, unitText);
+
+                        categories[ingredient.category].push({
+                            id: ingredient.ingredientId,
+                            text: ingredient.ingredientName + unitText,
+                            unit: ingredient.unit  // 把單位信息綁定到選項的數據上
+                        });
+                    });
+
+                    var results = [];
+                    for (var category in categories) {
+                        results.push({
+                            text: category,
+                            children: categories[category]
+                        });
+                    }
+
+                    return {
+                        results: results
+                    };
+                },
+                cache: true
+            }
+        });
+    }
+
+
 
 </script>
 
