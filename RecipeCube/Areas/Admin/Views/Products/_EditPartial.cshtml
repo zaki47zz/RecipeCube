@@ -8,12 +8,12 @@
             <input type="hidden" asp-for="ProductId" />
             <div class="form-group">
                 <label asp-for="ProductName" class="control-label">商品名稱</label>
-                <input asp-for="ProductName" class="form-control" />
+                <input asp-for="ProductName" class="form-control" readonly/>
                 <span asp-validation-for="ProductName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="IngredientId" class="control-label">食材編號</label>
-                <input asp-for="IngredientId" class="form-control" />
+                <input asp-for="IngredientId" class="form-control" readonly/>
                 <span asp-validation-for="IngredientId" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -23,7 +23,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Stock" class="control-label">庫存</label>
-                <input asp-for="Stock" class="form-control" />
+                <input asp-for="Stock" class="form-control"/>
                 <span asp-validation-for="Stock" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -43,8 +43,8 @@
                 <input type="file" asp-for="Photo" accept="image/*" class="form-control" />
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="儲存" class="btn btn-primary" />
+            <div class="d-flex justify-content-center">
+                <input id="submit" type="submit" value="儲存" class="btn btn-info mx-3" />
                 <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
             </div>
         </form>
@@ -55,6 +55,7 @@
 
 <script>
     $(document).ready(function () {
+        $.validator.unobtrusive.parse('#editForm');
         Image();
     });
     function Image() {
@@ -71,11 +72,11 @@
                             $("#Photo").prev().attr("title", file.name);
                         };
                         reader.readAsDataURL(file);
-                        $(".btn.btn-primary").prop("disabled", false);
+                        $("#submit").prop("disabled", false);
                     }
                     else {
                         alert("不允許的檔案上傳類型")
-                        $(".btn.btn-primary").prop("disabled", true);
+                        $("#submit").prop("disabled", true);
                         inputFile.value = "";
                         $("#Photo").prev().attr("src", "@Url.Content("~/img/icon_large.png")");
                         $("#Photo").prev().attr("title", "尚無圖檔");
