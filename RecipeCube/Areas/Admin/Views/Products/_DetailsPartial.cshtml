@@ -42,7 +42,16 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.Status)
+                        @{
+                            if (Model.Status==true)
+                            {
+                                @:正常供貨
+                            }
+                            else
+                            {
+                                @:停售
+                            }
+                        }
                     </dd>
                 </div>
                 <div mb-3>

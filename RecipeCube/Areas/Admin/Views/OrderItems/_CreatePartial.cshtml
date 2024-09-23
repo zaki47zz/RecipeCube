@@ -33,7 +33,11 @@
         </div>
     </div>
 </div>
-
+<script>
+    $(document).ready(function () { 
+        $.validator.unobtrusive.parse('#createForm');
+    });
+</script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
