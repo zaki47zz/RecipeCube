@@ -66,7 +66,9 @@
                         @Html.DisplayNameFor(model => model.VisibilityStr)
                     </dt>
                     <dd class="col-12">
-                        @Html.DisplayFor(model => model.VisibilityStr)
+                        <span class="badge @(Model.Visibility == true ? "bg-success" : Model.Visibility == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.Visibility == true ? "群組" : "個人")
+                        </span>
                     </dd>
                 </div>
             </dl>

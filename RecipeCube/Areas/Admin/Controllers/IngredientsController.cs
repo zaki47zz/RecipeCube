@@ -168,9 +168,9 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] IngredientViewModel ingredientModel)
+        public JsonResult Edit(int id, [Bind("IngredientId,IngredientName,Category,Synonym,ExpireDay,Unit,Gram,Photo")] Ingredient model)
         {
-            if (id != ingredientModel.IngredientId)
+            if (id != model.IngredientId)
             {
                 return new JsonResult(new { success = false, error = "ID不符合!" });
             }
@@ -179,7 +179,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             {
                 try
                 {
-                    Ingredient? ingredientInDB = _context.Ingredients.Find(ingredientModel.IngredientId);
+                    Ingredient? ingredientInDB = _context.Ingredients.Find(model.IngredientId);
                     if (Request.Form.Files["Photo"] != null)
                     {
                         var file = Request.Form.Files["Photo"];
@@ -190,15 +190,15 @@ namespace RecipeCube.Areas.Admin.Controllers
                             file.CopyTo(stream);
                         }
                         // 更新產品圖片
-                        ingredientModel.Photo = fileName;
+                        model.Photo = fileName;
                     }
                     else
                     {
-                        ingredientModel.Photo = ingredientInDB.Photo;
+                        model.Photo = ingredientInDB.Photo;
                     }
                     _context.Entry(ingredientInDB).State = EntityState.Detached;
 
-                    _context.Update(ingredientModel);
+                    _context.Update(model);
                     _context.SaveChanges();
                     return new JsonResult(new { success = true });
                 }
