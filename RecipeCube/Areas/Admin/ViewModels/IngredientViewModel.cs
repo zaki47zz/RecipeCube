@@ -21,6 +21,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         public string? Synonym { get; set; }
 
         [Display(Name = "預設到期日")]
+        [Range(0, 10000.00, ErrorMessage = "預設到期日必須在1到1000天之間")]
         public int? ExpireDay { get; set; } = 7; //預設到期日
 
         [Display(Name = "單位")]
