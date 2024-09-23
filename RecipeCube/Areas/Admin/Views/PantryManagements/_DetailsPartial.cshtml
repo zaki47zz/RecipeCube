@@ -51,6 +51,9 @@
                     </dt>
                     <dd class="col-12">
                         @Html.DisplayFor(model => model.Action)
+                        <span class="badge @(Model.Action == "增加" ? "bg-success" : "bg-danger")">
+                            @(Model.Action == "增加" ? "增加" : "減少")
+                        </span>
                     </dd>
                 </div>
                 <div class="mb-3">
