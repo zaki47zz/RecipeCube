@@ -5,15 +5,15 @@
         <div class="w-100">
             <form id="editForm" asp-action="Edit" asp-route-id="@Model.OrderId" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="OrderId" />
+            <input type="hidden" asp-for="OrderId" readonly/>
             <div class="form-group">
                 <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
+                <input asp-for="UserId" class="form-control" readonly/>
                 <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="OrderTime" class="control-label"></label>
-                <input asp-for="OrderTime" class="form-control" />
+                <input asp-for="OrderTime" class="form-control" readonly/>
                 <span asp-validation-for="OrderTime" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -30,16 +30,22 @@
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
                 <div class="d-flex justify-content-center">
-                <input type="submit" value="儲存" class="btn btn-primary" />
+                    <input type="submit" value="儲存" class="btn btn-info mx-3" />
                     <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">回到列表</a>
             </div>
         </form>
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
 
+        $.validator.unobtrusive.parse('#editForm');
+    });
+</script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            
     }
 }
