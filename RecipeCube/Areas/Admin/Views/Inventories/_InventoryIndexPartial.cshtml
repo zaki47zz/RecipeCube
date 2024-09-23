@@ -68,7 +68,10 @@
                         @Html.DisplayFor(modelItem => item.IsExpiringStr)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.VisibilityStr)
+                        @* @Html.DisplayFor(modelItem => item.VisibilityStr) *@
+                        <span class="badge @(item.Visibility.GetValueOrDefault() ? "bg-success" : "bg-danger")">
+                            @(item.Visibility.GetValueOrDefault() ? "群組" : "個人")
+                        </span>
                     </td>
                     <td>
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.InventoryId">編輯</button>
