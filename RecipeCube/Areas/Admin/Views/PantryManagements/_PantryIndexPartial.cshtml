@@ -54,7 +54,10 @@
                         @Html.DisplayFor(modelItem => item.IngredientUnit)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Action)
+                        @* @Html.DisplayFor(modelItem => item.Action) *@
+                        <span class="badge @(item.Action == "增加" ? "bg-success" : "bg-danger")">
+                            @(item.Action == "增加" ? "增加" : "減少")
+                        </span>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Time)
