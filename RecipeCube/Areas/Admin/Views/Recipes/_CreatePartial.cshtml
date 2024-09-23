@@ -14,7 +14,7 @@
 
                 <div class="form-group">
                     <label asp-for="UserId" class="control-label"></label>
-                    <input asp-for="UserId" class="form-control" />
+                    <input asp-for="UserId" class="form-control" value="0"/>
                     <span asp-validation-for="UserId" class="text-danger"></span>
                 </div>
 
@@ -134,7 +134,7 @@
                 </div>
 
                 <div class="form-group d-flex justify-content-center">
-                    <input type="submit" value="新增" class="btn btn-info" />
+                    <input type="submit" value="新增" class="btn btn-info me-3" />
                     <a href="javascript:void(0)" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">返回</a>
                 </div>
             </form>
@@ -244,10 +244,12 @@
                 var inputHtml = `
                 <div class="form-group">
                     <label for="IngredientQuantities_${ingredientId}" class="control-label">${ingredientName} 的數量：${unit}</label>
-                    <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity}" />
+                        <input type="number" step="0.1" class="form-control" id="IngredientQuantities_${ingredientId}" name="IngredientQuantities[${ingredientId}]" value="${quantity || 1}"  required/>
                 </div>`;
                 ingredientQuantitiesDiv.append(inputHtml);
             });
+            // 重新解析 unobtrusive validation，讓動態生成的 input 欄位啟動驗證功能
+            $.validator.unobtrusive.parse('#createForm');
         });
 
 
