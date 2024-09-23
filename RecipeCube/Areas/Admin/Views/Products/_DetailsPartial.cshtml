@@ -42,16 +42,9 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </dt>
                     <dd class="col-12">
-                        @{
-                            if (Model.Status==true)
-                            {
-                                @:正常供貨
-                            }
-                            else
-                            {
-                                @:停售
-                            }
-                        }
+                        <span class="badge @(Model.Status == true ? "bg-success" : Model.Status == false ? "bg-danger" : "bg-secondary")">
+                            @(Model.Status == true ? "正常供貨" : Model.Status == false ? "停售" : "未知")
+                        </span>
                     </dd>
                 </div>
                 <div mb-3>
