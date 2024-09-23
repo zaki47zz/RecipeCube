@@ -16,6 +16,9 @@ public partial class OrderItemViewModel
     [Required(ErrorMessage ="商品編號欄位必填")]
     public int? ProductId { get; set; }
 
+    [Display(Name ="商品名稱")]
+    public string? ProductName { get; set; } // 商品名稱
+
     [Display(Name ="數量")]
     [Required(ErrorMessage ="數量欄位必填")]
     public int? Quantity { get; set; }
@@ -23,5 +26,7 @@ public partial class OrderItemViewModel
     [Display(Name ="單價")]
     [Required(ErrorMessage ="單價欄位必填")]
     public int? Price { get; set; }
+
+    
 }
 

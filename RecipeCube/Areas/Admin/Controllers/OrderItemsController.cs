@@ -22,6 +22,11 @@ namespace RecipeCube.Areas.Admin.Controllers
             ViewBag.OrderId = orderid;
             Debug.WriteLine($"IIIIIIDDDDDDD==================={orderid}");
             var orderItems = await _context.OrderItems.ToListAsync();
+
+            var productIds = orderItems.Select(oi=>oi.ProductId).Distinct().ToList();
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.ProductId))
+                .ToListAsync();
             var viewModel = orderItems.Select(orderItem => new OrderItemViewModel
             {
                 OrderItemId=orderItem.OrderItemId,
@@ -29,6 +34,7 @@ namespace RecipeCube.Areas.Admin.Controllers
                 ProductId=orderItem.ProductId,
                 Quantity=orderItem.Quantity,
                 Price=orderItem.Price,
+                ProductName=products.FirstOrDefault(p=>p.ProductId==orderItem.ProductId)?.ProductName,
             }).ToList();
             return PartialView("_OrderItemIndexPartial", viewModel);
         }
