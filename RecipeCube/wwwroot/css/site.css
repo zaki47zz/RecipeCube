@@ -41,3 +41,17 @@ body {
 .modal .w-100, .modal label {
     font-size: large !important;
 }
+
+/*Sidebar的顏色及icon顯示*/
+/* 預設圖標顏色 */
+.nav-link i {
+    color: #333; /* 沒有點擊時的顏色 */
+}
+/* 點擊時的顏色 */
+.nav-link.active i {
+    color: #FFFFFF;
+}
+/* 懸停時的顏色 */
+.nav-link:hover i {
+    color: #FF9224;
+}
