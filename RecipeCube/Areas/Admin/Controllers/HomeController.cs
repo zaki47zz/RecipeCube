@@ -14,7 +14,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             _context = context;
         }
         // 要求Roles ="Admin"的使用者登入才能訪問Admin頁面
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
 
