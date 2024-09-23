@@ -8,6 +8,8 @@ namespace RecipeCube.Areas.Admin.ViewModels
 
         public int RecipeId { get; set; }
         [Display(Name = "食譜名稱")]
+        [Required(ErrorMessage = "食譜名稱為必填")]
+        [MaxLength(10, ErrorMessage = "食譜名稱長度不可超過10個字")]
         public string? RecipeName { get; set; }
         [Display(Name = "使用者ID")]
         public string? UserId { get; set; }
@@ -40,8 +42,10 @@ namespace RecipeCube.Areas.Admin.ViewModels
 
         // 使用者選擇的食材清單
         [Display(Name = "選擇的食材")]
+        [Required(ErrorMessage = "請選擇至少一種食材")]
         public List<int> SelectedIngredients { get; set; } = new List<int>(); // 這裡保存已選擇食材的ID
         [Display(Name = "食材數量")]
+        [Required(ErrorMessage = "請填寫食材數量")]
         public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();
         // 新增一個屬性來儲存食材的單位
         public Dictionary<int, string> IngredientUnits { get; set; } = new Dictionary<int, string>(); // 保存食材的單位

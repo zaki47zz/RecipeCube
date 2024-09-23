@@ -8,10 +8,13 @@ namespace RecipeCube.Areas.Admin.ViewModels
 
         public int RecipeIngredientId { get; set; }
         [Display(Name = "食譜Id")]
+        [Required(ErrorMessage = "食譜Id為必填")]
         public int? RecipeId { get; set; }
         [Display(Name = "食材Id")]
+        [Required(ErrorMessage = "食材Id為必填")]
         public int? IngredientId { get; set; }
         [Display(Name = "食材數量")]
+        [Required(ErrorMessage = "食材數量為必填")]
         public decimal? Quantity { get; set; }
         [Display(Name = "食譜名稱")]
         public string RecipeName { get; set; } // 食譜名稱
