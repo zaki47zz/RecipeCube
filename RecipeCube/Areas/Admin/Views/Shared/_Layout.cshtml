@@ -232,15 +232,15 @@
     <script src="/js/core/popper.min.js"></script>
     <script src="/js/core/bootstrap.min.js"></script>
     <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Scollbar -->
     <script src="/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="/lib/datatables/datatables.min.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
     <!-- 掛載validation驗證js -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <!-- 掛載 select2 js-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- 連結View內script -->
@@ -252,6 +252,9 @@
             // 定義一個全局的 orderId 變數
             let orderId = null;
             let orderpass = false;
+            // 定義保存的頁面與搜尋條件
+            let savedPage = null;
+            let savedSearchQuery = null;
 
             // 初始化Sidebar卷軸
             if (navigator.userAgent.indexOf('Win') > -1 && document.querySelector('#sidenav-scrollbar')) {
@@ -263,7 +266,13 @@
             }
 
             function initializeDataTableWithFilter(columnIndex) {
-                new DataTable("table", {
+                //console.log("columnIndex:", columnIndex)
+                var table = $('.table').DataTable({
+                    // 您的 DataTable 設定
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                        paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+                    },
                     initComplete: function () {
                         if (columnIndex !== null) {
                             var column = this.api().column(columnIndex);
@@ -282,13 +291,10 @@
                                 select.add(new Option(d));
                             });
                         }
-                    },
-                    language: {
-                        url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
-                        paginate: { first: "«", previous: "‹", next: "›", last: "»" },
-                    },
+                    }
                 });
             }
+
 
             // 載入Partial
             function loadPartial() {
@@ -312,6 +318,94 @@
                     }
                 });
             }
+            // 初始化 DataTable 並加載資料 (首次載入)
+            function firstloadPartial() {
+                // console.log('First load of partial content...');
+                // console.log("filterRow", filterRow);
+                // 載入資料
+                $.ajax({
+                    url: `/Admin/${controller}/${parentId}IndexPartial`,
+                    type: 'GET',
+                    success: function (data) {
+                        // console.log('Partial content loaded for the first time');
+                        $('#dynamic-content').html(data);
+                        initializeDataTableWithFilter(filterRow);
+
+                        // 設定頁面標題
+                        var newTitle = $('#dynamic-content').find('h1').text();
+                        document.title = newTitle + ' - 食譜魔方';  // 設置頁面標題
+                        $('ol.breadcrumb .breadcrumb-item.active').text(newTitle);
+                        $('h6.font-weight-bolder').text(newTitle);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading partial content: " + error);
+                    }
+                });
+            }
+
+            function reloadPartial() {
+                // 檢查 DataTable 是否已經初始化並儲存當前頁面資訊
+                if ($.fn.DataTable && $.fn.DataTable.isDataTable('.table')) {
+                    let table = $('.table').DataTable();
+
+                    // 儲存頁面資訊
+                    let pageInfo = table.page.info();
+                    savedPage = pageInfo.page;  // 保存當前頁碼
+                    savedSearchQuery = table.search();  // 保存當前搜尋條件
+                } else {
+                    console.warn('Table is not initialized yet or DataTable is not loaded.');
+                }
+
+                // 載入資料
+                $.ajax({
+                    url: `/Admin/${controller}/${parentId}IndexPartial`,  
+                    type: 'GET',
+                    success: function (data) {
+                        // console.log('Partial content reloaded');
+                        $('#dynamic-content').html(data);  // 替換內容
+
+                        // 確保 DataTable library 被正確加載
+                        setTimeout(function () {
+                            if ($.fn.dataTable) {
+                                // console.log('Attempting to initialize DataTable...');
+
+                                if ($('.table').length) {
+                                    let newTable = $('.table').DataTable({
+                                        language: {
+                                            url: "//cdn.datatables.net/plug-ins/2.1.6/i18n/zh-HANT.json",
+                                            paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+                                        },
+                                        // 初始化完成後還原頁碼和搜尋條件
+                                        initComplete: function () {
+                                            // 還原搜尋條件
+                                            if (savedSearchQuery !== null) {
+                                                newTable.search(savedSearchQuery).draw(false);
+                                                $('.table_filter input[type="search"]').val(savedSearchQuery);
+                                                // console.log('Restored search query: ' + savedSearchQuery);
+                                            }
+
+                                            // 還原頁碼
+                                            if (savedPage !== null && savedPage >= 0) {
+                                                newTable.page(savedPage).draw(false);  // 還原到保存的頁碼
+                                                // console.log('Restored page: ' + savedPage);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    console.warn('Table element not found for DataTable initialization!');
+                                }
+                            } else {
+                                console.error('DataTable library not loaded!');
+                            }
+                        }, 0);  // 使用 0 延遲以確保在 DOM 完成後再初始化 DataTable
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading partial content: " + error);
+                    }
+                });
+            }
+
+
 
             // 載入Modal
             function loadModalData(url, modalSelector, successCallback) {
@@ -366,7 +460,7 @@
                                     // 使用帶有 orderId 的載入方法
                                     loadPartialWithOrderId(orderId);
                                 } else {
-                                    loadPartial();
+                                    reloadPartial();
                                 }
                             } else {
                                 $(modalSelector + ' .modal-body').html(response);
@@ -392,20 +486,20 @@
 
                 switch (parentId) {
                     case 'User': controller = 'Users'; filterRow = null; break;
-                    case 'Group': controller = 'UserGroups'; filterRow = null; break;
-                    case 'PreferedFood': controller = 'PreferedIngredients'; filterRow = null; break;
-                    case 'ExclusiveFood': controller = 'ExclusiveIngredients'; filterRow = null; break;
+                    case 'Group': controller = 'UserGroups'; filterRow = 0; break;
+                    case 'PreferedFood': controller = 'PreferedIngredients'; filterRow = 0; break;
+                    case 'ExclusiveFood': controller = 'ExclusiveIngredients'; filterRow = 0; break;
                     case 'Inventory': controller = 'Inventories'; filterRow = 0; break;
                     case 'Pantry': controller = 'PantryManagements'; filterRow = 0; break;
                     case 'Ingredient': controller = 'Ingredients'; filterRow = 1; break;
                     case 'RecipeIngredient': controller = 'RecipeIngredients'; filterRow = 3; break;
                     case 'Recipe': controller = 'Recipes'; filterRow = 2; break;
-                    case 'Product': controller = 'Products'; filterRow = null; break;
-                    case 'Order': controller = 'Orders'; filterRow = null; break;
-                    case 'OrderItem': controller = 'OrderItems'; filterRow = null; orderpass = false; break;
+                    case 'Product': controller = 'Products'; filterRow = 0; break;
+                    case 'Order': controller = 'Orders'; filterRow = 0; break;
+                    case 'OrderItem': controller = 'OrderItems'; filterRow = 0; orderpass = false; break;
                     default: console.error('Controller 未定義或 parentId 為 Home'); return;
                 }
-                loadPartial();
+                firstloadPartial();
             });
 
             $(document).on('click', '.edit', function () {
@@ -441,7 +535,7 @@
             // Modal關閉時的反應
             $('.modal').on('hidden.bs.modal', function () {
                 $(this).find('.modal-body').html('');  // 清空 modal 內容
-                loadPartial();
+                reloadPartial();
             });
 
             //給訂單跳轉到訂單詳細時用的Code

@@ -74,48 +74,53 @@
             '液體類': 7, '零食類': 30, '調料類': 90, '其他類': 90
         };
 
-        // 當分類選項改變時，設定對應的過期天數
+
+        // 當分類選項改變時，設定對應的過期天數（只有當用戶選擇改變時觸發）
         $('#categoryInput').on('change', function () {
             const category = $(this).val();
             const defaultExpireDay = categoryExpireDays[category] || 7;
-            $('#expireDayInput').val(defaultExpireDay);
-        }).trigger('change');
 
-            // 預覽圖片的功能
-            function previewImage(inputFile) {
-                if (inputFile.files[0]) {
-                    var allowTypes = "image.*";  // 允許的檔案類型
-                    var file = inputFile.files[0];
+            // 確保只有在使用者手動改變分類時，才更新過期天數
+            if (defaultExpireDay !== $('#expireDayInput').val()) {
+                $('#expireDayInput').val(defaultExpireDay);
+            }
+        });
 
-                    // 檢查檔案類型是否符合允許的格式
-                    if (file.type.match(allowTypes)) {
-                        var reader = new FileReader();
+        // 預覽圖片的功能
+        function previewImage(inputFile) {
+            if (inputFile.files[0]) {
+                var allowTypes = "image.*";  // 允許的檔案類型
+                var file = inputFile.files[0];
 
-                        // 當檔案讀取完成時，更新圖片預覽
-                        reader.onload = function (e) {
-                            $("#Photo").prev().attr("src", e.target.result);  // 顯示圖片
-                            $("#Photo").prev().attr("title", file.name);      // 顯示圖片名稱
-                        };
-                        reader.readAsDataURL(file);
+                // 檢查檔案類型是否符合允許的格式
+                if (file.type.match(allowTypes)) {
+                    var reader = new FileReader();
 
-                        // 啟用提交按鈕
-                        $("input[type='submit']").prop("disabled", false);
-                    } else {
-                        // 如果檔案類型不符合，提示錯誤並重設預覽
-                        alert("不允許的檔案上傳類型");
-                        $("input[type='submit']").prop("disabled", false);
-                        inputFile.value = "";  // 重設檔案選擇
-                        $("#Photo").prev().attr("src", '@Url.Content("/img/icon_large.png")');  // 重設預覽圖片
-                        $("#Photo").prev().attr("title", "尚無圖檔");  // 重設圖片標題
-                    }
+                    // 當檔案讀取完成時，更新圖片預覽
+                    reader.onload = function (e) {
+                        $("#Photo").prev().attr("src", e.target.result);  // 顯示圖片
+                        $("#Photo").prev().attr("title", file.name);      // 顯示圖片名稱
+                    };
+                    reader.readAsDataURL(file);
+
+                    // 啟用提交按鈕
+                    $("input[type='submit']").prop("disabled", false);
+                } else {
+                    // 如果檔案類型不符合，提示錯誤並重設預覽
+                    alert("不允許的檔案上傳類型");
+                    $("input[type='submit']").prop("disabled", false);
+                    inputFile.value = "";  // 重設檔案選擇
+                    $("#Photo").prev().attr("src", '@Url.Content("/img/icon_large.png")');  // 重設預覽圖片
+                    $("#Photo").prev().attr("title", "尚無圖檔");  // 重設圖片標題
                 }
             }
+        }
 
-            // 當使用者選擇檔案時，觸發預覽功能
-            $("#Photo").on("change", function () {
-                previewImage(this);
-            });
+        // 當使用者選擇檔案時，觸發預覽功能
+        $("#Photo").on("change", function () {
+            previewImage(this);
         });
+    });
 </script>
 
 
