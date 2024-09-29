@@ -1,56 +1,41 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NuGet.Packaging.Signing;
 using RecipeCube.Areas.Identity.Pages.SqlClient;
 using RecipeCube.Data;
-using System.ComponentModel.DataAnnotations;
+using static RecipeCube.Areas.Identity.Pages.SqlClient.FoodService;
 
 namespace RecipeCube.Areas.Identity.Pages.Account.Manage
 {
-    public class IndexModel : PageModel
+    public class PreferedFoodModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        public List<Food> Foods { get; set; }
 
-        public IndexModel(
+        public PreferedFoodModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
-        [Display(Name = "Name")]
-        public string UserName { get; set; }
         [TempData]
         public string StatusMessage { get; set; }
         [BindProperty]
         public InputModel Input { get; set; }
         public class InputModel
         {
-            [Display(Name = "使用者名稱")]
-            public string UserName { get; set; }
-
-            [Phone]
-            [Display(Name = "電話號碼")]
-            public string PhoneNumber { get; set; }
+            public bool preferred_checked { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
-            var username = await _userManager.GetUserNameAsync(user);
-            var phonenumber = await _userManager.GetPhoneNumberAsync(user);
-
-            UserName = username;
-
+            var PreferedFood = user.preferred_checked;
             Input = new InputModel
             {
-                UserName = username,
-                PhoneNumber = phonenumber
+                preferred_checked = PreferedFood
             };
         }
 
@@ -62,6 +47,8 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            var foodService = new FoodService();
+            Foods = await foodService.GetAllIngredientsAsync();
             await LoadAsync(user);
             return Page();
         }
@@ -80,27 +67,44 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var UserName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.UserName != UserName || Input.PhoneNumber != phoneNumber)
+
+            if (Input.preferred_checked != user.preferred_checked)
             {
                 var fieldData = new Dictionary<string, object>
                 {
-                    { "UserName", Input.UserName },
-                    { "PhoneNumber", Input.PhoneNumber }
+                    { "preferred_checked", Input.preferred_checked }
                 };
                 var updater = new UpdateSql();
                 var rowsAffected = await updater.UpdateTableAsync("User", fieldData, "Id", user.Id);
 
                 if (rowsAffected == 0)
                 {
-                    ModelState.AddModelError(string.Empty, "Error updating UserName.");
+                    ModelState.AddModelError(string.Empty, "Error");
                     StatusMessage = "Error updating user.";
                     return RedirectToPage();
                 }
             }
+
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostSaveExclusiveAsync(int ingredientId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var foodService = new FoodService(); // 手動實例化 FoodService
+            var rowsAffected = await foodService.SaveIngredientsAsync("Prefered_Ingredients", userId, ingredientId);
+
+            if (rowsAffected > 0)
+            {
+                StatusMessage = "食材已成功加入偏好食材清單";
+            }
+            else
+            {
+                StatusMessage = "加入偏好食材清單時發生錯誤";
+            }
+
             return RedirectToPage();
         }
     }

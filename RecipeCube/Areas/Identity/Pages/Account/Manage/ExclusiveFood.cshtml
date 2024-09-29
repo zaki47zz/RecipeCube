@@ -1,0 +1,51 @@
+﻿@page
+@model ExclusiveFoodModel
+@{
+    ViewData["Title"] = "不可食用食材";
+    ViewData["ActivePage"] = ManageNavPages.ExclusiveFood;
+}
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" asp-page-handler="SaveExclusive">
+            <div class="mb-3">
+                <label for="categorySelect">選擇類別</label>
+                <select id="categorySelect" class="form-control">
+                    <option value="">選擇類別</option>
+                    @foreach (var category in Model.Foods.Select(i => i.Category).Distinct())
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="ingredientSelect">選擇食材</label>
+                <select id="ingredientSelect" class="form-control" name="ingredientId">
+                    <option value="">先選擇類別</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">儲存</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var ingredients = @Html.Raw(Json.Serialize(Model.Foods));
+
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            var selectedCategory = this.value;
+            var ingredientSelect = document.getElementById('ingredientSelect');
+            ingredientSelect.innerHTML = '<option value="">選擇食材</option>';
+            var filteredIngredients = ingredients.filter(i => i.category === selectedCategory);
+            filteredIngredients.forEach(function (ingredient) {
+                var option = document.createElement('option');
+                option.value = ingredient.ingredientId;
+                option.textContent = ingredient.ingredientName;
+                ingredientSelect.appendChild(option);
+                    });
+                });
+    </script>
+}

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RecipeCube.Areas.Identity.Pages.SqlClient;
 using RecipeCube.Data;
+using RecipeCube.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace RecipeCube.Areas.Identity.Pages.Account.Manage
 {
@@ -24,7 +27,6 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
         public InputModel Input { get; set; }
         public class InputModel
         {
-            
             public bool dietary_restrictions { get; set; }
             public bool preferred_checked { get; set; }
             public bool exclusive_checked { get; set; }
@@ -41,6 +43,51 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
                 preferred_checked = PreferedFood,
                 exclusive_checked = ExclusiveFood
             };
+
+            if (user.dietary_restrictions)
+            {
+                ViewData["Dietaryrestrictions"] = true;
+            }
+            else
+            {
+                ViewData["Dietaryrestrictions"] = false;
+            }
+
+
+
+
+            // 如果 preferred_checked 為 true
+            if (user.preferred_checked)
+            {
+                var joinSql = new JOINSql();
+                var preferedIngredients = await joinSql.SelectJoinAsync("Prefered_Ingredients", user.Id);
+                if (preferedIngredients == null || preferedIngredients.All(string.IsNullOrWhiteSpace))
+
+                {
+                    ViewData["PreferedIngredients"] = "找不到偏好食材資料，請確認是否有填入資料";
+                }
+                else
+                {
+                    // 將結果存入 ViewData 或 Model
+                    ViewData["PreferedIngredients"] = string.Join(", ", preferedIngredients);
+                }
+            }
+
+
+            if (user.exclusive_checked == true)
+            {
+                var joinSql = new JOINSql();
+                var exclusiveIngredients = await joinSql.SelectJoinAsync("Exclusive_Ingredients", user.Id);
+                if (exclusiveIngredients == null || exclusiveIngredients.All(string.IsNullOrWhiteSpace))
+                {
+                    ViewData["ExclusiveIngredients"] = "找不到不可食材資料，請確認是否有填入資料";
+                }
+                else
+                {
+                    // 將結果存入 ViewData 或 Model
+                    ViewData["ExclusiveIngredients"] = string.Join(", ", exclusiveIngredients);
+                }
+            }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -70,46 +117,20 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
             }
 
 
-            if (Input.dietary_restrictions != user.dietary_restrictions)
+            if (Input.dietary_restrictions != user.dietary_restrictions || Input.preferred_checked != user.preferred_checked || Input.exclusive_checked != user.exclusive_checked)
             {
-                user.dietary_restrictions = Input.dietary_restrictions;
-                var result = await _userManager.UpdateAsync(user);
-                if (!result.Succeeded)
+                var fieldData = new Dictionary<string, object>
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    StatusMessage = "Error updating user.";
-                    return RedirectToPage();
-                }
-            }
+                    { "dietary_restrictions", Input.dietary_restrictions },
+                    { "preferred_checked", Input.preferred_checked },
+                    { "exclusive_checked", Input.exclusive_checked },
+                };
+                var updater = new UpdateSql();
+                var rowsAffected = await updater.UpdateTableAsync("User", fieldData, "Id", user.Id);
 
-            if (Input.preferred_checked != user.preferred_checked)
-            {
-                user.preferred_checked = Input.preferred_checked;  
-                var result = await _userManager.UpdateAsync(user);  
-                if (!result.Succeeded)
+                if (rowsAffected == 0)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    StatusMessage = "Error updating user.";
-                    return RedirectToPage();
-                }
-            }
-
-            if (Input.exclusive_checked != user.exclusive_checked)
-            {
-                user.exclusive_checked = Input.exclusive_checked;
-                var result = await _userManager.UpdateAsync(user);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                    ModelState.AddModelError(string.Empty, "Error");
                     StatusMessage = "Error updating user.";
                     return RedirectToPage();
                 }

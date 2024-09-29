@@ -8,7 +8,8 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
         public static string Email => "Email";
         public static string Group => "Group";
         public static string Food => "Food";
-        public static string FoodDetails => "FoodDetails";
+        public static string PreferedFood => "PreferedFood";
+        public static string ExclusiveFood => "ExclusiveFood";
         public static string Name => "Name"; 
         public static string Phone => "Phone";
         public static string ChangePassword => "ChangePassword";

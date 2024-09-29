@@ -5,6 +5,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
+using RecipeCube.Areas.Identity.Pages.SqlClient;
 using RecipeCube.Data;
 using System.ComponentModel.DataAnnotations;
 
@@ -68,18 +70,21 @@ namespace RecipeCube.Areas.Identity.Pages.Account.Manage
             }
             if (Input.group_id != user.group_id)
             {
-                user.group_id = Input.group_id;  // 設定新的 group_id
-                var result = await _userManager.UpdateAsync(user);  // 更新使用者資料
-                if (!result.Succeeded)
+                var fieldData = new Dictionary<string, object>
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                    { "group_id", Input.group_id }
+                };
+                var updater = new UpdateSql();
+                var rowsAffected = await updater.UpdateTableAsync("User", fieldData, "Id", user.Id);
+
+                if (rowsAffected == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "Error updating group_id.");
                     StatusMessage = "Error updating user.";
                     return RedirectToPage();
                 }
             }
+
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

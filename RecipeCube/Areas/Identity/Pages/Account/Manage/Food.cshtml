@@ -1,10 +1,9 @@
 ﻿@page
 @model FoodModel
 @{
-    ViewData["Title"] = "Food";
+    ViewData["Title"] = "飲食偏好";
     ViewData["ActivePage"] = ManageNavPages.Food;
 }
-
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
@@ -12,30 +11,40 @@
             <form id="profiles-form" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="mb-3 form-check ">
-                <label asp-for="Input.dietary_restrictions" class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.dietary_restrictions" placeholder="Please enter your dietary_restrictions." />
-                    @Html.DisplayNameFor(model => model.Input.dietary_restrictions)
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Input.dietary_restrictions" />
+                    @((bool)ViewData["Dietaryrestrictions"] ? "素食" : "葷食")
+                </label>
+
+            </div>
+
+            <div class="mb-3 form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Input.preferred_checked" />
+                    偏好食材
+                    <br>
+                    @ViewData["PreferedIngredients"]
+                    <br>
+                    <a class="nav-link text-dark" href="" onclick="event.preventDefault();  window.location.href = '/Identity/Account/Manage/PreferedFood';">
+                        加入偏好食材
+                    </a>
                 </label>
             </div>
-            <div class="mb-3 form-check ">
-                <label asp-for="Input.preferred_checked" class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.preferred_checked" placeholder="Please enter your preferred_checkedr." />
-                    @Html.DisplayNameFor(model => model.Input.preferred_checked)
-                </label>
-            </div>
-            <div class="mb-3 form-check ">
-                <label asp-for="Input.exclusive_checked" class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.exclusive_checked" placeholder="Please enter your exclusive_checked." />
-                    @Html.DisplayNameFor(model => model.Input.exclusive_checked)
+            <div class="mb-3 form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Input.exclusive_checked" />
+                    不可食用食材
+                    <br>
+                    @ViewData["ExclusiveIngredients"]
+                    <br>
+                    <a class="nav-link text-dark" href="" onclick="event.preventDefault();  window.location.href = '/Identity/Account/Manage/ExclusiveFood';">
+                        加入不可食用食材
+                    </a>
                 </label>
             </div>
             <div class="d-flex justify-content-center">
-                <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">儲存</button>
+                <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">確認修改</button>
             </div>
         </form>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
