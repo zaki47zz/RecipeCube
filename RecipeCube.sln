@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeCube", "RecipeCube\RecipeCube.csproj", "{FEE980D9-8D06-4A96-AF4C-C919527E0743}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeCube", "RecipeCube\RecipeCube.csproj", "{FEE980D9-8D06-4A96-AF4C-C919527E0743}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeCubeWebService", "RecipeCubeWebService\RecipeCubeWebService.csproj", "{4CB01A7E-F21C-44D8-888D-76897066DDD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FEE980D9-8D06-4A96-AF4C-C919527E0743}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEE980D9-8D06-4A96-AF4C-C919527E0743}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEE980D9-8D06-4A96-AF4C-C919527E0743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB01A7E-F21C-44D8-888D-76897066DDD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB01A7E-F21C-44D8-888D-76897066DDD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB01A7E-F21C-44D8-888D-76897066DDD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB01A7E-F21C-44D8-888D-76897066DDD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
