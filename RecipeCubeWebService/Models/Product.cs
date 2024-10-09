@@ -20,4 +20,6 @@ public partial class Product
     public bool? Status { get; set; }
 
     public string Photo { get; set; }
+
+    public decimal? UnitQuantity { get; set; }
 }

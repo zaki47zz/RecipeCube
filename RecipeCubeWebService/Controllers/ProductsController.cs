@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
 
 namespace RecipeCubeWebService.Controllers
@@ -25,6 +26,49 @@ namespace RecipeCubeWebService.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return await _context.Products.ToListAsync();
+        }
+
+        // GET: api/productsANDcategory
+        [HttpGet("ProductsNcategory")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsNcategory()
+        {
+            var result = await _context.Products
+                .GroupJoin(
+                    _context.Ingredients,
+                    p => p.IngredientId,
+                    i => i.IngredientId,
+                    (p, ig) => new { p, ig }
+                )
+                .SelectMany(
+                    pg => pg.ig.DefaultIfEmpty(), // 左外聯接
+                    (pg, ig) => new { pg.p, ig }
+                )
+                .GroupJoin(
+                    _context.RecipeIngredients,
+                    pg => pg.ig.IngredientId, // 假設使用 IngredientId 來聯接 RecipeIngredients
+                    ri => ri.IngredientId, // 假設 RecipeIngredients 中也有 IngredientId
+                    (pg, ri) => new { pg.p, pg.ig, ri }
+                )
+                .SelectMany(
+                    x => x.ri.DefaultIfEmpty(), // 左外聯接
+                    (x, ri) => new ProductDTO
+                    {
+                        ProductId = x.p.ProductId,
+                        ProductName = x.p.ProductName,
+                        IngredientId = x.p.IngredientId,
+                        Price = x.p.Price,
+                        Stock = x.p.Stock,
+                        Status = x.p.Status,
+                        Photo = x.p.Photo,
+                        Category = x.ig.Category,
+                        unit = x.ig.Unit,
+                        Quantity = ri.Quantity,
+                        UnitQuantity=x.p.UnitQuantity,
+                    }
+                )
+                .ToListAsync();
+
+            return Ok(result);
         }
 
         // GET: api/Products/5
