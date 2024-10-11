@@ -20,8 +20,8 @@
 
         public string? unit { get; set; }
 
-        public decimal? Quantity { get; set; }
-
         public decimal? UnitQuantity { get; set; }
+
+        public string? Description { get; set; }
     }
 }

@@ -16,4 +16,14 @@ public partial class Order
     public int? TotalAmount { get; set; }
 
     public bool? Status { get; set; }
+
+    public string OrderAddress { get; set; }
+
+    public string OrderPhone { get; set; }
+
+    public string OrderEmail { get; set; }
+
+    public string OrderRemark { get; set; }
+
+    public string OrderName { get; set; }
 }

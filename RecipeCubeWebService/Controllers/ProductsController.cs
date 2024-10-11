@@ -34,36 +34,25 @@ namespace RecipeCubeWebService.Controllers
         {
             var result = await _context.Products
                 .GroupJoin(
-                    _context.Ingredients,
-                    p => p.IngredientId,
-                    i => i.IngredientId,
-                    (p, ig) => new { p, ig }
+                _context.Ingredients,
+                p => p.IngredientId,    // 產品的 IngredientId
+                i => i.IngredientId,    // 類別的 IngredientId
+                (p, ingredient) => new { p, ingredient } // 返回一個包含產品 (p) 和對應集合 (ingredient) 的匿名型別
                 )
                 .SelectMany(
-                    pg => pg.ig.DefaultIfEmpty(), // 左外聯接
-                    (pg, ig) => new { pg.p, ig }
-                )
-                .GroupJoin(
-                    _context.RecipeIngredients,
-                    pg => pg.ig.IngredientId, // 假設使用 IngredientId 來聯接 RecipeIngredients
-                    ri => ri.IngredientId, // 假設 RecipeIngredients 中也有 IngredientId
-                    (pg, ri) => new { pg.p, pg.ig, ri }
-                )
-                .SelectMany(
-                    x => x.ri.DefaultIfEmpty(), // 左外聯接
-                    (x, ri) => new ProductDTO
-                    {
-                        ProductId = x.p.ProductId,
-                        ProductName = x.p.ProductName,
-                        IngredientId = x.p.IngredientId,
-                        Price = x.p.Price,
-                        Stock = x.p.Stock,
-                        Status = x.p.Status,
-                        Photo = x.p.Photo,
-                        Category = x.ig.Category,
-                        unit = x.ig.Unit,
-                        Quantity = ri.Quantity,
-                        UnitQuantity=x.p.UnitQuantity,
+                pg => pg.ingredient.DefaultIfEmpty(), // 左外連接
+                (pg, ingredient) => new ProductDTO {   // 為每個產品和它的成分創建 ProductDTO
+                    ProductId = pg.p.ProductId,
+                    ProductName = pg.p.ProductName,
+                    IngredientId = pg.p.IngredientId,
+                    Price = pg.p.Price,
+                    Stock = pg.p.Stock,
+                    Status = pg.p.Status,
+                    Photo = pg.p.Photo,
+                    Category = ingredient.Category,
+                    unit = ingredient.Unit,
+                    UnitQuantity = pg.p.UnitQuantity,
+                    Description = pg.p.Description
                     }
                 )
                 .ToListAsync();

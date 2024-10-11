@@ -175,6 +175,9 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("product_name");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Stock).HasColumnName("stock");
+            entity.Property(e => e.UnitQuantity)
+               .HasColumnType("decimal(10, 2)")
+               .HasColumnName("unit_quantity");
         });
 
         modelBuilder.Entity<Recipe>(entity =>
