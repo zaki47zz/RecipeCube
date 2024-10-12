@@ -10,15 +10,15 @@ $(document).ready(function () {
     let savedPage = null;
     let savedSearchQuery = null;
 
-    function navbarColorOnResize() {
-        var navbar = document.getElementById('sidenav-main');  // 根據你提供的ID
-        if (navbar) {
-            // 如果 navbar 存在，則進行 classList 操作
-            navbar.classList.add('new-class');  // 示例：添加 class 'new-class'
-        } else {
-            console.warn("Navbar element not found.");
-        }
-    }
+    //function navbarColorOnResize() {
+    //    var navbar = document.getElementById('sidenav-main');  // 根據你提供的ID
+    //    if (navbar) {
+    //        // 如果 navbar 存在，則進行 classList 操作
+    //        navbar.classList.add('new-class');  // 示例：添加 class 'new-class'
+    //    } else {
+    //        console.warn("Navbar element not found.");
+    //    }
+    //}
 
 
     // 初始化Sidebar卷軸
@@ -94,11 +94,15 @@ $(document).ready(function () {
                 var data = await response.text();
                 $('#dynamic-content').html(data);
                 initializeDataTableWithFilter(filterRow);
+                // 更新 URL 並加入到歷史記錄中
+                history.pushState(null, '', `/Admin/${controller}`);
+
                 // 設定頁面標題
                 let newTitle = $('#dynamic-content').find('h1').text();
                 document.title = newTitle + ' - 食譜魔方';
                 $('ol.breadcrumb .breadcrumb-item.active').text(newTitle);
                 $('h6.font-weight-bolder').text(newTitle);
+
             }
             else {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -390,7 +394,8 @@ $(document).ready(function () {
             if (response.ok) {
                 const data = await response.text();  // 獲取返回的 HTML 內容
                 $('#dynamic-content').html(data);  // 更新 DOM
-
+                // 使用 History API 更新 URL 並加入歷史記錄
+                history.pushState(null, '', `/Admin/${controller}`);
                 // 初始化 DataTable 並應用篩選條件
                 const table = new DataTable("table", {
                     initComplete: function () {
@@ -401,6 +406,7 @@ $(document).ready(function () {
                         paginate: { first: "«", previous: "‹", next: "›", last: "»" },
                     },
                 });
+
             } else {
                 throw new Error(`Error: ${response.statusText}`);
             }
@@ -408,4 +414,51 @@ $(document).ready(function () {
             alert(`Error: ${error}`);
         }
     }
+    function updateSidebarActive(controller) {
+        
+        let trimmedController = controller.slice(0, -1);
+        $("#sidenav-main ul.navbar-nav .nav-link").removeClass("active");
+        // 根據 controller 更新 active 的項目
+        $("#sidenav-main ul.navbar-nav .nav-item").each(function () {
+            let itemController = $(this).attr('id');
+            //console.log(itemController);
+            //console.log(this);
+
+            if (itemController && itemController.toLowerCase() === trimmedController.toLowerCase()) {
+                $(this).children('.nav-link').addClass("active");
+            }
+        });
+    }
+    window.onpopstate = async function () {
+        const url = window.location.pathname;  // 取得當前頁面的 URL 路徑
+        const segments = url.split('/');  // 切割 URL，分離出每個部分的路徑片段
+        const controller = segments.length > 2 ? segments[2] : null;  // 根據 URL 片段取得 controller 名稱
+        const parentId = controller ? controller.slice(0, -1) : null;  // 將 controller 最後一個字母去掉作為 parentId
+
+        // 如果 controller 或 parentId 不存在，則退出
+        if (!controller || !parentId) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/Admin/${controller}/${parentId}IndexPartial`, {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                const data = await response.text();
+                $('#dynamic-content').html(data);  // 使用回應的 HTML 內容更新頁面
+                initializeDataTableWithFilter(filterRow);  // 初始化 DataTable
+                updateSidebarActive(controller);  // 根據當前的 controller 更新側邊欄的 active 狀態
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Failed to load the partial view:', error);
+        }
+    };
+
+
+
+
 });
