@@ -34,6 +34,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Stock = product.Stock,
                 Status = product.Status,
                 Photo = product.Photo,
+                UnitQuantity = product.UnitQuantity,
+                Description = product.Description,
             }).ToList();
 
             // 傳遞 ViewModle 列表到 PartialView
@@ -57,6 +59,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Stock = product.Stock,
                 Status = product.Status,
                 Photo = product.Photo,
+                UnitQuantity = product.UnitQuantity,
+                Description = product.Description,
             };
 
             return PartialView("_DetailsPartial",viewModel);
@@ -72,7 +76,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo,UnitQuantity,Description")] Product product
         )
         {
             if (ModelState.IsValid)
@@ -118,6 +122,8 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Stock = product.Stock,
                 Status = product.Status,
                 Photo = product.Photo,
+                UnitQuantity = product.UnitQuantity,
+                Description = product.Description,
             };
             return PartialView("_EditPartial",viewModel);
         }
@@ -127,7 +133,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult Edit(
             int id,
-            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo")] Product product
+            [Bind("ProductId,ProductName,IngredientId,Price,Stock,Status,Photo,UnitQuantity,Description")] Product product
         )
         {
             if (id != product.ProductId)
