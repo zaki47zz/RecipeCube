@@ -211,7 +211,7 @@ $(document).ready(function () {
             // 使用 FormData 來處理文件上傳
             var formData = new FormData(this);
             try {
-                var respnose = await fetch($(this).attr('action'), {
+                var response = await fetch($(this).attr('action'), {
                     method: "POST",
                     body: formData,
                 });
@@ -229,7 +229,7 @@ $(document).ready(function () {
                     $(modalSelector + ' .modal-body').html(data);
                 }
             } catch (error) {
-                alert(error);
+                alert(error + "123");
             }
         });
     }
