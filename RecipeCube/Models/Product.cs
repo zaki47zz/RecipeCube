@@ -19,4 +19,7 @@ public partial class Product
 
     public string? Photo { get; set; }
 
+    public decimal? UnitQuantity { get; set; }
+
+    public string? Description { get; set; }
 }
