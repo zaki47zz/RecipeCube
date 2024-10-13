@@ -21,13 +21,8 @@ namespace RecipeCubeWebService.Controllers
             _context = context;
         }
 
-        // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-            return await _context.Products.ToListAsync();
-        }
-
+        
+        // 讀取所有商品 包含類別
         // GET: api/productsANDcategory
         [HttpGet("ProductsNcategory")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsNcategory()
@@ -58,6 +53,89 @@ namespace RecipeCubeWebService.Controllers
                 .ToListAsync();
 
             return Ok(result);
+        }
+
+        // 讀取單一商品 包含類別
+        // GET: api/productsANDcategory/1
+        [HttpGet("ProductsNcategory/{id}")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsNcategory(int id)
+        {
+            var result = await _context.Products
+                .Where(p=>p.ProductId == id)
+                .GroupJoin(
+                _context.Ingredients,
+                p => p.IngredientId,    // 產品的 IngredientId
+                i => i.IngredientId,    // 類別的 IngredientId
+                (p, ingredient) => new { p, ingredient } // 返回一個包含產品 (p) 和對應集合 (ingredient) 的匿名型別
+                )
+                .SelectMany(
+                pg => pg.ingredient.DefaultIfEmpty(), // 左外連接
+                (pg, ingredient) => new ProductDTO
+                {   // 為每個產品和它的成分創建 ProductDTO
+                    ProductId = pg.p.ProductId,
+                    ProductName = pg.p.ProductName,
+                    IngredientId = pg.p.IngredientId,
+                    Price = pg.p.Price,
+                    Stock = pg.p.Stock,
+                    Status = pg.p.Status,
+                    Photo = pg.p.Photo,
+                    Category = ingredient.Category,
+                    unit = ingredient.Unit,
+                    UnitQuantity = pg.p.UnitQuantity,
+                    Description = pg.p.Description
+                }
+                )
+                .FirstOrDefaultAsync();
+
+            if(result == null )
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+
+        // 讀取商品類別 並讀出每類商品數量
+        // GET: api/GetProductsCategory
+        [HttpGet("GetProductsCategory")]
+        public async Task<ActionResult<IEnumerable<ProductsCategoryDTO>>> GetProductsCategory()
+        {
+            var result = await _context.Products
+                .GroupJoin(
+                _context.Ingredients,
+                p => p.IngredientId,    // 產品的 IngredientId
+                i => i.IngredientId,    // 類別的 IngredientId
+                (p, ingredient) => new { p, ingredient } // 返回一個包含產品 (p) 和對應集合 (ingredient) 的匿名型別
+                )
+                .SelectMany(
+                pg => pg.ingredient.DefaultIfEmpty(), // 左外連接
+                (pg, ingredient) => new ProductsCategoryDTO
+                {   // 為每個產品和它的成分創建 ProductsCategory
+                    ProductId = pg.p.ProductId,
+                    Category = ingredient.Category,
+                }
+                )
+                .ToListAsync();
+
+           var categories = result
+                .GroupBy(p=>p.Category) //案類別分組
+                .Select(g=>new ProductsCategoryDTO // 建立新 DTO
+                { 
+                    Category = g.Key,
+                    Count = g.Count(),
+                }).ToList();
+
+            return Ok(categories);
+        }
+
+        //=============================================================================
+
+        // GET: api/Products
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        {
+            return await _context.Products.ToListAsync();
         }
 
         // GET: api/Products/5
