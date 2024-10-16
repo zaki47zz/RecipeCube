@@ -26,6 +26,31 @@
                     <span asp-validation-for="TotalAmount" class="text-danger"></span>
                 </div>
                 <div class="form-group">
+                    <label asp-for="OrderName" class="control-label"></label>
+                    <input asp-for="OrderName" class="form-control" />
+                    <span asp-validation-for="OrderName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderPhone" class="control-label"></label>
+                    <input asp-for="OrderPhone" class="form-control" />
+                    <span asp-validation-for="OrderPhone" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderAddress" class="control-label"></label>
+                    <input asp-for="OrderAddress" class="form-control" />
+                    <span asp-validation-for="OrderAddress" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderEmail" class="control-label"></label>
+                    <input asp-for="OrderEmail" class="form-control" />
+                    <span asp-validation-for="OrderEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderRemark" class="control-label"></label>
+                    <input asp-for="OrderRemark" class="form-control" />
+                    <span asp-validation-for="OrderRemark" class="text-danger"></span>
+                </div>
+                <div class="form-group">
                     <label asp-for="Status" class="control-label"></label>
                     <select asp-for="Status" class="form-control">
                         <option value="true">已付款</option>

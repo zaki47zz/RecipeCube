@@ -29,4 +29,10 @@ public partial class ProductViewModel
 
     [Display(Name ="商品圖檔名稱")]
     public string? Photo { get; set; }
+
+    [Display(Name = "商品單位量")]
+    public decimal? UnitQuantity { get; set; }
+
+    [Display(Name = "商品描述")]
+    public string? Description { get; set; }
 }

@@ -109,6 +109,19 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()
                 .HasColumnName("order_id");
+            entity.Property(e => e.OrderAddress)
+                .HasMaxLength(50)
+                .HasColumnName("order_address");
+            entity.Property(e => e.OrderEmail)
+                .HasMaxLength(50)
+                .HasColumnName("order_email");
+            entity.Property(e => e.OrderName)
+                .HasMaxLength(50)
+                .HasColumnName("order_name");
+            entity.Property(e => e.OrderPhone)
+                .HasMaxLength(50)
+                .HasColumnName("order_phone");
+            entity.Property(e => e.OrderRemark).HasColumnName("order_remark");
             entity.Property(e => e.OrderTime).HasColumnName("order_time");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
@@ -165,6 +178,7 @@ public partial class RecipeCubeContext : DbContext
         modelBuilder.Entity<Product>(entity =>
         {
             entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
             entity.Property(e => e.Photo)
                 .HasMaxLength(255)
@@ -175,6 +189,9 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("product_name");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Stock).HasColumnName("stock");
+            entity.Property(e => e.UnitQuantity)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("unit_quantity");
         });
 
         modelBuilder.Entity<Recipe>(entity =>

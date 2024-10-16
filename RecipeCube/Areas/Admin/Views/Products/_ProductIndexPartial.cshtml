@@ -38,6 +38,9 @@
                     @Html.DisplayNameFor(model => model.Stock)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.UnitQuantity)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Status)
                 </th>
                @*  <th>
@@ -65,6 +68,10 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Stock)
                     </td>
+                      <td>
+                        @Html.DisplayFor(modelItem => item.UnitQuantity)
+                    </td>
+                     
                   @*   <td>
                         @Html.DisplayFor(modelItem => item.Status)
                     </td> *@
