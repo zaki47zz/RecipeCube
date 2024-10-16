@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RecipeCubeWebService.Models;
 namespace RecipeWebService.Models;
 
 public partial class RecipeCubeContext : DbContext
@@ -14,5 +15,12 @@ public partial class RecipeCubeContext : DbContext
                 .Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("RecipeCube"));
         }
+    }
+
+public DbSet<RecipeCubeWebService.Models.Recipe> Recipe { get; set; } = default!;
+
+    public static implicit operator RecipeCubeContext(RecipeCubeWebService.Models.RecipeCubeContext v)
+    {
+        throw new NotImplementedException();
     }
 }
