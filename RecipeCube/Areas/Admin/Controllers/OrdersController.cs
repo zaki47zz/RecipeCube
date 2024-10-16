@@ -26,6 +26,11 @@ namespace RecipeCube.Areas.Admin.Controllers
                 UserId=order.UserId,
                 OrderTime=order.OrderTime,
                 TotalAmount=order.TotalAmount,
+                OrderName=order.OrderName,
+                OrderPhone=order.OrderPhone,
+                OrderAddress=order.OrderAddress,
+                OrderEmail=order.OrderEmail,
+                OrderRemark=order.OrderRemark,
                 Status=order.Status,
             }).ToList();
             return PartialView("_OrderIndexPartial", viewModel);
@@ -42,7 +47,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,UserId,OrderTime,TotalAmount,Status,OrderRemark,OrderEmail,OrderAddress,OrderPhone,OrderName")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -69,6 +74,11 @@ namespace RecipeCube.Areas.Admin.Controllers
                 UserId = order.UserId,
                 OrderTime = order.OrderTime,
                 TotalAmount = order.TotalAmount,
+                OrderName = order.OrderName,
+                OrderPhone = order.OrderPhone,
+                OrderAddress = order.OrderAddress,
+                OrderEmail = order.OrderEmail,
+                OrderRemark = order.OrderRemark,
                 Status = order.Status,
             };
             return PartialView("_EditPartial",viewModel);
@@ -79,7 +89,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Edit(long id, [Bind("OrderId,UserId,OrderTime,TotalAmount,Status")] Order order)
+        public JsonResult Edit(long id, [Bind("OrderId,UserId,OrderTime,TotalAmount,Status,OrderRemark,OrderEmail,OrderAddress,OrderPhone,OrderName")] Order order)
         {
             if (id != order.OrderId)
             {
