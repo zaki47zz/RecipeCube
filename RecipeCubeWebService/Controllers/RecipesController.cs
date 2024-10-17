@@ -46,7 +46,9 @@ namespace RecipeCubeWebService.Controllers
                 var ingredients = await _context.Ingredients
                     .Where(i => ingredientIds.Contains(i.IngredientId))
                     .ToListAsync();
-
+                // 將 SelectedIngredients 排序
+                var sortedIngredientIds = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList();
+                sortedIngredientIds.Sort();
                 // 創建 DTO
                 var recipeDto = new RecipeDto
                 {
@@ -63,7 +65,7 @@ namespace RecipeCubeWebService.Controllers
                     Visibility = recipe.Visibility,
                     Photo = recipe.Photo,
                     Status = recipe.Status,
-                    SelectedIngredients = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList(),
+                    SelectedIngredients = sortedIngredientIds,
                     SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                     IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
                                                               .ToDictionary(g => g.Key, g => g.First().Quantity ?? 0M),
@@ -95,7 +97,8 @@ namespace RecipeCubeWebService.Controllers
             var ingredients = await _context.Ingredients
                 .Where(i => ingredientIds.Contains(i.IngredientId))
                 .ToListAsync();
-
+            var sortedIngredientIds = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList();
+            sortedIngredientIds.Sort();
             // 創建 DTO
             var recipeDto = new RecipeDto
             {
@@ -112,7 +115,7 @@ namespace RecipeCubeWebService.Controllers
                 Visibility = recipe.Visibility,
                 Photo = recipe.Photo,
                 Status = recipe.Status,
-                SelectedIngredients = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList(),
+                SelectedIngredients = sortedIngredientIds,
                 SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                 IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
                                                           .ToDictionary(g => g.Key, g => g.First().Quantity ?? 0M),
