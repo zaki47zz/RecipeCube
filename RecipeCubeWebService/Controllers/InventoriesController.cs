@@ -48,6 +48,8 @@ namespace RecipeCubeWebService.Controllers
 
             var ingredients = await _context.Ingredients.ToListAsync(); //抓所有食材的資料
 
+
+
             List<InventoryDTO> inventoryDTOs = new List<InventoryDTO>();
 
             foreach (Inventory userInventory in userInventories)
@@ -62,7 +64,6 @@ namespace RecipeCubeWebService.Controllers
                     IngredientId = userInventory.IngredientId,
                     Quantity = userInventory.Quantity,
                     ExpiryDate = userInventory.ExpiryDate,
-                    IsExpiring = userInventory.IsExpiring,
                     Visibility = userInventory.Visibility,
                     IngredientName = ingredient.Select(i => i.IngredientName).FirstOrDefault(),
                     Category = ingredient.Select(i => i.Category).FirstOrDefault(),
