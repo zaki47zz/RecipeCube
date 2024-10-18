@@ -83,7 +83,19 @@ namespace RecipeCubeWebService.Controllers
             return CreatedAtAction("GetOrder", new { id = order.OrderId }, orderDTO);
         }
 
+        // GET: api/Orders/5
+        //[HttpGet("{userId}")]
+        //public async Task<ActionResult<Order>> GetOrder(long id)
+        //{
+        //    var order = await _context.Orders.FindAsync(id);
 
+        //    if (order == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return order;
+        //}
         //=========================================================================================
 
         // GET: api/Orders
