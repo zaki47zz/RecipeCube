@@ -1,6 +1,6 @@
 ﻿namespace RecipeCubeWebService.DTO;
 
-    public class OrderOrderItemDTO
+    public class GetOrderOrderItemProduct
     {
         public long OrderId { get; set; }
 
@@ -22,6 +22,6 @@
 
         public string? OrderName { get; set; }
 
-        public List<OrderItemDTO>? OrderItemsDTO { get; set; }
-}
+        public List<GetOrderItemProductUnit>? GetOrderItemProductUnit { get; set; }
+    }
 
