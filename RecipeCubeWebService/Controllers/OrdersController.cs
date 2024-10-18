@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
 
 namespace RecipeCubeWebService.Controllers
@@ -19,6 +20,71 @@ namespace RecipeCubeWebService.Controllers
         {
             _context = context;
         }
+
+        // 創建訂單/訂單明細
+        // POST: api/Orders
+        [HttpPost("PostOrderOrderItem")]
+        public async Task<ActionResult<OrderOrderItemDTO>> PostOrder(OrderOrderItemDTO orderDTO)
+        {
+            // order實體
+            var order = new Order
+            {
+                OrderId = orderDTO.OrderId,
+                UserId = orderDTO.UserId,
+                OrderTime = orderDTO.OrderTime,
+                TotalAmount = orderDTO.TotalAmount,
+                Status = orderDTO.Status,
+                OrderAddress = orderDTO.OrderAddress,
+                OrderPhone = orderDTO.OrderPhone,
+                OrderEmail = orderDTO.OrderEmail,
+                OrderRemark = orderDTO.OrderRemark,
+                OrderName = orderDTO.OrderName,
+            };
+
+            // order新增至Orders表
+            _context.Orders.Add(order);
+
+            // 保存 Order
+            await _context.SaveChangesAsync();
+
+            // OrderItem實體
+            foreach (var orderItemDTO in orderDTO.OrderItemsDTO)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId= orderItemDTO.OrderId,
+                    ProductId = orderItemDTO.ProductId,
+                    Quantity = orderItemDTO.Quantity,
+                    Price = orderItemDTO.Price,
+                };
+
+                // orderItem 新增至 OrderItems
+                _context.OrderItems.Add(orderItem);
+            }
+
+
+            try
+            {
+                // 保存OrderItems
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (OrderExists(order.OrderId))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetOrder", new { id = order.OrderId }, orderDTO);
+        }
+
+
+        //=========================================================================================
 
         // GET: api/Orders
         [HttpGet]
