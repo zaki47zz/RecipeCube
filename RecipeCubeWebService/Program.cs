@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RecipeCubeWebService.Models;
 
@@ -14,6 +15,9 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("RecipeCube"));
 });
+
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 
 builder.Services.AddCors(options =>
 {
