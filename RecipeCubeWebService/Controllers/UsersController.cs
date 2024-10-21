@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using RecipeCubeWebService.DTO;
 
+
 namespace RecipeCubeWebService.Controllers
 {
     [Route("api/[controller]")]
@@ -45,25 +46,25 @@ namespace RecipeCubeWebService.Controllers
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, login.Password);
                 if (passwordVerificationResult == PasswordVerificationResult.Success)
                 {
-                    // 創建 JWT Token
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes("3f50a33d7bca2e1a346f5a8c4f5b7e9a");
+                // 創建 JWT Token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes("3f50a33d7bca2e1a346f5a8c4f5b7e9a");
                     var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = new ClaimsIdentity(new Claim[]
-                        {
+                {
+                   Subject = new ClaimsIdentity(new Claim[]
+                   {
                             new Claim(ClaimTypes.SerialNumber, user.Id),
                             new Claim(ClaimTypes.Name, user.UserName),
-                            new Claim(ClaimTypes.Email, user.Email)
-                        }),
-                        // 測試用設定token到期日為30天
-                        Expires = DateTime.UtcNow.AddDays(30),
+                       new Claim(ClaimTypes.Email, user.Email)
+                   }),
+                    // 測試用設定token到期日為30天
+                    Expires = DateTime.UtcNow.AddDays(30),
                         //Expires = DateTime.UtcNow.AddSeconds(30),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-                    };
+                };
 
                     var token = tokenHandler.CreateToken(tokenDescriptor);
-                    var tokenString = tokenHandler.WriteToken(token);
+                var tokenString = tokenHandler.WriteToken(token);
                     return Ok(new { Token = tokenString, Message = "登入成功",usernamejwt = user.UserName });
                 }
             }
