@@ -13,7 +13,7 @@ public partial class Order
 
     public int? TotalAmount { get; set; }
 
-    public bool? Status { get; set; }
+    public int? Status { get; set; }
 
     public string? OrderAddress { get; set; }
 

@@ -41,6 +41,6 @@ namespace RecipeCube.Areas.Admin.ViewModels;
 
         [Display(Name = "訂單狀態")]
         [Required(ErrorMessage ="訂單狀態欄位必填")]
-        public bool? Status { get; set; }
-        
+        public int? Status { get; set; }
+
     }
