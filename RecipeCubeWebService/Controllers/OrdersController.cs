@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
 
@@ -82,6 +84,51 @@ namespace RecipeCubeWebService.Controllers
 
             return CreatedAtAction("GetOrder", new { id = order.OrderId }, orderDTO);
         }
+
+        //==========================================================================================
+        // 支付請求
+        [HttpPost("StartPayment")]
+        public async Task<ActionResult<string>> StartPayment([FromBody] Order order)
+        {
+            // 使用綠界支付 SDK 或 REST API 創建支付請求
+            var paymentHtml = await CreatePaymentRequest(order); // 這裡需要實現你的支付請求邏輯
+
+            return Ok(paymentHtml); // 返回生成的支付 HTML
+        }
+
+        private async Task<string> CreatePaymentRequest(Order order)
+        {
+            // 使用 HttpClient 發送支付請求到綠界
+            using (var client = new HttpClient())
+            {
+                var requestUri = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"; //綠界 API 端點
+
+                var paymentData = new
+                {
+                    MerchantTradeNo = "test" + DateTime.UtcNow.Ticks,
+                    MerchantTradeDate = DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss"),
+                    TotalAmount = order.TotalAmount.ToString(),
+                    TradeDesc = "訂單支付",
+                    ItemName = "測試商品等",
+                    ReturnURL = "你的回傳 URL", // 替換為你的回傳 URL
+                    ClientBackURL = "你的返回 URL", // 替換為用戶返回 URL
+                };
+
+                var json = JsonConvert.SerializeObject(paymentData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(requestUri, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    return responseBody; // 返回支付的 HTML
+                }
+
+                throw new Exception("支付請求失敗");
+            }
+        }
+
+        //=========================================================================================
 
         // 取得我的訂單 join四張表 order orderItem product ingredients
         // GET: api/Orders/5
