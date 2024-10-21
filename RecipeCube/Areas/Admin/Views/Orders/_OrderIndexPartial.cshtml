@@ -80,13 +80,18 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.OrderRemark)
                     </td>
-                    @* <td>
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td> *@
                     <td>
-                    <span class="badge @(item.Status.GetValueOrDefault() ? "bg-success" : "bg-danger")">
-                        @(item.Status.GetValueOrDefault() ? "已付款" : "未付款")
-                    </span>
+                        @{
+                            string orderStatus = item.Status switch
+                            {
+                                1 => "未付款",
+                                2 => "已付款",
+                                3 => "訂單確認中",
+                                4 => "已出貨",
+                                5 => "訂單完成",
+                            };
+                        }
+                        @orderStatus
                     </td>
                     <td class="text-center">
                         <button class="edit btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.OrderId">編輯訂單</button>
