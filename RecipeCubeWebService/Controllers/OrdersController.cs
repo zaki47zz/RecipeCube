@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -87,46 +90,125 @@ namespace RecipeCubeWebService.Controllers
 
         //==========================================================================================
         // 支付請求
+        //[HttpPost("StartPayment")]
+        //public async Task<ActionResult<string>> StartPayment([FromBody] Order order)
+        //{
+        //    // 使用綠界支付 SDK 或 REST API 創建支付請求
+        //    var paymentHtml = await CreatePaymentRequest(order); // 這裡需要實現你的支付請求邏輯
+
+        //    return Ok(paymentHtml); // 返回生成的支付 HTML
+        //}
+
+        //private async Task<string> CreatePaymentRequest(Order order)
+        //{
+        //    // 使用 HttpClient 發送支付請求到綠界
+        //    using (var client = new HttpClient())
+        //    {
+        //        var requestUri = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"; //綠界 API 端點
+
+        //        var paymentData = new
+        //        {
+        //            MerchantTradeNo = "test" + DateTime.UtcNow.Ticks,
+        //            MerchantTradeDate = DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss"),
+        //            TotalAmount = order.TotalAmount.ToString(),
+        //            TradeDesc = "訂單支付",
+        //            ItemName = "測試商品",
+        //            ReturnURL = "", // 替換為你的回傳 URL
+        //            ClientBackURL = "", // 替換為用戶返回 URL
+        //        };
+
+        //        var json = JsonConvert.SerializeObject(paymentData);
+        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        //        var response = await client.PostAsync(requestUri, content);
+
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            var responseBody = await response.Content.ReadAsStringAsync();
+        //            return responseBody; // 返回支付的 HTML
+        //        }
+
+        //        throw new Exception("支付請求失敗");
+        //    }
+        //}
+
+        
+        private string hashKey = "pwFHCqoQZGmho4w6"; // 綠界測試平台 HashKey
+        private string hashIV = "EkRm7iFT261dpevs";  // 綠界測試平台 HashIV
+        string returnUrl = "https://4948-2001-b400-e758-86a7-c860-f211-eefa-8d36.ngrok-free.app";
+        // 支付請求
         [HttpPost("StartPayment")]
         public async Task<ActionResult<string>> StartPayment([FromBody] Order order)
         {
-            // 使用綠界支付 SDK 或 REST API 創建支付請求
-            var paymentHtml = await CreatePaymentRequest(order); // 這裡需要實現你的支付請求邏輯
-
-            return Ok(paymentHtml); // 返回生成的支付 HTML
+            var paymentHtml = await CreatePaymentRequest(order);
+            return Ok(paymentHtml);
         }
 
+        // 建立支付請求
         private async Task<string> CreatePaymentRequest(Order order)
         {
-            // 使用 HttpClient 發送支付請求到綠界
             using (var client = new HttpClient())
             {
-                var requestUri = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"; //綠界 API 端點
+                var requestUri = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
 
-                var paymentData = new
-                {
-                    MerchantTradeNo = "test" + DateTime.UtcNow.Ticks,
-                    MerchantTradeDate = DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss"),
-                    TotalAmount = order.TotalAmount.ToString(),
-                    TradeDesc = "訂單支付",
-                    ItemName = "測試商品等",
-                    ReturnURL = "你的回傳 URL", // 替換為你的回傳 URL
-                    ClientBackURL = "你的返回 URL", // 替換為用戶返回 URL
-                };
+                var paymentData = new Dictionary<string, string>
+        {
+            { "MerchantID", "3002607" },
+            { "MerchantTradeNo", order.OrderId.ToString() },
+            { "MerchantTradeDate", DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss") },
+            { "PaymentType", "aio" },
+            { "TotalAmount", order.TotalAmount.ToString() },
+            { "TradeDesc", "訂單支付" },
+            { "ItemName", "測試商品" },
+            { "ReturnURL", $"{returnUrl}/api/Orders/StartPayment" },
+            { "ClientBackURL", "https://8567-2001-b400-e758-86a7-c860-f211-eefa-8d36.ngrok-free.app/api/Orders" },
+            { "ChoosePayment", "Credit" },
+            { "EncryptType", "1" }
+        };
 
-                var json = JsonConvert.SerializeObject(paymentData);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                paymentData.Add("CheckMacValue", GetCheckMacValue(paymentData));
+
+                // 使用 FormUrlEncodedContent
+                var content = new FormUrlEncodedContent(paymentData);
+
                 var response = await client.PostAsync(requestUri, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    return responseBody; // 返回支付的 HTML
+                    return responseBody;
                 }
 
-                throw new Exception("支付請求失敗");
+                throw new Exception($"支付請求失敗: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
             }
         }
+
+        // 生成 CheckMacValue 的方法
+        private string GetCheckMacValue(Dictionary<string, string> order)
+        {
+            var param = order.Keys.OrderBy(x => x).Select(key => key + "=" + order[key]).ToList();
+        var checkValue = string.Join("&", param);
+            //測試用的 HashKey
+            var hashKey = "pwFHCqoQZGmho4w6";
+            //測試用的 HashIV
+            var HashIV = "EkRm7iFT261dpevs";
+            checkValue = $"HashKey={hashKey}" + "&" + checkValue + $"&HashIV={HashIV}";
+            checkValue = HttpUtility.UrlEncode(checkValue).ToLower();
+            checkValue = GetSHA256(checkValue);
+            return checkValue.ToUpper();
+        }
+        private string GetSHA256(string value)
+        {
+            var result = new StringBuilder();
+            var sha256 = SHA256Managed.Create();
+            var bts = Encoding.UTF8.GetBytes(value);
+            var hash = sha256.ComputeHash(bts);
+            for (int i = 0; i < hash.Length; i++)
+            {
+                result.Append(hash[i].ToString("X2"));
+            }
+            return result.ToString();
+        }
+
 
         //=========================================================================================
 
