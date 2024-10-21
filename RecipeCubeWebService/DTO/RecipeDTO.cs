@@ -38,6 +38,8 @@ namespace RecipeCubeWebService.DTO
         public List<int> SelectedIngredients { get; set; } = new List<int>();
         // 食材名稱
         public List<string> SelectedIngredientNames { get; set; } = new List<string>();
+        // 新增同義字欄位
+        public List<string> Synonyms { get; set; } = new List<string>(); 
         // 食材數量
         [Required(ErrorMessage = "請填寫食材數量")]
         public Dictionary<int, decimal> IngredientQuantities { get; set; } = new Dictionary<int, decimal>();

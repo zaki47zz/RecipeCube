@@ -28,6 +28,7 @@ namespace RecipeCubeWebService.Controllers
         //    return await _context.Recipes.ToListAsync();
         //}
         // GET: api/Recipes
+        // GET: api/Recipes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
         {
@@ -46,9 +47,14 @@ namespace RecipeCubeWebService.Controllers
                 var ingredients = await _context.Ingredients
                     .Where(i => ingredientIds.Contains(i.IngredientId))
                     .ToListAsync();
+
+                // 查詢同義字
+                var synonyms = ingredients.SelectMany(i => i.Synonym?.Split(',') ?? Array.Empty<string>()).Distinct().ToList();
+
                 // 將 SelectedIngredients 排序
                 var sortedIngredientIds = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList();
                 sortedIngredientIds.Sort();
+
                 // 創建 DTO
                 var recipeDto = new RecipeDto
                 {
@@ -69,7 +75,8 @@ namespace RecipeCubeWebService.Controllers
                     SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                     IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
                                                               .ToDictionary(g => g.Key, g => g.First().Quantity ?? 0M),
-                    IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit ?? string.Empty)
+                    IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit ?? string.Empty),
+                    Synonyms = synonyms
                 };
 
                 recipeDtos.Add(recipeDto);
@@ -77,6 +84,7 @@ namespace RecipeCubeWebService.Controllers
 
             return Ok(recipeDtos);
         }
+
         // GET: api/Recipes/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDto>> GetRecipe(int id)
@@ -97,8 +105,13 @@ namespace RecipeCubeWebService.Controllers
             var ingredients = await _context.Ingredients
                 .Where(i => ingredientIds.Contains(i.IngredientId))
                 .ToListAsync();
+
+            // 查詢同義字
+            var synonyms = ingredients.SelectMany(i => i.Synonym?.Split(',') ?? Array.Empty<string>()).Distinct().ToList();
+
             var sortedIngredientIds = recipeIngredients.Select(ri => ri.IngredientId ?? 0).ToList();
             sortedIngredientIds.Sort();
+
             // 創建 DTO
             var recipeDto = new RecipeDto
             {
@@ -119,11 +132,13 @@ namespace RecipeCubeWebService.Controllers
                 SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                 IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
                                                           .ToDictionary(g => g.Key, g => g.First().Quantity ?? 0M),
-                IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit ?? string.Empty)
+                IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit ?? string.Empty),
+                Synonyms = synonyms
             };
 
             return Ok(recipeDto);
         }
+    
         // PUT: api/Recipes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         // PUT: api/Recipes/5
@@ -222,6 +237,21 @@ namespace RecipeCubeWebService.Controllers
             {
                 return BadRequest(ModelState);
             }
+            // Custom validation
+            if (string.IsNullOrWhiteSpace(recipeDto.RecipeName))
+            {
+                return BadRequest("食譜名稱不能為空");
+            }
+
+            if (recipeDto.SelectedIngredients == null || !recipeDto.SelectedIngredients.Any())
+            {
+                return BadRequest("至少選擇一樣食材");
+            }
+
+            if (string.IsNullOrWhiteSpace(recipeDto.Category))
+            {
+                return BadRequest("類別需被選擇");
+            }
 
             // Create new Recipe entity
             var recipe = new Recipe
@@ -270,20 +300,20 @@ namespace RecipeCubeWebService.Controllers
         }
 
         // DELETE: api/Recipes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRecipe(int id)
-        {
-            var recipe = await _context.Recipes.FindAsync(id);
-            if (recipe == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteRecipe(int id)
+        //{
+        //    var recipe = await _context.Recipes.FindAsync(id);
+        //    if (recipe == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.Recipes.Remove(recipe);
-            await _context.SaveChangesAsync();
+        //    _context.Recipes.Remove(recipe);
+        //    await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         private bool RecipeExists(int id)
         {
