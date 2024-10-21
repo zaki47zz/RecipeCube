@@ -6,6 +6,7 @@ namespace RecipeCubeWebService.DTO
         public int InventoryId { get; set; }
         public int GroupId { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
         public int? IngredientId { get; set; }
         public string IngredientName { get; set; }
         public string Category { get; set; }
