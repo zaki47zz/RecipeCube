@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeCubeWebService.DTO;
@@ -18,8 +20,8 @@ namespace RecipeCubeWebService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly RecipeCubeContext _context;
+        // 偷內建hash方法，注入後就能拿來用了
         private readonly IPasswordHasher<User> _passwordHasher;
-
 
         public UsersController(RecipeCubeContext context, IPasswordHasher<User> passwordHasher)
         {
@@ -27,8 +29,7 @@ namespace RecipeCubeWebService.Controllers
             _passwordHasher = passwordHasher;
         }
 
-
-        // GET: api/Users
+        // GET: api/Users 測試GET有沒有壞掉用
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -36,23 +37,20 @@ namespace RecipeCubeWebService.Controllers
         }
 
         // GET: api/Users/5
+        /*  購物車會用到  */
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
-
-
             if (user == null)
             {
                 return NotFound();
             }
-
-
             return user;
         }
+        /*  購物車會用到  */
 
-
-        // POST: api/Users
+        // POST: api/Users 測試POST有沒有壞掉用
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
@@ -79,51 +77,51 @@ namespace RecipeCubeWebService.Controllers
         }
 
 
-
-
         // 註冊功能
         [HttpPost("SignUp")]
-        public IActionResult SignUpDTO(SignUpDTO signUp)
+        public async Task<IActionResult> SignUpDTO(SignUpDTO signUp)
         {
-            var existingUser = _context.Users.SingleOrDefault(u => u.Email == signUp.Email);
+            if (signUp == null)
+            {
+                return BadRequest("Invalid signup data.");
+            }
+            var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == signUp.Email);
             if (existingUser != null)
             {
                 return Conflict(new { Message = "User with this email already exists" });
             }
 
-
             var userName = signUp.Email;
             var newUser = new User
             {
                 Id = Guid.NewGuid().ToString(), // 隨機生成UUID
-                UserName = userName, // 使用者名稱設為 email
+                UserName = userName, // 使用者名稱預設為 email
                 NormalizedUserName = userName.ToUpper(), // 正常化名稱
                 Email = signUp.Email, // 註冊的Email
                 NormalizedEmail = signUp.Email.ToUpper(), // 正常化Email
-                EmailConfirmed = true, // 設為已確認電子郵件
+                EmailConfirmed = false, // 設為未確認電子郵件
                 SecurityStamp = Guid.NewGuid().ToString(), // 隨機生成
                 ConcurrencyStamp = Guid.NewGuid().ToString(), // 隨機生成
-                PhoneNumber = "", // 註冊時的手機號碼（可選）
+                PhoneNumber = "", // 註冊時的手機號碼
                 PhoneNumberConfirmed = false, // 手機號碼未確認
                 TwoFactorEnabled = false, // 預設關閉雙重驗證
                 LockoutEnabled = true, // 開啟鎖定功能
                 AccessFailedCount = 0, // 登入失敗次數設為0
-                DietaryRestrictions = signUp.DietaryRestrictions, // 其他自訂字段
-                ExclusiveChecked = false,
-                GroupId = 0,
-                PreferredChecked = false,
+                DietaryRestrictions = signUp.DietaryRestrictions, //葷(F)素(T)選擇，前端預設F
+                ExclusiveChecked = false, // 預設不可食用食物關閉，驗證後可在使用者設定修改填入
+                GroupId = 0, // 預設沒有群組
+                PreferredChecked = false, // 預設偏好食物關閉，驗證後可在使用者設定修改填入
                 Status = true // 使用者狀態設定為啟用
             };
 
-
+            // 用偷來的方法hash加密password
             newUser.PasswordHash = _passwordHasher.HashPassword(newUser, signUp.Password);
-
 
             try
             {
                 // 4. 將新使用者保存至資料庫
                 _context.Users.Add(newUser);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -137,15 +135,11 @@ namespace RecipeCubeWebService.Controllers
                 }
             }
 
-
-            // 5. 返回註冊成功的回應
+            //5.返回註冊成功的回應
             return Ok(new { Message = "User created successfully", User = newUser });
-
-
         }
 
-
-        // 登入功能
+        // 登入功能  
         [HttpPost("SignIn")]
         public IActionResult SignIn(SignInDTO signIn)
         {
@@ -180,10 +174,6 @@ namespace RecipeCubeWebService.Controllers
             }
             return Ok(new { Message = "登入失敗" });
         }
-
-
-
-
 
         private bool UserExists(string id)
         {

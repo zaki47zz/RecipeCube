@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Identity;
-using RecipeCubeWebService;
 using Microsoft.EntityFrameworkCore;
 using RecipeCubeWebService.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RecipeCubeWebService.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using RecipeCubeWebService.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,7 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddCors(options =>
 {
@@ -75,7 +78,7 @@ void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
