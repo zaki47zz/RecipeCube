@@ -29,7 +29,7 @@ namespace RecipeCubeWebService.DTO
 
         public bool? Visibility { get; set; }
 
-        public string Photo { get; set; }
+        public string? PhotoName { get; set; }
 
         public bool? Status { get; set; }
 

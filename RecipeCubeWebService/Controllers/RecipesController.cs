@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
+using Newtonsoft.Json;
 
 namespace RecipeCubeWebService.Controllers
 {
@@ -69,7 +71,7 @@ namespace RecipeCubeWebService.Controllers
                     Steps = recipe.Steps,
                     Seasoning = recipe.Seasoning,
                     Visibility = recipe.Visibility,
-                    Photo = recipe.Photo,
+                    PhotoName = recipe.Photo,
                     Status = recipe.Status,
                     SelectedIngredients = sortedIngredientIds,
                     SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
@@ -126,7 +128,7 @@ namespace RecipeCubeWebService.Controllers
                 Steps = recipe.Steps,
                 Seasoning = recipe.Seasoning,
                 Visibility = recipe.Visibility,
-                Photo = recipe.Photo,
+                PhotoName = recipe.Photo,
                 Status = recipe.Status,
                 SelectedIngredients = sortedIngredientIds,
                 SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
@@ -167,7 +169,7 @@ namespace RecipeCubeWebService.Controllers
             recipe.Steps = recipeDto.Steps;
             recipe.Seasoning = recipeDto.Seasoning;
             recipe.Visibility = recipeDto.Visibility;
-            recipe.Photo = recipeDto.Photo;
+            recipe.Photo = recipeDto.PhotoName;
             recipe.Status = recipeDto.Status;
 
             _context.Entry(recipe).State = EntityState.Modified;
@@ -229,13 +231,14 @@ namespace RecipeCubeWebService.Controllers
 
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // POST: api/Recipes
         [HttpPost]
-        public async Task<ActionResult<Recipe>> PostRecipe(RecipeDto recipeDto)
+        [RequestSizeLimit(104857600)] // 100 MB
+        public async Task<ActionResult<Recipe>> PostRecipe([FromForm] RecipeDto recipeDto, IFormFile photo)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { Errors = errors });
             }
             // Custom validation
             if (string.IsNullOrWhiteSpace(recipeDto.RecipeName))
@@ -252,7 +255,25 @@ namespace RecipeCubeWebService.Controllers
             {
                 return BadRequest("類別需被選擇");
             }
+            // Save photo
+            string photoFileName = null;
+            if (photo != null && photo.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/recipe");
+                photoFileName = $"{Guid.NewGuid()}_{Path.GetFileName(photo.FileName).Replace(" ", "_")}";
+                string filePath = Path.Combine(uploadsFolder, photoFileName);
 
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(stream);
+                }
+            }
+            if (photo == null)
+            {
+                return BadRequest("必須上傳一張食譜照片");
+            }
+
+            Console.WriteLine(photoFileName);
             // Create new Recipe entity
             var recipe = new Recipe
             {
@@ -266,7 +287,7 @@ namespace RecipeCubeWebService.Controllers
                 Steps = recipeDto.Steps,
                 Seasoning = recipeDto.Seasoning,
                 Visibility = recipeDto.Visibility,
-                Photo = recipeDto.Photo,
+                Photo = photoFileName,
                 Status = recipeDto.Status
             };
 
