@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Identity;
-using RecipeCubeWebService;
 using Microsoft.EntityFrameworkCore;
 using RecipeCubeWebService.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RecipeCubeWebService.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using RecipeCubeWebService.Controllers;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("RecipeCube"));
@@ -22,12 +27,23 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
+builder.Services.AddHttpClient<UsersController>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7188"); // API 路徑
+});
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
+
+// 設定 Data Protection
+builder.Services.AddDataProtection()
+    .SetApplicationName("RecipeCubeWebService");
+
 
 var app = builder.Build();
 
@@ -41,7 +57,7 @@ if (app.Environment.IsDevelopment())
 void ConfigureServices(IServiceCollection services)
 {
     // JWT 認證配置
-    var key = Encoding.ASCII.GetBytes("3f50a33d7bca2e1a346f5a8c4f5b7e9a");
+    var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
     services.AddAuthentication(x =>
     {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -75,7 +91,7 @@ void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

@@ -32,14 +32,22 @@ namespace RecipeCubeWebService.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<IEnumerable<InventoryDTO>>> GetInventory(string userId)
         {
-            var groupId = await _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => u.GroupId)
-                .FirstOrDefaultAsync(); //抓傳進來user的群組id
-
-            if (groupId == null)
+            var userInfo = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new
             {
-                return NotFound();
+                GroupId = u.GroupId,
+                UserName = u.UserName
+            })
+            .FirstOrDefaultAsync();
+
+            // 從結果中提取 GroupId 和 UserName
+            var groupId = userInfo?.GroupId;
+            var userName = userInfo?.UserName;
+
+            if (groupId == null || userName == null)
+            {
+                return BadRequest();
             }
 
             var userInventories = await _context.Inventories
@@ -59,8 +67,9 @@ namespace RecipeCubeWebService.Controllers
                 InventoryDTO inventoryDTO = new InventoryDTO
                 {
                     InventoryId = userInventory.InventoryId,
-                    GroupId = (int)userInventory.GroupId,
+                    GroupId = (int)groupId,
                     UserId = userInventory.UserId,
+                    UserName = userName,
                     IngredientId = userInventory.IngredientId,
                     Quantity = userInventory.Quantity,
                     ExpiryDate = userInventory.ExpiryDate,
