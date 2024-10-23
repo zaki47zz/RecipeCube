@@ -27,7 +27,6 @@ namespace RecipeCubeWebService.Controllers
             _passwordHasher = passwordHasher;
         }
 
-
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
