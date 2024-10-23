@@ -22,11 +22,13 @@ namespace RecipeCubeWebService.Controllers
         private readonly RecipeCubeContext _context;
         // 偷內建hash方法，注入後就能拿來用了
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly HttpClient _httpClient;
 
-        public UsersController(RecipeCubeContext context, IPasswordHasher<User> passwordHasher)
+        public UsersController(RecipeCubeContext context, IPasswordHasher<User> passwordHasher, HttpClient httpClient)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _httpClient = httpClient;
         }
 
         // GET: api/Users 測試GET有沒有壞掉用
@@ -117,29 +119,43 @@ namespace RecipeCubeWebService.Controllers
             // 用偷來的方法hash加密password
             newUser.PasswordHash = _passwordHasher.HashPassword(newUser, signUp.Password);
 
-            try
+            // 將新使用者保存至資料庫
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            var emailVerificationEndpoint = "https://localhost:7188/api/EmailVerification/GenerateToken";
+            var emailVerificationRequest = new
             {
-                // 將新使用者保存至資料庫
-                _context.Users.Add(newUser);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
+                Email = signUp.Email
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(emailVerificationEndpoint, emailVerificationRequest);
+            if (!response.IsSuccessStatusCode)
             {
-                if (UserExists(newUser.Id))
-                {
-                    return Conflict(new { Message = "User with this ID already exists" });
-                }
-                else
-                {
-                    throw; // 如果是其他的資料庫錯誤，則拋出異常
-                }
+                return StatusCode((int)response.StatusCode, new { Message = "Failed to generate verification link." });
             }
 
-            //返回註冊成功的回應
+            var verificationData = await response.Content.ReadFromJsonAsync<VerificationResponseDTO>();
+
+            // 呼叫 Email API 發送郵件
+            var emailSendEndpoint = "https://localhost:7188/api/Email/Send";
+            var emailSendRequest = new
+            {
+                Email = signUp.Email,
+                Message = $"請點擊以下連結以驗證您的帳號：{verificationData?.VerificationLink}"
+            };
+
+            var emailResponse = await _httpClient.PostAsJsonAsync(emailSendEndpoint, emailSendRequest);
+            if (!emailResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)emailResponse.StatusCode, new { Message = "Failed to send verification email." });
+            }
+
             return Ok(new
             {
-                //UserId = newUser.Id, 放牠就無法解碼，把它丟掉就沒解碼問題了
-                Email = newUser.Email
+                Email = signUp.Email,
+                VerificationLink = verificationData?.VerificationLink,
+                Message = "Verification email has been sent."
             });
         }
 

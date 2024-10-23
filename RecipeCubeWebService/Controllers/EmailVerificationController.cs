@@ -20,7 +20,7 @@ namespace RecipeCubeWebService.Controllers
         }
 
         // POST: api/EmailVerification/GenerateToken
-        // 生成 Token 方法
+        // 生成 驗證連結api 方法
         [HttpPost("GenerateToken")]
         public IActionResult GenerateEmailVerificationToken([FromBody] UserVerificationDTO user)
         {
@@ -48,8 +48,8 @@ namespace RecipeCubeWebService.Controllers
             Console.WriteLine($"生成的 Token: {tokenString}");
             return Ok(new { VerificationLink = verificationLink });
         }
-
-        // 這個 action 用來接受驗證請求
+        // /api/EmailVerification/VerifyEmail
+        // 接收驗證連結，驗證後將修改sql資料表內的EmailConfirmed為true
         [HttpGet("VerifyEmail")]
         public IActionResult VerifyEmail(string token)
         {

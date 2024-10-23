@@ -18,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
@@ -27,6 +28,11 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
+builder.Services.AddHttpClient<UsersController>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7188"); // API ¸ô®|
+});
 
 builder.Services.AddCors(options =>
 {
