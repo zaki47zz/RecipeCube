@@ -119,7 +119,7 @@ namespace RecipeCubeWebService.Controllers
 
             try
             {
-                // 4. 將新使用者保存至資料庫
+                // 將新使用者保存至資料庫
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
             }
@@ -135,8 +135,12 @@ namespace RecipeCubeWebService.Controllers
                 }
             }
 
-            //5.返回註冊成功的回應
-            return Ok(new { Message = "User created successfully", User = newUser });
+            //返回註冊成功的回應
+            return Ok(new
+            {
+                //UserId = newUser.Id, 放牠就無法解碼，把它丟掉就沒解碼問題了
+                Email = newUser.Email
+            });
         }
 
         // 登入功能  
@@ -151,7 +155,7 @@ namespace RecipeCubeWebService.Controllers
                 {
                     // 創建 JWT Token
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes("3f50a33d7bca2e1a346f5a8c4f5b7e9a");
+                    var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
@@ -163,7 +167,7 @@ namespace RecipeCubeWebService.Controllers
                         // 測試用設定token到期日為30天
                         Expires = DateTime.UtcNow.AddDays(30),
                         //Expires = DateTime.UtcNow.AddSeconds(30),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
 
 

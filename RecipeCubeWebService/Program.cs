@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using RecipeCubeWebService.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using RecipeCubeWebService.Controllers;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
@@ -32,6 +34,11 @@ builder.Services.AddCors(options =>
         builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
+// 設定 Data Protection
+builder.Services.AddDataProtection()
+    .SetApplicationName("RecipeCubeWebService");
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,7 +51,7 @@ if (app.Environment.IsDevelopment())
 void ConfigureServices(IServiceCollection services)
 {
     // JWT 認證配置
-    var key = Encoding.ASCII.GetBytes("3f50a33d7bca2e1a346f5a8c4f5b7e9a");
+    var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
     services.AddAuthentication(x =>
     {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
