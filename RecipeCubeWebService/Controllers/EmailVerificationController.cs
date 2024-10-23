@@ -85,8 +85,8 @@ namespace RecipeCubeWebService.Controllers
                 user.EmailConfirmed = true; // 更新 EmailConfirmed 狀態
                 _context.Users.Update(user); // 更新用戶
                 _context.SaveChanges(); // 保存更改
-
-                return Ok(new { Message = "Email verified successfully", Email = email });
+                var redirectUrl = "http://localhost:5173/inventory";
+                return Redirect(redirectUrl);
             }
             catch (SecurityTokenExpiredException)
             {
