@@ -129,7 +129,7 @@ namespace RecipeCubeWebService.Controllers
             _context.Inventories.Add(inventory);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInventory", new { id = inventory.InventoryId }, inventory);
+            return Ok();
         }
 
         // DELETE: api/Inventories/5
