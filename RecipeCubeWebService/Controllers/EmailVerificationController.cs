@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 
@@ -14,9 +17,13 @@ namespace RecipeCubeWebService.Controllers
     {
         private readonly RecipeCubeContext _context; // 注入資料庫上下文
         private readonly string _jwtSecret = "thisisaverylongsecretkeyforjwtwhichis256bits!!"; // 替換為您的 JWT 秘鑰
-        public EmailVerificationController(RecipeCubeContext context) // 構造函數
+        private readonly HttpClient _httpClient;
+        private readonly IPasswordHasher<User> _passwordHasher;
+        public EmailVerificationController(RecipeCubeContext context, HttpClient httpClient, IPasswordHasher<User> passwordHasher) // 構造函數
         {
             _context = context;
+            _httpClient = httpClient;
+            _passwordHasher = passwordHasher;
         }
 
         // POST: api/EmailVerification/GenerateToken
@@ -48,6 +55,60 @@ namespace RecipeCubeWebService.Controllers
             Console.WriteLine($"生成的 Token: {tokenString}");
             return Ok(new { VerificationLink = verificationLink });
         }
+
+        // POST: api/EmailVerification/ResetEmailConfirmed
+        //  重發驗證信 = GenerateToken 呼叫email api
+        [HttpPost("ResetEmailConfirmed")]
+        public async Task<IActionResult> ResetEmailConfirmed([FromBody] UserVerificationDTO user)
+        {
+            if (user == null || string.IsNullOrWhiteSpace(user.Email))
+            {
+                return BadRequest("Invalid user information.");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[] {
+            new Claim("email", user.Email) // 使用字符串 "email"
+        }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            var verificationLink = Url.Action("VerifyEmail", "EmailVerification", new { token = tokenString }, Request.Scheme);
+
+
+            // 呼叫 Email API 發送郵件
+            var emailSendEndpoint = "https://localhost:7188/api/Email/Send";
+            var emailSendRequest = new
+            {
+                Email = user.Email,
+                Message = $"請點擊以下連結以驗證您的帳號：{verificationLink}"
+            };
+
+            var emailResponse = await _httpClient.PostAsJsonAsync(emailSendEndpoint, emailSendRequest);
+            if (!emailResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)emailResponse.StatusCode, new { Message = "Failed to send verification email." });
+            }
+            return Ok(new
+            {
+                Email = user.Email,
+                VerificationLink = verificationLink,
+                Message = "Verification email has been sent."
+            });
+        }
+
+
+
         // /api/EmailVerification/VerifyEmail
         // 接收驗證連結，驗證後將修改sql資料表內的EmailConfirmed為true
         [HttpGet("VerifyEmail")]
@@ -99,6 +160,177 @@ namespace RecipeCubeWebService.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Error validating token: {ex.GetType().Name} - {ex.Message}");
+                return Unauthorized(new { Message = "Invalid token" });
+            }
+        }
+
+
+
+        // POST: api/EmailVerification/ForgetPassword
+        //  發送清空密碼連結
+        [HttpPost("ForgetPassword")]
+        public async Task<IActionResult> ForgetPassword([FromBody] UserVerificationDTO user)
+        {
+            if (user == null || string.IsNullOrWhiteSpace(user.Email))
+            {
+                return BadRequest("Invalid user information.");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[] {
+            new Claim("email", user.Email) // 使用字符串 "email"
+        }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            var resetPasswordLink = Url.Action("VerifyPassword", "EmailVerification", new { token = tokenString }, Request.Scheme);
+
+
+            // 呼叫 Email API 發送郵件
+            var emailSendEndpoint = "https://localhost:7188/api/Email/Send";
+            var emailSendRequest = new
+            {
+                Email = user.Email,
+                Message = $"請點擊以下連結以重設你的密碼：{resetPasswordLink}"
+            };
+
+            var emailResponse = await _httpClient.PostAsJsonAsync(emailSendEndpoint, emailSendRequest);
+            if (!emailResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)emailResponse.StatusCode, new { Message = "Failed to send verification email." });
+            }
+            return Ok(new
+            {
+                ResetPasswordLink = resetPasswordLink,
+                Message = "Password reset link sent to your email."
+            });
+        }
+        // GET: api/EmailVerification/VerifyPassword
+        [HttpGet("VerifyPassword")]
+        // 接收清空密碼連結 驗證後修改sql內的passwordhash為""，再導向前端重設密碼頁面
+        public IActionResult VerifyPassword(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return BadRequest("Invalid token.");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var email = jwtToken.Claims.First(x => x.Type == "email").Value; // 更新為使用字符串 "email"
+
+                // 查找用戶並更新 EmailConfirmed 狀態
+                var user = _context.Users.SingleOrDefault(u => u.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found." });
+                }
+
+                user.PasswordHash = ""; //  清空密碼
+                _context.Users.Update(user); // 更新用戶
+                _context.SaveChanges(); // 保存更改
+
+
+                // 生成新的短期 token
+                var newTokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[] {
+                new Claim("email", email)
+            }),
+                    Expires = DateTime.UtcNow.AddMinutes(1), // 1分鐘過期
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var newToken = tokenHandler.CreateToken(newTokenDescriptor);
+                var newTokenString = tokenHandler.WriteToken(newToken);
+
+                // 將新 token 包含在跳轉的 URL 中
+                var redirectUrl = $"http://localhost:5173/resetpasswordset?token={newTokenString}";
+                return Redirect(redirectUrl);
+                //return Ok(redirectUrl);
+
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                return Unauthorized(new { Message = "Token expired" });
+            }
+            catch (SecurityTokenInvalidSignatureException)
+            {
+                return Unauthorized(new { Message = "Invalid token signature" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error validating token: {ex.GetType().Name} - {ex.Message}");
+                return Unauthorized(new { Message = "Invalid token" });
+            }
+        }
+
+        // POST: api/EmailVerification/ResetPassword
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordRequest)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
+            try
+            {
+                tokenHandler.ValidateToken(resetPasswordRequest.Token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.FromMinutes(1)
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var email = jwtToken.Claims.First(x => x.Type == "email").Value;
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+                
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found." });
+                }
+                user.PasswordHash = _passwordHasher.HashPassword(user, resetPasswordRequest.Password);//  修改密碼
+                _context.Users.Update(user); // 更新用戶
+                await _context.SaveChangesAsync(); // 保存更改
+                return Ok(new
+                {
+                    Message = "修改成功"
+                });
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                // Token 過期時回傳 401 錯誤
+                 return  Unauthorized(new { Message = "Token 過期了" });
+            }
+            catch (SecurityTokenInvalidSignatureException)
+            {
+                // 無效的 token 簽名
+                return Unauthorized(new { Message = "連結錯誤" });
+            }
+            catch (Exception)
+            {
+                // 捕捉其他例外
                 return Unauthorized(new { Message = "Invalid token" });
             }
         }

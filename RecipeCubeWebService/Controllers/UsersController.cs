@@ -177,8 +177,9 @@ namespace RecipeCubeWebService.Controllers
                         Subject = new ClaimsIdentity(new Claim[]
                    {
                             new Claim(ClaimTypes.SerialNumber, user.Id),
+                            new Claim(ClaimTypes.Email, user.Email),
                             new Claim(ClaimTypes.Name, user.UserName),
-                       new Claim(ClaimTypes.Email, user.Email)
+                            new Claim(ClaimTypes.GroupSid, user.GroupId.ToString()),
                    }),
                         // 測試用設定token到期日為30天
                         Expires = DateTime.UtcNow.AddDays(30),

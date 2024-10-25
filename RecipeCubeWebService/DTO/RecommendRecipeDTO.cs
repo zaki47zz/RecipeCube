@@ -14,6 +14,7 @@
         public string DetailedCategory { get; set; }
         public List<int?>? IngredientIds { get; set; }
         public List<string> IngredientNames { get; set; }
-
+        public bool IsEnoughIngredients { get; set; }  // 是否有足夠食材
+        public List<MissingIngredientDTO>? MissingIngredients { get; set; } // 缺少的食材及其數量與單位
     }
 }
