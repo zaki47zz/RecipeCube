@@ -93,7 +93,7 @@ namespace RecipeCubeWebService.Controllers
         //==========================================================================================
         
 
-        string ServerReturnUrl = "https://a8a4-59-125-142-166.ngrok-free.app";
+        string ServerReturnUrl = "https://6c29-59-125-142-166.ngrok-free.app";
 
         string ClientReturnUrl = "https://485e-59-125-142-166.ngrok-free.app";
 
@@ -218,6 +218,124 @@ namespace RecipeCubeWebService.Controllers
                             }
                         }
                     }
+                }
+
+                await _context.SaveChangesAsync(); // 保存變更
+            }
+
+            return Ok("OK");
+        }
+
+        // 專給繼續付款用的綠界api===========================================================================
+        // 支付請求
+        [HttpPost("StartPaymentForContinue")]
+        public ActionResult StartPaymentForContinue([FromBody] Order order)
+        {
+            var paymentHtml = CreatePaymentRequestForContinue(order);
+            return Content(paymentHtml, "text/html");  // 返回 HTML 給前端
+        }
+
+        // 建立支付請求 (生成 HTML 表單)
+        private string CreatePaymentRequestForContinue(Order order)
+        {
+            var paymentData = new Dictionary<string, string>
+       {
+           { "MerchantID", "3002607" },  // 特店編號
+           { "MerchantTradeNo", order.OrderId.ToString() },  // 特店訂單編號
+           { "MerchantTradeDate", DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss") },  // 特店交易時間
+           { "PaymentType", "aio" },  // 交易類型  固定 "aio"
+           { "TotalAmount", order.TotalAmount.ToString() },  // 交易金額 僅能整數
+           { "TradeDesc", "訂單支付" },  // 交易描述
+           { "ItemName", "食品food" },  // 商品名稱
+           { "ReturnURL", $"{ServerReturnUrl}/api/Orders/PayInfoForContinue" },  // server 端通知網址
+           { "ClientBackURL", $"{ClientReturnUrl}/storeproduct" },  // 導回 client 頁面
+           { "ChoosePayment", "Credit" },  // 預設付款方式
+           { "EncryptType", "1" }  // CheckMacValue 加密類型 固定 "1" SHA256加密
+       };
+
+            paymentData.Add("CheckMacValue", GetCheckMacValueForContinue(paymentData));  // 檢查碼
+
+            // 生成 HTML 表單
+            var formHtml = new StringBuilder();
+            formHtml.AppendLine("<form id='ecpay-form' action='https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5' method='POST'>");
+
+            foreach (var keyValuePair in paymentData)
+            {
+                formHtml.AppendLine($"<input type='hidden' name='{keyValuePair.Key}' value='{keyValuePair.Value}' />");
+            }
+
+            formHtml.AppendLine("</form>");
+            formHtml.AppendLine("<script>document.getElementById('ecpay-form').submit();</script>");
+
+            return formHtml.ToString();  // 返回完整的 HTML 表單
+        }
+
+        // 生成 CheckMacValue 的方法
+        private string GetCheckMacValueForContinue(Dictionary<string, string> order)
+        {
+            var param = order.Keys.OrderBy(x => x).Select(key => key + "=" + order[key]).ToList();
+            var checkValue = string.Join("&", param);
+
+            // 測試用的 HashKey 和 HashIV
+            var hashKey = "pwFHCqoQZGmho4w6";
+            var hashIV = "EkRm7iFT261dpevs";
+
+            checkValue = $"HashKey={hashKey}&{checkValue}&HashIV={hashIV}";
+            checkValue = HttpUtility.UrlEncode(checkValue).ToLower();
+            checkValue = GetSHA256ForContinue(checkValue);
+
+            return checkValue.ToUpper();
+        }
+
+        // SHA256 加密
+        private string GetSHA256ForContinue(string value)
+        {
+            var result = new StringBuilder();
+            var sha256 = SHA256.Create();
+            var bts = Encoding.UTF8.GetBytes(value);
+            var hash = sha256.ComputeHash(bts);
+            for (int i = 0; i < hash.Length; i++)
+            {
+                result.Append(hash[i].ToString("X2"));
+            }
+            return result.ToString();
+        }
+        //================================================================================================================
+
+        // 接收綠界回傳付款是否成功
+        [HttpPost("PayInfoForContinue")]
+        public async Task<ActionResult> PayInfoForContinue([FromForm] PaymentResponse paymentResponse)
+        {
+            // 檢查 paymentResponse 是否為 null
+            if (paymentResponse == null)
+            {
+                return BadRequest("Invalid payment information.");
+            }
+
+
+            string merchantTradeNo = paymentResponse.MerchantTradeNo;
+
+            // 確保商戶交易號有足夠長度以移除 "00"
+            if (merchantTradeNo.Length < 2 || !merchantTradeNo.EndsWith("00"))
+            {
+                return BadRequest("Invalid order ID format.");
+            }
+
+            // 移除尾部的 "00" 以獲取原始訂單編號
+            string originalOrderIdString = merchantTradeNo.Substring(0, merchantTradeNo.Length - 2);
+
+            // 查詢訂單
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(m => m.OrderId.ToString() == originalOrderIdString.ToString()); 
+
+            // 查詢商品 
+
+            if (order != null)
+            {
+                // 如果付款成功，更新 status 為 2
+                if (paymentResponse.RtnCode == 1) // 根據您的業務邏輯判斷成功的條件
+                {
+                    order.Status = 2; // 將 status 更新為 2
                 }
 
                 await _context.SaveChangesAsync(); // 保存變更
