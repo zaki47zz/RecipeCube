@@ -27,9 +27,13 @@ public partial class Recipe
 
     public string Seasoning { get; set; }
 
-    public bool? Visibility { get; set; }
+    public int? Visibility { get; set; }
 
     public string Photo { get; set; }
 
     public bool? Status { get; set; }
+
+    public string Time { get; set; }
+
+    public string Description { get; set; }
 }

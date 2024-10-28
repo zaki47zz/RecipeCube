@@ -27,7 +27,7 @@ namespace RecipeCubeWebService.DTO
 
         public string Seasoning { get; set; }
 
-        public bool? Visibility { get; set; }
+        public int? Visibility { get; set; }
 
         public string? PhotoName { get; set; }
 

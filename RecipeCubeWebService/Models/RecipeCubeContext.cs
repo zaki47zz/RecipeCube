@@ -198,10 +198,15 @@ public partial class RecipeCubeContext : DbContext
 
         modelBuilder.Entity<Recipe>(entity =>
         {
-            entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
+            entity.Property(e => e.RecipeId)
+                .ValueGeneratedNever()
+                .HasColumnName("recipe_id");
             entity.Property(e => e.Category)
                 .HasMaxLength(10)
                 .HasColumnName("category");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.DetailedCategory)
                 .HasMaxLength(255)
                 .HasColumnName("detailed_category");
@@ -218,8 +223,11 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("seasoning");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Steps).HasColumnName("steps");
+            entity.Property(e => e.Time)
+                .HasMaxLength(255)
+                .HasColumnName("time");
             entity.Property(e => e.UserId)
-                .HasMaxLength(450)
+                .HasMaxLength(255)
                 .HasColumnName("user_id");
             entity.Property(e => e.Visibility).HasColumnName("visibility");
             entity.Property(e => e.WestEast).HasColumnName("west_east");
