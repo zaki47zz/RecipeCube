@@ -93,7 +93,7 @@ namespace RecipeCubeWebService.Controllers
         //==========================================================================================
         
 
-        string ServerReturnUrl = "https://4f3c-2001-b400-e2d0-410d-1536-406a-c1f3-d9d2.ngrok-free.app";
+        string ServerReturnUrl = "https://6c29-59-125-142-166.ngrok-free.app";
 
         string ClientReturnUrl = "https://485e-59-125-142-166.ngrok-free.app";
 
