@@ -9,8 +9,8 @@ using RecipeCubeWebService.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
-
+using System.Net.Http;
+using System.Net.Http.Json;
 
 
 namespace RecipeCubeWebService.Controllers
@@ -160,41 +160,53 @@ namespace RecipeCubeWebService.Controllers
         }
 
         // 登入功能  
+
+
         [HttpPost("SignIn")]
-        public IActionResult SignIn(SignInDTO signIn)
+        public async Task<IActionResult> SignIn(SignInDTO signIn)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == signIn.Email);
+
             if (user != null)
             {
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, signIn.Password);
+
                 if (passwordVerificationResult == PasswordVerificationResult.Success)
                 {
                     // 創建 JWT Token
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
+
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
-                   {
+                        {
                             new Claim(ClaimTypes.SerialNumber, user.Id),
                             new Claim(ClaimTypes.Email, user.Email),
                             new Claim(ClaimTypes.Name, user.UserName),
                             new Claim(ClaimTypes.GroupSid, user.GroupId.ToString()),
-                   }),
-                        // 測試用設定token到期日為30天
+                        }),
                         Expires = DateTime.UtcNow.AddDays(30),
-                        //Expires = DateTime.UtcNow.AddSeconds(30),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        SigningCredentials = new SigningCredentials(
+                            new SymmetricSecurityKey(key),
+                            SecurityAlgorithms.HmacSha256Signature)
                     };
-
 
                     var token = tokenHandler.CreateToken(tokenDescriptor);
                     var tokenString = tokenHandler.WriteToken(token);
-                    return Ok(new { Token = tokenString, Message = "登入成功", usernamejwt = user.UserName });
+
+                    return Ok(new
+                    {
+                        Token = tokenString,
+                        Message = "登入成功",
+                        usernamejwt = user.UserName
+                    });
                 }
             }
+
             return Ok(new { Message = "登入失敗" });
         }
+
 
         private bool UserExists(string id)
         {
