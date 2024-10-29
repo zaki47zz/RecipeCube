@@ -113,16 +113,66 @@ namespace RecipeCubeWebService.Controllers
         //    return NoContent();
         //}
 
-        //// POST: api/ExclusiveIngredients
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<ExclusiveIngredient>> PostExclusiveIngredient(ExclusiveIngredient exclusiveIngredient)
-        //{
-        //    _context.ExclusiveIngredients.Add(exclusiveIngredient);
-        //    await _context.SaveChangesAsync();
+        // POST: /api/UserIngredients/ExclusiveIngredientsAdd
+        [HttpPost("ExclusiveIngredientsAdd")]
+        public async Task<IActionResult> ExclusiveIngredientsAddDTO(IngredientsAddDTO ExclusiveIngredientsAdd)
+        {
+            if(ExclusiveIngredientsAdd ==null)
+            {
+                return BadRequest("Invalid signup data.");
+            }
+            var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Id == ExclusiveIngredientsAdd.User_Id);
+            if (existingUser == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
 
-        //    return CreatedAtAction("GetExclusiveIngredient", new { id = exclusiveIngredient.ExclusiveIngredientId }, exclusiveIngredient);
-        //}
+            var userId = ExclusiveIngredientsAdd.User_Id;
+            var IngredientsId = ExclusiveIngredientsAdd.Ingredient_Id;
+
+            var newExclusiveIngredient = new ExclusiveIngredient
+            {
+                UserId = ExclusiveIngredientsAdd.User_Id,
+                IngredientId = ExclusiveIngredientsAdd.Ingredient_Id
+            };
+
+            // 將新項目新增至資料庫
+            _context.ExclusiveIngredients.Add(newExclusiveIngredient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Exclusive ingredient added successfully" });
+        }
+
+
+        // POST: /api/UserIngredients/PreferedIngredientsAdd
+        [HttpPost("PreferedIngredientsAdd")]
+        public async Task<IActionResult> PreferedIngredientsAddDTO(IngredientsAddDTO PreferedIngredientsAdd)
+        {
+            if (PreferedIngredientsAdd == null)
+            {
+                return BadRequest("Invalid signup data.");
+            }
+            var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Id == PreferedIngredientsAdd.User_Id);
+            if (existingUser == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            var userId = PreferedIngredientsAdd.User_Id;
+            var IngredientsId = PreferedIngredientsAdd.Ingredient_Id;
+
+            var newPreferedIngredient = new PreferedIngredient
+            {
+                UserId = PreferedIngredientsAdd.User_Id,
+                IngredientId = PreferedIngredientsAdd.Ingredient_Id
+            };
+
+            // 將新項目新增至資料庫
+            _context.PreferedIngredients.Add(newPreferedIngredient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Exclusive ingredient added successfully" });
+        }
 
         // DELETE: /api/UserIngredients/ExclusiveIngredientsDelete
         [HttpDelete("ExclusiveIngredientsDelete")]
