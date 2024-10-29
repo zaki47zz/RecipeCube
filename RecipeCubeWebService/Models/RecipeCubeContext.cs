@@ -29,6 +29,8 @@ public partial class RecipeCubeContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductEvaluate> ProductEvaluates { get; set; }
+
     public virtual DbSet<Recipe> Recipes { get; set; }
 
     public virtual DbSet<RecipeIngredient> RecipeIngredients { get; set; }
@@ -194,6 +196,20 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.UnitQuantity)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("unit_quantity");
+        });
+
+        modelBuilder.Entity<ProductEvaluate>(entity =>
+        {
+            entity.HasKey(e => e.EvaluateId);
+
+            entity.ToTable("Product_evaluate");
+
+            entity.Property(e => e.EvaluateId).HasColumnName("evaluate_id");
+            entity.Property(e => e.CommentMessage).HasColumnName("comment_message");
+            entity.Property(e => e.CommentStars).HasColumnName("comment_stars");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
         });
 
         modelBuilder.Entity<Recipe>(entity =>
