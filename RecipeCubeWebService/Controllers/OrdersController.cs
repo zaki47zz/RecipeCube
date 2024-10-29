@@ -93,7 +93,7 @@ namespace RecipeCubeWebService.Controllers
         //==========================================================================================
         
 
-        string ServerReturnUrl = "https://6c29-59-125-142-166.ngrok-free.app";
+        string ServerReturnUrl = " https://b5c0-2001-b400-e2d0-410d-ac81-4a35-23ce-dd84.ngrok-free.app";
 
         string ClientReturnUrl = "https://485e-59-125-142-166.ngrok-free.app";
 
@@ -336,6 +336,30 @@ namespace RecipeCubeWebService.Controllers
                 if (paymentResponse.RtnCode == 1) // 根據您的業務邏輯判斷成功的條件
                 {
                     order.Status = 2; // 將 status 更新為 2
+
+                    // 查詢訂單明細
+                    var orderItems = await _context.OrderItems
+                        .Where(oi => oi.OrderId == order.OrderId)
+                        .ToListAsync();
+
+                    // 對應商品
+                    foreach (var items in orderItems)
+                    {
+                        var product = await _context.Products
+                            .FirstOrDefaultAsync(p => p.ProductId == items.ProductId);
+
+                        if (product != null)
+                        {
+                            // 更改庫存
+                            product.Stock -= Convert.ToInt32(product.UnitQuantity) * items.Quantity;
+
+                            // 如果扣完庫存小於 0 
+                            if (product.Stock < 0)
+                            {
+                                product.Stock = 0;
+                            }
+                        }
+                    }
                 }
 
                 await _context.SaveChangesAsync(); // 保存變更
