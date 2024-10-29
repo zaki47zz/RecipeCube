@@ -177,6 +177,9 @@ namespace RecipeCubeWebService.Controllers
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
 
+                    bool exclusiveChecked = user.ExclusiveChecked;
+                    bool preferredChecked = user.PreferredChecked;
+
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
@@ -185,6 +188,9 @@ namespace RecipeCubeWebService.Controllers
                             new Claim(ClaimTypes.Email, user.Email),
                             new Claim(ClaimTypes.Name, user.UserName),
                             new Claim(ClaimTypes.GroupSid, user.GroupId.ToString()),
+                            // 添加自訂的布林值 Claims
+                            new Claim("ExclusiveChecked", exclusiveChecked.ToString()),
+                            new Claim("PreferredChecked", preferredChecked.ToString())
                         }),
                         Expires = DateTime.UtcNow.AddDays(30),
                         SigningCredentials = new SigningCredentials(

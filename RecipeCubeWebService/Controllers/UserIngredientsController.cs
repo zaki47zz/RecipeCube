@@ -37,7 +37,7 @@ namespace RecipeCubeWebService.Controllers
             .ToList();
             if (!exclusiveIngredientsDetails.Any())
             {
-                return Ok(new { ExclusiveIngredients = ""});
+                return NoContent(); // 或者使用 return Ok(); 返回空的結果
             }
             return Ok(new { ExclusiveIngredients = exclusiveIngredientsDetails });
         }
@@ -58,7 +58,7 @@ namespace RecipeCubeWebService.Controllers
             .ToList();
             if (!preferredIngredientsDetails.Any())
             {
-                return Ok(new { PreferredIngredients = "" });
+                return NoContent(); // 或者使用 return Ok(); 返回空的結果
             }
             return Ok(new { PreferredIngredients = preferredIngredientsDetails });
         }
@@ -124,21 +124,38 @@ namespace RecipeCubeWebService.Controllers
         //    return CreatedAtAction("GetExclusiveIngredient", new { id = exclusiveIngredient.ExclusiveIngredientId }, exclusiveIngredient);
         //}
 
-        //// DELETE: api/ExclusiveIngredients/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteExclusiveIngredient(int id)
-        //{
-        //    var exclusiveIngredient = await _context.ExclusiveIngredients.FindAsync(id);
-        //    if (exclusiveIngredient == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: /api/UserIngredients/ExclusiveIngredientsDelete
+        [HttpDelete("ExclusiveIngredientsDelete")]
+        public async Task<IActionResult> DeleteExclusiveIngredient(int id)
+        {
+            var exclusiveIngredient = await _context.ExclusiveIngredients.FindAsync(id);
+            if (exclusiveIngredient == null)
+            {
+                return NotFound();
+            }
 
-        //    _context.ExclusiveIngredients.Remove(exclusiveIngredient);
-        //    await _context.SaveChangesAsync();
+            _context.ExclusiveIngredients.Remove(exclusiveIngredient);
+            await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
+
+        // DELETE: /api/UserIngredients/PreferedIngrediensDelete
+        [HttpDelete("PreferedIngrediensDelete")]
+        public async Task<IActionResult> DeletePreferedIngredient(int id)
+        {
+            var preferedIngredient = await _context.PreferedIngredients.FindAsync(id);
+            if (preferedIngredient == null)
+            {
+                return NotFound();
+            }
+
+            _context.PreferedIngredients.Remove(preferedIngredient);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
 
         private bool ExclusiveIngredientExists(int id)
         {
