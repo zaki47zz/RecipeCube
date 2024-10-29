@@ -159,9 +159,7 @@ namespace RecipeCubeWebService.Controllers
             });
         }
 
-        // 登入功能  
-
-
+        // 登入功能 
         [HttpPost("SignIn")]
         public async Task<IActionResult> SignIn(SignInDTO signIn)
         {
@@ -188,6 +186,7 @@ namespace RecipeCubeWebService.Controllers
                             new Claim(ClaimTypes.Email, user.Email),
                             new Claim(ClaimTypes.Name, user.UserName),
                             new Claim(ClaimTypes.GroupSid, user.GroupId.ToString()),
+                            new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
                             // 添加自訂的布林值 Claims
                             new Claim("ExclusiveChecked", exclusiveChecked.ToString()),
                             new Claim("PreferredChecked", preferredChecked.ToString())
@@ -213,6 +212,48 @@ namespace RecipeCubeWebService.Controllers
             return Ok(new { Message = "登入失敗" });
         }
 
+        // 修改會員資料功能
+        // PUT: api/Users/AccountSettings
+        [HttpPut("AccountSettings")]
+        public async Task<IActionResult> AccountSettingsDTO(AccountSettingsDTO accountSettings)
+        {
+            // 檢查傳入的資料是否為 null
+            if (accountSettings == null)
+            {
+                return BadRequest("Invalid account settings data."); // 如果資料為 null，返回400錯誤
+            }
+
+            // 根據傳入的 User_Id 查詢資料庫中的使用者
+            var user = await _context.Users.FindAsync(accountSettings.User_Id);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found." }); // 如果找不到使用者，返回404錯誤
+            }
+
+            // 更新使用者的屬性
+            user.UserName = accountSettings.UserName; // 更新使用者名稱
+            user.PhoneNumber = accountSettings.Phone; // 更新使用者手機號碼
+
+            _context.Entry(user).State = EntityState.Modified; // 將使用者的狀態設置為已修改
+
+            try
+            {
+                await _context.SaveChangesAsync(); // 保存變更到資料庫
+            }
+            catch (DbUpdateConcurrencyException) // 處理並發更新異常
+            {
+                if (!UserExists(accountSettings.User_Id)) // 檢查使用者是否仍存在
+                {
+                    return NotFound(); // 如果使用者不存在，返回404錯誤
+                }
+                else
+                {
+                    throw; // 重新拋出異常
+                }
+            }
+
+            return NoContent(); // 返回204狀態碼，表示成功處理請求但沒有內容返回
+        }
 
         private bool UserExists(string id)
         {
