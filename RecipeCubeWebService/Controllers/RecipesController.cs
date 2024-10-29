@@ -72,7 +72,9 @@ namespace RecipeCubeWebService.Controllers
                     Seasoning = recipe.Seasoning,
                     Visibility = recipe.Visibility,
                     PhotoName = recipe.Photo,
-                    Status = recipe.Status,
+                    Status = (bool)recipe.Status,
+                    Time = recipe.Time,
+                    Description = recipe.Description,
                     SelectedIngredients = sortedIngredientIds,
                     SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                     IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
@@ -129,7 +131,9 @@ namespace RecipeCubeWebService.Controllers
                 Seasoning = recipe.Seasoning,
                 Visibility = recipe.Visibility,
                 PhotoName = recipe.Photo,
-                Status = recipe.Status,
+                Status = (bool)recipe.Status,
+                Time = recipe.Time,
+                Description = recipe.Description,
                 SelectedIngredients = sortedIngredientIds,
                 SelectedIngredientNames = ingredients.Select(i => i.IngredientName).ToList(),
                 IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
@@ -171,7 +175,8 @@ namespace RecipeCubeWebService.Controllers
             recipe.Visibility = recipeDto.Visibility;
             recipe.Photo = recipeDto.PhotoName;
             recipe.Status = recipeDto.Status;
-
+            recipe.Time = recipeDto.Time;
+            recipe.Description = recipeDto.Description;
             _context.Entry(recipe).State = EntityState.Modified;
 
             // Update RecipeIngredients
@@ -288,7 +293,9 @@ namespace RecipeCubeWebService.Controllers
                 Seasoning = recipeDto.Seasoning,
                 Visibility = recipeDto.Visibility,
                 Photo = photoFileName,
-                Status = recipeDto.Status
+                Status = recipeDto.Status,
+                Time = recipeDto.Time,
+                Description = recipeDto.Description,
             };
 
             _context.Recipes.Add(recipe);

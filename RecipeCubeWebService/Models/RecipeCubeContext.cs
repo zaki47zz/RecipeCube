@@ -198,9 +198,7 @@ public partial class RecipeCubeContext : DbContext
 
         modelBuilder.Entity<Recipe>(entity =>
         {
-            entity.Property(e => e.RecipeId)
-                .ValueGeneratedNever()
-                .HasColumnName("recipe_id");
+            entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
             entity.Property(e => e.Category)
                 .HasMaxLength(10)
                 .HasColumnName("category");

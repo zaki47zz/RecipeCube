@@ -31,8 +31,10 @@ namespace RecipeCubeWebService.DTO
 
         public string? PhotoName { get; set; }
 
-        public bool? Status { get; set; }
+        public bool Status { get; set; }
+        public string Time { get; set; }
 
+        public string? Description { get; set; }
         // 使用者選擇的食材清單
         [Required(ErrorMessage = "請選擇至少一種食材")]
         public List<int> SelectedIngredients { get; set; } = new List<int>();
