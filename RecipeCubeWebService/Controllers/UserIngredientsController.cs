@@ -52,7 +52,7 @@ namespace RecipeCubeWebService.Controllers
             .Where(e => e.UserId == exi.User_Id)
             .Select(e => new
             {
-                PreferIngredientId = e.PerferIngredientId,
+                PreferIngredientId = e.PreferIngredientId,
                 PreferIngredientName = e.Ingredient.IngredientName
             })
             .ToList();
