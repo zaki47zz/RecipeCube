@@ -168,11 +168,11 @@ public partial class RecipeCubeContext : DbContext
 
         modelBuilder.Entity<PreferedIngredient>(entity =>
         {
-            entity.HasKey(e => e.PerferIngredientId);
+            entity.HasKey(e => e.PreferIngredientId);
 
             entity.ToTable("Prefered_Ingredients");
 
-            entity.Property(e => e.PerferIngredientId).HasColumnName("perfer_ingredient_id");
+            entity.Property(e => e.PreferIngredientId).HasColumnName("prefer_ingredient_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
             entity.Property(e => e.UserId)
                 .HasMaxLength(450)
