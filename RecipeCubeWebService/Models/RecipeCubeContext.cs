@@ -13,6 +13,8 @@ public partial class RecipeCubeContext : DbContext
     {
     }
 
+    public virtual DbSet<Coupon> Coupons { get; set; }
+
     public virtual DbSet<ExclusiveIngredient> ExclusiveIngredients { get; set; }
 
     public virtual DbSet<Ingredient> Ingredients { get; set; }
@@ -43,6 +45,8 @@ public partial class RecipeCubeContext : DbContext
 
     public virtual DbSet<UserClaim> UserClaims { get; set; }
 
+    public virtual DbSet<UserCoupon> UserCoupons { get; set; }
+
     public virtual DbSet<UserGroup> UserGroups { get; set; }
 
     public virtual DbSet<UserIdMapping> UserIdMappings { get; set; }
@@ -55,6 +59,22 @@ public partial class RecipeCubeContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Coupon>(entity =>
+        {
+            entity.Property(e => e.CouponId).HasColumnName("coupon_id");
+            entity.Property(e => e.CouponName)
+                .HasMaxLength(50)
+                .HasColumnName("coupon_name");
+            entity.Property(e => e.DiscountType)
+                .HasMaxLength(50)
+                .HasColumnName("discount_type");
+            entity.Property(e => e.DiscountValue)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("discount_value");
+            entity.Property(e => e.MinSpend).HasColumnName("minSpend");
+            entity.Property(e => e.Status).HasColumnName("status");
+        });
+
         modelBuilder.Entity<ExclusiveIngredient>(entity =>
         {
             entity.ToTable("Exclusive_Ingredients");
@@ -306,6 +326,19 @@ public partial class RecipeCubeContext : DbContext
             entity.Property(e => e.UserId).IsRequired();
 
             entity.HasOne(d => d.User).WithMany(p => p.UserClaims).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<UserCoupon>(entity =>
+        {
+            entity.HasKey(e => e.UserConponId);
+
+            entity.ToTable("User_Coupons");
+
+            entity.Property(e => e.UserConponId).HasColumnName("user_conponId");
+            entity.Property(e => e.AcquireDate).HasColumnName("acquire_date");
+            entity.Property(e => e.CouponId).HasColumnName("coupon_id");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
         });
 
         modelBuilder.Entity<UserGroup>(entity =>

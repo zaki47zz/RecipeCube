@@ -15,6 +15,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[Coupons]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Exclusive_Ingredients]",
          "ObjectType": 0
       },
@@ -68,6 +72,10 @@
       },
       {
          "Name": "[dbo].[User]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User_Coupons]",
          "ObjectType": 0
       },
       {
