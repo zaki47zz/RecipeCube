@@ -113,8 +113,6 @@ namespace RecipeCubeWebService.Controllers
                 return NotFound(new { Message = "已有群組" });
             }
             Random Number = new Random();
-            var GroupAdmin = userGroupAdd.group_Admin_Id;
-            var GroupName = userGroupAdd.group_name;
             var GroupInvite = 0;
             int group_Invite = 0;
             Console.WriteLine();
@@ -130,14 +128,14 @@ namespace RecipeCubeWebService.Controllers
             Console.WriteLine();
             Console.WriteLine(group_Invite);
 
-            var newGroug = new UserGroup
+            var newGroup = new UserGroup
             {
                 GroupAdmin = userGroupAdd.group_Admin_Id,
                 GroupName = userGroupAdd.group_name,
                 GroupInvite = group_Invite,
             };
 
-            _context.UserGroups.Add(newGroug);
+            _context.UserGroups.Add(newGroup);
             await _context.SaveChangesAsync();
 
             return Ok(new { Message = "新增成功" });
