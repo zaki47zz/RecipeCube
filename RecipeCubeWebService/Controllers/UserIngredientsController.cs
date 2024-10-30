@@ -140,7 +140,7 @@ namespace RecipeCubeWebService.Controllers
             _context.ExclusiveIngredients.Add(newExclusiveIngredient);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Exclusive ingredient added successfully" });
+            return Ok(new { Message = "新增成功" });
         }
 
 
@@ -171,7 +171,7 @@ namespace RecipeCubeWebService.Controllers
             _context.PreferedIngredients.Add(newPreferedIngredient);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Exclusive ingredient added successfully" });
+            return Ok(new { Message = "新增成功" });
         }
 
         // DELETE: /api/UserIngredients/ExclusiveIngredientsDelete

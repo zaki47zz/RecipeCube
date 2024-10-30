@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RecipeCubeWebService.DTO;
 using RecipeCubeWebService.Models;
 
 namespace RecipeCubeWebService.Controllers
@@ -97,6 +98,47 @@ namespace RecipeCubeWebService.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // POST: api/UserGroups
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("CreateGroup")]
+        public async Task<IActionResult> CreateGroupDTO(CreateGroupDTO userGroupAdd)
+        {
+            if (userGroupAdd == null) {
+                return BadRequest("userGroup沒資料");
+            }
+            var existingGroup = await _context.UserGroups.SingleOrDefaultAsync(u => u.GroupAdmin == userGroupAdd.group_Admin_Id);
+            if (existingGroup != null)  {
+                return NotFound(new { Message = "已有群組" });
+            }
+            Random Number = new Random();
+            var GroupInvite = 0;
+            int group_Invite = 0;
+            Console.WriteLine();
+            Console.WriteLine(group_Invite);
+            group_Invite = Number.Next(100000000, 999999999);
+            var existingGroupInvite = await _context.UserGroups.SingleOrDefaultAsync(u => u.GroupInvite == group_Invite);
+            Console.WriteLine();
+            Console.WriteLine(group_Invite);
+            while (existingGroupInvite != null)
+            {
+                GroupInvite = group_Invite;
+            }
+            Console.WriteLine();
+            Console.WriteLine(group_Invite);
+
+            var newGroup = new UserGroup
+            {
+                GroupAdmin = userGroupAdd.group_Admin_Id,
+                GroupName = userGroupAdd.group_name,
+                GroupInvite = group_Invite,
+            };
+
+            _context.UserGroups.Add(newGroup);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "新增成功" });
         }
 
         private bool UserGroupExists(int id)

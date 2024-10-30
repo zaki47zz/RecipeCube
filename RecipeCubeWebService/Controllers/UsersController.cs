@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 
 namespace RecipeCubeWebService.Controllers
@@ -255,6 +256,47 @@ namespace RecipeCubeWebService.Controllers
             return NoContent(); // 返回204狀態碼，表示成功處理請求但沒有內容返回
         }
 
+        // 修改 or 加入群組功能 
+        [HttpPut("changeGroup")]
+        public async Task<IActionResult> ChangeGroup(changeGroupDTO changeGroup)
+        {
+            if (changeGroup == null)
+            {
+                return BadRequest(new { Message = "請填入Group ID" });
+            }
+
+
+            var user = _context.Users.SingleOrDefault(u => u.Id == changeGroup.change_user_Id);
+            var group = _context.UserGroups.SingleOrDefault(u => u.GroupId == changeGroup.change_Group_Id);
+
+            if (group == null || user == null)
+            {
+                return NotFound(new { Message = "無此群組" });
+            }
+
+            // 更新使用者的屬性
+            user.GroupId = changeGroup.change_Group_Id;
+
+            _context.Entry(user).State = EntityState.Modified; // 將使用者的狀態設置為已修改
+
+            try
+            {
+                await _context.SaveChangesAsync(); // 保存變更到資料庫
+            }
+            catch (DbUpdateConcurrencyException) // 處理並發更新異常
+            {
+                if (!UserExists(changeGroup.change_user_Id)) // 檢查使用者是否仍存在
+                {
+                    return NotFound(); // 如果使用者不存在，返回404錯誤
+                }
+                else
+                {
+                    throw; // 重新拋出異常
+                }
+            }
+
+            return Ok(new { Message = "成功" }); // 返回204狀態碼，表示成功處理請求但沒有內容返回
+        }
         private bool UserExists(string id)
         {
             return _context.Users.Any(e => e.Id == id);
