@@ -6,9 +6,13 @@
 
         public int? GroupId { get; set; }
 
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
+
+        public string? OwnerId { get; set; }
+
+        public string? OwnerName { get; set; }
 
         public int? IngredientId { get; set; }
 

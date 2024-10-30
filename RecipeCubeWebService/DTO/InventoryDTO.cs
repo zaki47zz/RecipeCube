@@ -15,32 +15,7 @@ namespace RecipeCubeWebService.DTO
         public decimal? Gram { get; set; }
         public string Photo { get; set; }
         public decimal? Quantity { get; set; }
-        private DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
-        private DateOnly? _expiryDate;
-        public DateOnly? ExpiryDate
-        {
-            get => _expiryDate;
-            set
-            {
-                _expiryDate = value;
-                UpdateIsExpiring();
-            }
-        }
-        public bool? IsExpiring { get; private set; } //確保只能通過 UpdateIsExpiring 方法來更新
-        public bool? IsExpired { get; private set; }
+        public DateOnly? ExpiryDate { get; set; }
         public bool? Visibility { get; set; }
-        private void UpdateIsExpiring()
-        {
-            if (_expiryDate == null)
-            {
-                IsExpiring = null;
-            }
-            else
-            {
-                int daysUntilExpiry = _expiryDate.Value.DayNumber - currentDate.DayNumber;
-                IsExpiring = daysUntilExpiry <= 3 && daysUntilExpiry >= 0;
-                IsExpired = daysUntilExpiry < 0;
-            }
-        }
     }
 }

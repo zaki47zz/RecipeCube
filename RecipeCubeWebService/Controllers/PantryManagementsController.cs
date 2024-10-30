@@ -60,6 +60,7 @@ namespace RecipeCubeWebService.Controllers
             foreach (PantryManagement userPantryManagement in userPantryManagements)
             {
                 var ingredient = ingredients.Where(i => i.IngredientId == userPantryManagement.IngredientId);
+                var ownerName = await _context.Users.Where(u => u.Id == userPantryManagement.OwnerId).Select(u => u.UserName).FirstOrDefaultAsync();
 
                 PantryDTO pantryDTO = new PantryDTO
                 {
@@ -67,6 +68,8 @@ namespace RecipeCubeWebService.Controllers
                     GroupId = (int)groupId,
                     UserId = userPantryManagement.UserId,
                     UserName = userName,
+                    OwnerId = userPantryManagement.OwnerId,
+                    OwnerName = ownerName,
                     IngredientId = userPantryManagement.IngredientId,
                     IngredientName = ingredient.Select(i => i.IngredientName).FirstOrDefault(),
                     Quantity = userPantryManagement.Quantity,
