@@ -27,6 +27,8 @@ public partial class RecipeCubeContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductEvaluate> ProductEvaluates { get; set; }
+
     public virtual DbSet<Recipe> Recipes { get; set; }
 
     public virtual DbSet<RecipeIngredient> RecipeIngredients { get; set; }
@@ -164,11 +166,11 @@ public partial class RecipeCubeContext : DbContext
 
         modelBuilder.Entity<PreferedIngredient>(entity =>
         {
-            entity.HasKey(e => e.PerferIngredientId);
+            entity.HasKey(e => e.PreferIngredientId);
 
             entity.ToTable("Prefered_Ingredients");
 
-            entity.Property(e => e.PerferIngredientId).HasColumnName("perfer_ingredient_id");
+            entity.Property(e => e.PreferIngredientId).HasColumnName("prefer_ingredient_id");
             entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
             entity.Property(e => e.UserId)
                 .HasMaxLength(450)
@@ -194,12 +196,29 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("unit_quantity");
         });
 
+        modelBuilder.Entity<ProductEvaluate>(entity =>
+        {
+            entity.HasKey(e => e.EvaluateId);
+
+            entity.ToTable("Product_evaluate");
+
+            entity.Property(e => e.EvaluateId).HasColumnName("evaluate_id");
+            entity.Property(e => e.CommentMessage).HasColumnName("comment_message");
+            entity.Property(e => e.CommentStars).HasColumnName("comment_stars");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+        });
+
         modelBuilder.Entity<Recipe>(entity =>
         {
             entity.Property(e => e.RecipeId).HasColumnName("recipe_id");
             entity.Property(e => e.Category)
                 .HasMaxLength(10)
                 .HasColumnName("category");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.DetailedCategory)
                 .HasMaxLength(255)
                 .HasColumnName("detailed_category");
@@ -216,8 +235,11 @@ public partial class RecipeCubeContext : DbContext
                 .HasColumnName("seasoning");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Steps).HasColumnName("steps");
+            entity.Property(e => e.Time)
+                .HasMaxLength(255)
+                .HasColumnName("time");
             entity.Property(e => e.UserId)
-                .HasMaxLength(450)
+                .HasMaxLength(255)
                 .HasColumnName("user_id");
             entity.Property(e => e.Visibility).HasColumnName("visibility");
             entity.Property(e => e.WestEast).HasColumnName("west_east");

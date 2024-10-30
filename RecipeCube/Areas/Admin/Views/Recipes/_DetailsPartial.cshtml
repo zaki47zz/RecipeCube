@@ -128,8 +128,8 @@
                         @Html.DisplayNameFor(model => model.Visibility)
                     </dt>
                     <dd class="col-12">
-                        <span class="badge @(Model.Visibility == true ? "bg-success" : Model.Visibility == false ? "bg-danger" : "bg-secondary")">
-                            @(Model.Visibility == true ? "私有" : Model.Visibility == false ? "群組" : "未知")
+                        <span class="badge @(Model.Visibility == 2 ? "bg-success" : Model.Visibility == 1 ? "bg-danger" : "bg-secondary")">
+                            @(Model.Visibility == 2 ? "私有" : Model.Visibility == 1 ? "群組" : "公開")
                         </span>
                     </dd>
                 </div>
