@@ -28,7 +28,7 @@ namespace RecipeCube.Areas.Admin.ViewModels
         [Display(Name = "調味料")]
         public string? Seasoning { get; set; }
         [Display(Name = "可見性")]
-        public bool? Visibility { get; set; }
+        public int? Visibility { get; set; }
         [Display(Name = "食譜照片")]
         public string? Photo { get; set; }
         [Display(Name = "食譜狀態")]

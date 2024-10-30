@@ -26,7 +26,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             var preferefdoods = await _context.PreferedIngredients.ToListAsync();
             var viewModel = preferefdoods.Select(preferefdood => new PreferedFoodViewModel
             {
-                PerferIngredientId = preferefdood.PerferIngredientId,
+                PerferIngredientId = preferefdood.PreferIngredientId,
                 UserId = preferefdood.UserId,
                 IngredientId = preferefdood.IngredientId
             }).ToList(); 
@@ -37,7 +37,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         public async Task<IActionResult> DetailsPartial(int id)
         {
             var preferefdood = await _context.PreferedIngredients
-                .FirstOrDefaultAsync(m => m.PerferIngredientId == id);
+                .FirstOrDefaultAsync(m => m.PreferIngredientId == id);
             if (preferefdood == null)
             {
                 return NotFound();
@@ -45,7 +45,7 @@ namespace RecipeCube.Areas.Admin.Controllers
 
             var viewmodel = new PreferedFoodViewModel
             {
-                PerferIngredientId = preferefdood.PerferIngredientId,
+                PerferIngredientId = preferefdood.PreferIngredientId,
                 UserId = preferefdood.UserId,
                 IngredientId = preferefdood.IngredientId
             };
@@ -85,7 +85,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             }
             var viewModel = new PreferedFoodViewModel
             {
-                PerferIngredientId = preferefdood.PerferIngredientId,
+                PerferIngredientId = preferefdood.PreferIngredientId,
                 UserId = preferefdood.UserId,
                 IngredientId = preferefdood.IngredientId
             };
@@ -99,7 +99,7 @@ namespace RecipeCube.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult Edit(int id, [Bind("PerferIngredientId,UserId,IngredientId")] PreferedIngredient preferedIngredient)
         {
-            if (id != preferedIngredient.PerferIngredientId)
+            if (id != preferedIngredient.PreferIngredientId)
             {
                 return new JsonResult(new { success = false, error = "ID不符合!" });
             }
@@ -134,7 +134,7 @@ namespace RecipeCube.Areas.Admin.Controllers
             }
 
             var preferedIngredient = await _context.PreferedIngredients
-                .FirstOrDefaultAsync(m => m.PerferIngredientId == id);
+                .FirstOrDefaultAsync(m => m.PreferIngredientId == id);
             if (preferedIngredient == null)
             {
                 return NotFound();
@@ -160,7 +160,7 @@ namespace RecipeCube.Areas.Admin.Controllers
 
         private bool PreferedIngredientExists(int id)
         {
-            return _context.PreferedIngredients.Any(e => e.PerferIngredientId == id);
+            return _context.PreferedIngredients.Any(e => e.PreferIngredientId == id);
         }
     }
 }
