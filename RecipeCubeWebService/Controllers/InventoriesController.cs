@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeCubeWebService.Models;
 using RecipeCubeWebService.DTO;
+using Microsoft.VisualBasic;
 
 namespace RecipeCubeWebService.Controllers
 {
@@ -56,6 +57,9 @@ namespace RecipeCubeWebService.Controllers
 
             var ingredients = await _context.Ingredients.ToListAsync(); //抓所有食材的資料
 
+            //為了計算天數要先抓三天後
+            DateOnly todayDate = DateOnly.FromDateTime(DateTime.Now);
+            DateOnly threeDayAfterDate = todayDate.AddDays(3);
 
 
             List<InventoryDTO> inventoryDTOs = new List<InventoryDTO>();
@@ -73,6 +77,8 @@ namespace RecipeCubeWebService.Controllers
                     IngredientId = userInventory.IngredientId,
                     Quantity = userInventory.Quantity,
                     ExpiryDate = userInventory.ExpiryDate,
+                    IsExpiring = userInventory.ExpiryDate < threeDayAfterDate && userInventory.ExpiryDate > todayDate ? true : false,
+                    IsExpired = userInventory.ExpiryDate < todayDate ? true : false,
                     Visibility = userInventory.Visibility,
                     IngredientName = ingredient.Select(i => i.IngredientName).FirstOrDefault(),
                     Category = ingredient.Select(i => i.Category).FirstOrDefault(),

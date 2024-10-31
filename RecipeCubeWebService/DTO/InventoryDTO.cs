@@ -16,6 +16,8 @@ namespace RecipeCubeWebService.DTO
         public string Photo { get; set; }
         public decimal? Quantity { get; set; }
         public DateOnly? ExpiryDate { get; set; }
+        public bool? IsExpiring { get; set; }
+        public bool? IsExpired { get; set; }
         public bool? Visibility { get; set; }
     }
 }
