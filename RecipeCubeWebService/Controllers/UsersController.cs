@@ -139,7 +139,7 @@ namespace RecipeCubeWebService.Controllers
             var verificationData = await response.Content.ReadFromJsonAsync<VerificationResponseDTO>();
 
             // 呼叫 Email API 發送郵件
-            var emailSendEndpoint = "https://localhost:7188/api//Gmail/send";
+            var emailSendEndpoint = "https://localhost:7188/api/Gmail/send";
             var emailSendRequest = new
             {
                 toName = "",
