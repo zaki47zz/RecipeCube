@@ -12,28 +12,20 @@ using Microsoft.AspNetCore.DataProtection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddHttpClient();
-
 builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("RecipeCube"));
 });
-
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
-
 builder.Services.AddHttpClient<UsersController>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7188"); // API 路徑
 });
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -44,6 +36,25 @@ builder.Services.AddCors(options =>
 builder.Services.AddDataProtection()
     .SetApplicationName("RecipeCubeWebService");
 
+// JWT 認證配置
+var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 var app = builder.Build();
 
@@ -54,51 +65,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-void ConfigureServices(IServiceCollection services)
-{
-    // JWT 認證配置
-    var key = Encoding.ASCII.GetBytes("thisisaverylongsecretkeyforjwtwhichis256bits!!");
-    services.AddAuthentication(x =>
-    {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(x =>
-    {
-        x.RequireHttpsMetadata = false;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+app.UseHttpsRedirection(); // 使用 HTTPS 重新導向
+app.UseStaticFiles(); // 使用靜態檔案
+app.UseCors("AllowAll"); // 使用 CORS 策略
+app.UseAuthentication(); // 啟用 JWT 驗證
+app.UseAuthorization(); // 啟用授權
 
-    services.AddControllers();
-}
+app.MapControllers(); // 映射控制器
 
-void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-    app.UseAuthentication(); // 必須啟用 JWT 驗證
-    app.UseAuthorization();
-
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-    });
-}
-
-
-//app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
-app.UseCors("AllowAll");
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+app.Run(); // 運行應用程式
