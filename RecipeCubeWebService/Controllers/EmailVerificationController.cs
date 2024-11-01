@@ -87,11 +87,13 @@ namespace RecipeCubeWebService.Controllers
 
 
             // 呼叫 Email API 發送郵件
-            var emailSendEndpoint = "https://localhost:7188/api/Email/Send";
+            var emailSendEndpoint = "https://localhost:7188/api/Gmail/send";
             var emailSendRequest = new
             {
-                Email = user.Email,
-                Message = $"請點擊以下連結以驗證您的帳號：{verificationLink}"
+                toName = "",
+                toEmail = user.Email,
+                title = "重發驗證信件",
+                body = $"請點擊以下連結以驗證您的帳號：{verificationLink}"
             };
 
             var emailResponse = await _httpClient.PostAsJsonAsync(emailSendEndpoint, emailSendRequest);
@@ -195,11 +197,13 @@ namespace RecipeCubeWebService.Controllers
 
 
             // 呼叫 Email API 發送郵件
-            var emailSendEndpoint = "https://localhost:7188/api/Email/Send";
+            var emailSendEndpoint = "https://localhost:7188/api/Gmail/send";
             var emailSendRequest = new
             {
-                Email = user.Email,
-                Message = $"請點擊以下連結以重設你的密碼：{resetPasswordLink}"
+                toName = "",
+                toEmail = user.Email,
+                title = "忘記密碼重設信件",
+                body = $"請點擊以下連結以重設你的密碼：{resetPasswordLink}"
             };
 
             var emailResponse = await _httpClient.PostAsJsonAsync(emailSendEndpoint, emailSendRequest);
@@ -305,7 +309,7 @@ namespace RecipeCubeWebService.Controllers
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var email = jwtToken.Claims.First(x => x.Type == "email").Value;
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
-                
+
                 if (user == null)
                 {
                     return NotFound(new { Message = "User not found." });
@@ -321,7 +325,7 @@ namespace RecipeCubeWebService.Controllers
             catch (SecurityTokenExpiredException)
             {
                 // Token 過期時回傳 401 錯誤
-                 return  Unauthorized(new { Message = "Token 過期了" });
+                return Unauthorized(new { Message = "Token 過期了" });
             }
             catch (SecurityTokenInvalidSignatureException)
             {
