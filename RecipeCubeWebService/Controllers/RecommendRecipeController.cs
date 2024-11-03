@@ -152,5 +152,102 @@ namespace RecipeCubeWebService.Controllers
                 return StatusCode(500, new { message = "發生伺服器錯誤", error = ex.Message });
             }
         }
+        [HttpGet("RandomRecommend")]
+        public async Task<ActionResult<RandomRecommendReciepDTO>> RandomRecommend(string? userId)
+        {
+            try
+            {
+                // 查找所有食譜
+                var allRecipes = await _context.Recipes.ToListAsync();
+
+                // 如果有 userId，嘗試優先推薦偏好相關的食譜
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var preferredIngredients = await _context.PreferedIngredients
+                        .Where(pi => pi.UserId == userId)
+                        .Select(pi => pi.IngredientId)
+                        .ToListAsync();
+
+                    var exclusiveIngredients = await _context.ExclusiveIngredients
+                        .Where(ei => ei.UserId == userId)
+                        .Select(ei => ei.IngredientId)
+                        .ToListAsync();
+
+                    // 過濾掉含有禁忌食材的食譜
+                    var filteredRecipes = allRecipes
+                        .Where(r => !_context.RecipeIngredients
+                            .Any(ri => ri.RecipeId == r.RecipeId && exclusiveIngredients.Contains(ri.IngredientId)))
+                        .ToList();
+
+                    // 優先推薦包含偏好食材的食譜
+                    var recommendedRecipes = filteredRecipes
+                        .Where(r => _context.RecipeIngredients
+                            .Any(ri => ri.RecipeId == r.RecipeId && preferredIngredients.Contains(ri.IngredientId)))
+                        .ToList();
+
+                    if (recommendedRecipes.Any())
+                    {
+                        var randomRecommendedRecipe = recommendedRecipes
+                            .OrderBy(r => Guid.NewGuid())
+                            .FirstOrDefault();
+
+                        return Ok(await ConvertToDTO(randomRecommendedRecipe));
+                    }
+                }
+
+                // 如果沒有偏好或禁忌設定，或者沒有符合偏好的食譜，則隨機推薦
+                var randomRecipe = allRecipes.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
+
+                if (randomRecipe == null)
+                {
+                    return NotFound(new { message = "未找到任何食譜" });
+                }
+
+                return Ok(await ConvertToDTO(randomRecipe));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "伺服器錯誤", error = ex.Message });
+            }
+        }
+
+        private async Task<RandomRecommendReciepDTO> ConvertToDTO(Recipe recipe)
+        {
+            var recipeIngredients = await _context.RecipeIngredients
+                .Where(ri => ri.RecipeId == recipe.RecipeId)
+                .ToListAsync();
+
+            var ingredients = await _context.Ingredients
+                .ToListAsync();
+
+            var selectedIngredientNames = recipeIngredients
+                .Select(ri => ingredients.FirstOrDefault(i => i.IngredientId == ri.IngredientId)?.IngredientName ?? string.Empty)
+                .ToList();
+
+
+            return new RandomRecommendReciepDTO
+            {
+                RecipeId = recipe.RecipeId,
+                RecipeName = recipe.RecipeName,
+                UserId = recipe.UserId,
+                IsCustom = recipe.IsCustom,
+                Restriction = recipe.Restriction,
+                WestEast = recipe.WestEast,
+                Category = recipe.Category,
+                DetailedCategory = recipe.DetailedCategory,
+                Steps = recipe.Steps,
+                Seasoning = recipe.Seasoning,
+                Visibility = recipe.Visibility,
+                PhotoName = recipe.Photo,
+                Status = (bool)recipe.Status,
+                Time = recipe.Time,
+                Description = recipe.Description,
+                SelectedIngredientNames = selectedIngredientNames,
+                IngredientQuantities = recipeIngredients.GroupBy(ri => ri.IngredientId ?? 0)
+                                                          .ToDictionary(g => g.Key, g => g.First().Quantity ?? 0M),
+                IngredientUnits = ingredients.ToDictionary(i => i.IngredientId, i => i.Unit ?? string.Empty),
+                MissingIngredients = new List<MissingIngredientDTO>()
+            };
+        }
     }
 }
