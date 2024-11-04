@@ -49,7 +49,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 IngredientUnit = ingredient?.Unit,
                 Quantity = inventory.Quantity,
                 ExpiryDate = inventory.ExpiryDate,
-                IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
             }).ToList();
 
@@ -173,7 +172,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                                 IngredientId = ingredientId,
                                 Quantity = quantity,
                                 ExpiryDate = expireDate,
-                                IsExpiring = isExpiring,
                                 Visibility = visibility,
                             });
                         }
@@ -321,7 +319,6 @@ namespace RecipeCube.Areas.Admin.Controllers
                 Quantity = inventory.Quantity,
                 IngredientUnit = ingredient.Unit,
                 ExpiryDate = inventory.ExpiryDate,
-                IsExpiring = inventory.IsExpiring,
                 Visibility = inventory.Visibility
             };
         }

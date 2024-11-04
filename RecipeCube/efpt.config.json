@@ -15,7 +15,87 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[Exclusive_Ingredients]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Ingredients]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Inventory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Order_Items]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Orders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Pantry_Management]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Prefered_Ingredients]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Product_evaluate]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Products]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Recipe_Ingredients]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Recipes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RoleClaims]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Roles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User_Coupons]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User_Groups]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserClaims]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserIdMapping]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserLogins]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserRoles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserTokens]",
          "ObjectType": 0
       }
    ],
