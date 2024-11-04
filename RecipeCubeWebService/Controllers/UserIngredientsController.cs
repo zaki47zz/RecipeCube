@@ -31,9 +31,10 @@ namespace RecipeCubeWebService.Controllers
             .Where(e => e.UserId == exi.User_Id)
             .Select(e => new
             {
+                IngredientId = e.IngredientId,
+                ExclusiveIngredientName = e.Ingredient.IngredientName,
                 ExclusiveIngredientId = e.ExclusiveIngredientId,
-                ExclusiveIngredientName = e.Ingredient.IngredientName
-             })
+            })
             .ToList();
             if (!exclusiveIngredientsDetails.Any())
             {
@@ -52,8 +53,10 @@ namespace RecipeCubeWebService.Controllers
             .Where(e => e.UserId == exi.User_Id)
             .Select(e => new
             {
+                IngredientId = e.IngredientId,
+                PreferIngredientName = e.Ingredient.IngredientName,
                 PreferIngredientId = e.PreferIngredientId,
-                PreferIngredientName = e.Ingredient.IngredientName
+
             })
             .ToList();
             if (!preferredIngredientsDetails.Any())

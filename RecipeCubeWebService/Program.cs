@@ -4,7 +4,6 @@ using RecipeCubeWebService.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using RecipeCubeWebService.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using RecipeCubeWebService.Controllers;
 using Microsoft.AspNetCore.DataProtection;
@@ -21,7 +20,6 @@ builder.Services.AddDbContext<RecipeCubeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RecipeCube"));
 });
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 builder.Services.AddHttpClient<UsersController>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7188"); // API ¸ô®|
