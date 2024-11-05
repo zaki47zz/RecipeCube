@@ -144,16 +144,17 @@ namespace RecipeCubeWebService.Controllers
 
             return Ok(recipeDto);
         }
-    
+
         // PUT: api/Recipes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // PUT: api/Recipes/5
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRecipe(int id, RecipeDto recipeDto)
+        public async Task<IActionResult> PutRecipe(int id, [FromForm] RecipeDto recipeDto, IFormFile? photo)
         {
             if (id != recipeDto.RecipeId)
             {
-                return BadRequest();
+
+                return BadRequest(new { message = "修改食譜資訊失敗" });
             }
 
             var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.RecipeId == id);
@@ -173,10 +174,26 @@ namespace RecipeCubeWebService.Controllers
             recipe.Steps = recipeDto.Steps;
             recipe.Seasoning = recipeDto.Seasoning;
             recipe.Visibility = recipeDto.Visibility;
-            recipe.Photo = recipeDto.PhotoName;
             recipe.Status = recipeDto.Status;
             recipe.Time = recipeDto.Time;
             recipe.Description = recipeDto.Description;
+
+            // 如果有上傳新的圖片，儲存圖片
+            if (photo != null)
+            {
+                // 定義圖片儲存的路徑
+                var imagePath = Path.Combine("wwwroot/images/recipe", photo.FileName);
+
+                // 儲存圖片到指定位置
+                using (var stream = new FileStream(imagePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(stream);
+                }
+
+                // 更新圖片名稱到資料庫
+                recipe.Photo = photo.FileName;
+            }
+
             _context.Entry(recipe).State = EntityState.Modified;
 
             // Update RecipeIngredients
@@ -231,8 +248,9 @@ namespace RecipeCubeWebService.Controllers
                 }
             }
 
-            return Ok("修改食譜資訊成功");
+            return Ok(new { message = "修改食譜資訊成功" });
         }
+
 
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
