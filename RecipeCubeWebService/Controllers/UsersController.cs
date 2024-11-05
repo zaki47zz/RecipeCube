@@ -165,7 +165,7 @@ namespace RecipeCubeWebService.Controllers
         // 登入功能 
         [HttpPost("SignIn")]
         public async Task<IActionResult> SignIn(SignInDTO signIn)
-        {
+        {   // 要補email 登入錯誤次數 帳號鎖定 驗證失敗 badrequest
             var user = _context.Users.SingleOrDefault(u => u.Email == signIn.Email);
 
             if (user != null)
