@@ -29,22 +29,22 @@ namespace RecipeCubeWebService.Controllers
 
         //  /api/OAuth/VerifyAudience
         // 判斷 aud是否和OAuth 2.0 用戶端 ID相同且exp未到期
-        [HttpGet("VerifyAudience")]
-        public async Task<IActionResult> VerifyAudience(string VerifyAud)
+        [HttpPost("VerifyAudience")]
+        public async Task<IActionResult> VerifyAudience(VerifyAudDTO verifyAud)
         {
-            if (string.IsNullOrEmpty(VerifyAud))
+            if (string.IsNullOrEmpty(verifyAud.oAuthGoogleJwt))
             {
                 return BadRequest(new { Message = "輸入為空" });
             }
             // 創建 JwtSecurityTokenHandler 來解析 JWT
             var handler = new JwtSecurityTokenHandler();
             // 驗證 Token 是否為有效的 JWT 格式
-            if (!handler.CanReadToken(VerifyAud))
+            if (!handler.CanReadToken(verifyAud.oAuthGoogleJwt))
             {
                 return BadRequest(new { Message = "無效的 JWT 格式" });
             }
             // 解析 JWT
-            var jwtToken = handler.ReadJwtToken(VerifyAud);
+            var jwtToken = handler.ReadJwtToken(verifyAud.oAuthGoogleJwt);
             // OAuth 2.0 用戶端 ID
             var RecipeCubeUserInUp = "925872879369-bn925g9150fm8dlkkip5n3cfd61cb3tb.apps.googleusercontent.com";
             // 取得 `aud` (Audience) 資訊
@@ -75,16 +75,17 @@ namespace RecipeCubeWebService.Controllers
             }
 
             var oAuthUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
-            // 如果第三方登入使用者不存在，呼叫 signUpDto api
+            // 如果第三方登入使用者不存在，呼叫 oAuthsignUpDto api
             if (oAuthUser == null)
             {
-                var signUpDto = new oAuthSignUpDTO{ UserName = username, Email = email };
+                var oAuthsignUp = new oAuthSignUpDTO{ UserName = username, Email = email };
                 // 呼叫 oAuthSignUp 方法
-                var result = await oAuthSignUp(signUpDto);
+                var result = await oAuthSignUp(oAuthsignUp);
                 // 根據呼叫的結果返回相應的訊息
                 if (result is OkObjectResult okResult)
                 {
-                    return Redirect("http://localhost:5173/oAuthFirstSignIn");
+                    //return Redirect("http://localhost:5173/oAuthFirstSignIn");
+                    return Ok(new { Message = "請填寫必填資訊已完成註冊" });
                 }
             }
             // 如果第三方登入使用者存在，未填寫必要資訊則導向前端填寫基本資料頁面
@@ -99,7 +100,8 @@ namespace RecipeCubeWebService.Controllers
             }
             else
             {   // 防止使用者網路不好造成錯誤
-                return Redirect("http://localhost:5173/oAuthFirstSignIn");
+                //return Redirect("http://localhost:5173/oAuthFirstSignIn");
+                return Ok(new { Message = "請填寫必填資訊已完成註冊"});
             }
 
             var user = _context.Users.SingleOrDefault(u => u.Email == email);
@@ -160,8 +162,8 @@ namespace RecipeCubeWebService.Controllers
                 return BadRequest("輸入為空"); // 如果資料為 null，返回400錯誤
             }
 
-            // 根據傳入的 User_Id 查詢資料庫中的使用者
-            var user = await _context.Users.FindAsync(oAuthFirstSignIn.User_Id);
+            // 根據傳入的 User_email 查詢資料庫中的使用者
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == oAuthFirstSignIn.oAuthEmail);
             if (user == null)
             {
                 return NotFound(new { Message = "User not found." }); // 如果找不到使用者，返回404錯誤
@@ -176,10 +178,17 @@ namespace RecipeCubeWebService.Controllers
             try
             {
                 await _context.SaveChangesAsync(); // 保存變更到資料庫
+                var oAuthSignIn_Id = user.Id;
+                var result = await oAuthSignIn(oAuthSignIn_Id);
+                if (result is OkObjectResult okResult)
+                {
+                    return Ok(okResult.Value);
+                }
+
             }
             catch (DbUpdateConcurrencyException) // 處理並發更新異常
             {
-                if (!UserExists(oAuthFirstSignIn.User_Id)) // 檢查使用者是否仍存在
+                if (!UserExists(oAuthFirstSignIn.oAuthEmail)) // 檢查使用者是否仍存在
                 {
                     return NotFound(); // 如果使用者不存在，返回404錯誤
                 }
@@ -189,7 +198,7 @@ namespace RecipeCubeWebService.Controllers
                 }
             }
 
-            return NoContent(); // 返回204狀態碼，表示成功處理請求但沒有內容返回
+            return Ok(new {  Message = "填寫成功",});
         }
         // /api/OAuth/oAuthSignIn
         // 第三方登入功能 
