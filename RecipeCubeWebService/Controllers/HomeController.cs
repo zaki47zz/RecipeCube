@@ -33,5 +33,35 @@ namespace RecipeCubeWebService.Controllers
             };
             return homeDTO;
         }
+
+        // GET: api/Home/Recommend
+        [HttpGet("Recommend")]
+        public async Task<ActionResult<IEnumerable<Recipe>>> GetRecommendRecipe()
+        {
+            var recipes = await _context.Recipes
+                .Where(recipe => recipe.UserId == "0" && recipe.Status == true)
+                .ToListAsync();
+
+            int recipeAmount = recipes.Count;
+            List<Recipe> selectedRecipes = new List<Recipe>();
+            Random random = new Random();
+            HashSet<int> selectedIndices = new HashSet<int>();
+
+            // 隨機選取 3 個不同的索引
+            while (selectedIndices.Count < 5 && selectedIndices.Count < recipeAmount)
+            {
+                int randomIndex = random.Next(0, recipeAmount);
+                selectedIndices.Add(randomIndex);
+            }
+
+            // 根據隨機索引選擇食譜
+            foreach (int index in selectedIndices)
+            {
+                selectedRecipes.Add(recipes[index]);
+            }
+
+            return Ok(selectedRecipes);
+        }
     }
 }
+
