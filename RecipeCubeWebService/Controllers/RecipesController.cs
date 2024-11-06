@@ -34,7 +34,9 @@ namespace RecipeCubeWebService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
         {
-            var recipes = await _context.Recipes.ToListAsync();
+            var recipes = await _context.Recipes
+                .Where(r => r.Status == true) // 只取狀態為 true 的食譜
+                .ToListAsync();
 
             var recipeDtos = new List<RecipeDto>();
             foreach (var recipe in recipes)
@@ -360,7 +362,39 @@ namespace RecipeCubeWebService.Controllers
 
         //    return NoContent();
         //}
+        // PATCH: api/Recipes/{id}/status
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateRecipeStatus(int id, [FromBody] RecipeStatusDto recipeStatusDto)
+        {
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.RecipeId == id);
+            if (recipe == null)
+            {
+                return NotFound(new { message = "找不到該食譜" });
+            }
 
+            // 更新狀態
+            recipe.Status = recipeStatusDto.Status;
+
+            // 將更新的狀態應用到資料庫中
+            try
+            {
+                _context.Entry(recipe).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RecipeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(new { message = "成功更新食譜狀態" });
+        }
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
