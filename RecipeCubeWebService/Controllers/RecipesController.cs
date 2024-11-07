@@ -45,7 +45,9 @@ namespace RecipeCubeWebService.Controllers
                 var recipeIngredients = await _context.RecipeIngredients
                     .Where(ri => ri.RecipeId == recipe.RecipeId)
                     .ToListAsync();
-
+                // 查詢 UserName
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == recipe.UserId);
+                string userName = user?.UserName ?? "系統"; // 如果找不到則設為 "系統"
                 // 查詢對應的食材
                 var ingredientIds = recipeIngredients.Select(ri => ri.IngredientId).Distinct().ToList();
                 var ingredients = await _context.Ingredients
@@ -65,6 +67,7 @@ namespace RecipeCubeWebService.Controllers
                     RecipeId = recipe.RecipeId,
                     RecipeName = recipe.RecipeName,
                     UserId = recipe.UserId,
+                    UserName = userName,
                     IsCustom = recipe.IsCustom,
                     Restriction = recipe.Restriction,
                     WestEast = recipe.WestEast,
@@ -100,7 +103,9 @@ namespace RecipeCubeWebService.Controllers
             {
                 return NotFound();
             }
-
+            // 查詢 UserName
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == recipe.UserId);
+            string userName = user?.UserName ?? "系統"; // 如果找不到則設為 "系統"
             // 手動查詢與該 Recipe 關聯的 RecipeIngredients
             var recipeIngredients = await _context.RecipeIngredients
                 .Where(ri => ri.RecipeId == recipe.RecipeId)
@@ -124,6 +129,7 @@ namespace RecipeCubeWebService.Controllers
                 RecipeId = recipe.RecipeId,
                 RecipeName = recipe.RecipeName,
                 UserId = recipe.UserId,
+                UserName = userName,
                 IsCustom = recipe.IsCustom,
                 Restriction = recipe.Restriction,
                 WestEast = recipe.WestEast,
