@@ -39,8 +39,10 @@ namespace RecipeCubeWebService.Controllers
 
                 var userInventoryIngredients = userInventory.Select(inv => inv.IngredientId).ToList();
 
-                // 一次性查找所有食譜及其相關的成分信息
-                var recipes = await _context.Recipes.ToListAsync();
+
+                var recipes = await _context.Recipes
+                    .Where(r => r.Status == true) // 只取狀態為 true 的食譜
+                    .ToListAsync();
                 var recipeIds = recipes.Select(r => r.RecipeId).ToList();
 
                 //var recipeIngredients = await _context.RecipeIngredients
@@ -158,7 +160,7 @@ namespace RecipeCubeWebService.Controllers
             try
             {
                 // 查找所有食譜
-                var allRecipes = await _context.Recipes.ToListAsync();
+                var allRecipes = await _context.Recipes.Where(r => r.Status == true).ToListAsync();
 
                 // 如果有 userId，嘗試優先推薦偏好相關的食譜
                 if (!string.IsNullOrEmpty(userId))
