@@ -47,7 +47,7 @@ namespace RecipeCubeWebService.Controllers
             Random random = new Random();
             HashSet<int> selectedIndices = new HashSet<int>();
 
-            // 隨機選取 3 個不同的索引
+            // 隨機選取5個食譜
             while (selectedIndices.Count < 5 && selectedIndices.Count < recipeAmount)
             {
                 int randomIndex = random.Next(0, recipeAmount);
