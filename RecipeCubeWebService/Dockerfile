@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Program.cs", "."]
-RUN dotnet restore "./Program.cs"
+COPY ["RecipeCubeWebService/Program.cs", "."]
+RUN dotnet restore "./RecipeCubeWebService/Program.cs"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./Program.cs" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./RecipeCubeWebService/Program.cs" -c $BUILD_CONFIGURATION -o /app/build
 
 # 此階段可用來發佈要複製到最終階段的服務專案
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Program.cs" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./RecipeCubeWebService/Program.cs" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # 此階段用於生產環境，或以一般模式從 VS 執行時 (未使用偵錯設定時的預設值)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Program.cs
+ENTRYPOINT ["dotnet", "RecipeCubeWebService.dll"]
