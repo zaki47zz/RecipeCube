@@ -45,14 +45,27 @@ namespace RecipeCubeWebService.Controllers
             }
             // 解析 JWT
             var jwtToken = handler.ReadJwtToken(verifyAud.oAuthGoogleJwt);
-            // OAuth 2.0 用戶端 ID
+            // Google OAuth 2.0 用戶端 ID
             var RecipeCubeUserInUp = "925872879369-bn925g9150fm8dlkkip5n3cfd61cb3tb.apps.googleusercontent.com";
+
+            var Channel_ID = "2006541501";
+
             // 取得 `aud` (Audience) 資訊
             var audience = jwtToken.Audiences.FirstOrDefault();
+            Console.WriteLine("++++++++++++++++++++++++");
+            Console.WriteLine(audience);
+            Console.WriteLine("++++++++++++++++++++++++");
             // 如果沒有 `aud`，返回錯誤 或與 與OAuth 2.0 用戶端 ID 不同
-            if (audience == null || audience != RecipeCubeUserInUp)
+            if (audience == null)
             {
-                return BadRequest(new { Message = "無效的 JWT 格式或 Audience 不匹配" });
+                if(audience != RecipeCubeUserInUp)
+                {
+                    return BadRequest(new { Message = "無效的 JWT 格式或 Google aud不匹配" });
+                }
+                else if(audience != Channel_ID)
+                {
+                    return BadRequest(new { Message = "無效的 JWT 格式或 Line aud 不匹配" });
+                }
             }
             // 取得所有 Claims 並轉為字典，方便提取所需值
             var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
