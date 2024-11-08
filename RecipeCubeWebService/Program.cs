@@ -17,13 +17,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<RecipeCubeContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RecipeCube"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("RecipeCube"));
 });
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddHttpClient<UsersController>(client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7188"); // API ¸ô®|
-});
+//builder.Services.AddHttpClient<UsersController>(client =>
+//{
+//    client.BaseAddress = new Uri("https://localhost:7188"); // API ¸ô®|
+//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
