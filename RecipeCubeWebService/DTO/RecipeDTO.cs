@@ -33,6 +33,7 @@ namespace RecipeCubeWebService.DTO
 
         public bool Status { get; set; }
         public string Time { get; set; }
+        public string? UserName { get; set; }
 
         public string? Description { get; set; }
         // 使用者選擇的食材清單
