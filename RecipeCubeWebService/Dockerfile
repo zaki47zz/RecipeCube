@@ -1,30 +1,29 @@
-# è«‹åƒé–± https://aka.ms/customizecontainer äº†è§£å¦‚ä½•è‡ªè¨‚æ‚¨çš„åµéŒ¯å®¹å™¨ï¼Œä»¥åŠ Visual Studio å¦‚ä½•ä½¿ç”¨æ­¤ Dockerfile ä¾†çµ„å»ºæ‚¨çš„æ˜ åƒï¼Œä»¥åŠ å¿«åµéŒ¯é€Ÿåº¦ã€‚
-
-# æ­¤éšæ®µç”¨æ–¼ä»¥å¿«é€Ÿæ¨¡å¼å¾ VS åŸ·è¡Œæ™‚ (åµéŒ¯è¨­å®šçš„é è¨­å€¼)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# æ­¤éšæ®µæ˜¯ç”¨ä¾†çµ„å»ºæœå‹™å°ˆæ¡ˆ
+# ¨Ï¥Î .NET 8 SDK §@¬°°ò©³¬M¹³
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["RecipeCubeWebService/Program.cs", "."]
-RUN dotnet restore "./RecipeCubeWebService/Program.cs"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./RecipeCubeWebService/Program.cs" -c $BUILD_CONFIGURATION -o /app/build
 
-# æ­¤éšæ®µå¯ç”¨ä¾†ç™¼ä½ˆè¦è¤‡è£½åˆ°æœ€çµ‚éšæ®µçš„æœå‹™å°ˆæ¡ˆ
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./RecipeCubeWebService/Program.cs" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# æ­¤éšæ®µç”¨æ–¼ç”Ÿç”¢ç’°å¢ƒï¼Œæˆ–ä»¥ä¸€èˆ¬æ¨¡å¼å¾ VS åŸ·è¡Œæ™‚ (æœªä½¿ç”¨åµéŒ¯è¨­å®šæ™‚çš„é è¨­å€¼)
-FROM base AS final
+# ³]©w¤u§@¥Ø¿ı
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# ±N±M®×ÀÉ®×½Æ»s¨ì®e¾¹¤¤
+COPY . .
+
+# ÁÙ­ì®M¥ó
+RUN dotnet restore
+
+# «Øºc±M®×
+RUN dotnet publish -c Release -o /out
+
+# ¨Ï¥Î .NET 8 ¹B¦æ®É§@¬°°ò©³¬M¹³
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+
+# ³]©w¹B¦æ®É¤u§@¥Ø¿ı
+WORKDIR /app
+
+# ½Æ»s«Ø¸mªºÀ³¥Îµ{¦¡
+COPY --from=build /out .
+
+# ¼ÉÅSÀ³¥Îµ{¦¡ªº°ğ
+EXPOSE 80
+
+# ³]©w®e¾¹±Ò°Ê©R¥O
 ENTRYPOINT ["dotnet", "RecipeCubeWebService.dll"]
