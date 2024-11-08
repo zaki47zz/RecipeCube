@@ -23,7 +23,7 @@ WORKDIR /app
 COPY --from=build /out .
 
 # 暴露應用程式的埠
-EXPOSE 80
+EXPOSE 8080
 
 # 設定容器啟動命令
 ENTRYPOINT ["dotnet", "RecipeCubeWebService.dll"]
