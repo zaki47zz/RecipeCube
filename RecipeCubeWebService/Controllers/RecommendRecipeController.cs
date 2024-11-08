@@ -29,29 +29,26 @@ namespace RecipeCubeWebService.Controllers
 
             try
             {
-                var userId = request.UserId;
+                var userId = (string)request.UserId;
                 var selectedIngredients = request.SelectedIngredients;
 
-                // 根據 userId 查找該用戶的庫存
-                var userInventory = await _context.Inventories
-                    .Where(inv => inv.UserId == userId)
-                    .ToListAsync();
+                // 當 userId 不為 0 時，才查找該用戶的庫存
+                List<Inventory> userInventory = new List<Inventory>();
+                if (userId != "0")
+                {
+                    userInventory = await _context.Inventories
+                        .Where(inv => inv.UserId == userId)
+                        .ToListAsync();
+                }
 
                 var userInventoryIngredients = userInventory.Select(inv => inv.IngredientId).ToList();
-
 
                 var recipes = await _context.Recipes
                     .Where(r => r.Status == true) // 只取狀態為 true 的食譜
                     .ToListAsync();
                 var recipeIds = recipes.Select(r => r.RecipeId).ToList();
 
-                //var recipeIngredients = await _context.RecipeIngredients
-                //    .Where(ri => recipeIds.Contains((int)ri.RecipeId))
-                //    .ToListAsync();
-                //var ingredients = await _context.Ingredients
-                //    .Where(ing => recipeIngredients.Select(ri => ri.IngredientId).Contains(ing.IngredientId))
-                //    .ToListAsync();
-                //上面這段改用JOIN
+                // 使用 JOIN 查找 RecipeIngredients 和 Ingredients
                 var recipeIngredients = await _context.RecipeIngredients
                     .Where(ri => recipeIds.Contains((int)ri.RecipeId))
                     .Join(_context.Ingredients,
@@ -93,21 +90,24 @@ namespace RecipeCubeWebService.Controllers
                         bool isEnoughIngredients = true;
                         var missingIngredients = new List<MissingIngredientDTO>();
 
-                        foreach (var recipeIngredient in currentRecipeIngredients)
+                        if (userId != "0") // 只有當 userId 不為 0 時才需要檢查庫存是否充足
                         {
-                            var inventoryItem = userInventory.FirstOrDefault(inv => inv.IngredientId == recipeIngredient.IngredientId);
-                            if (inventoryItem == null || inventoryItem.Quantity < recipeIngredient.Quantity)
+                            foreach (var recipeIngredient in currentRecipeIngredients)
                             {
-                                isEnoughIngredients = false;
-                                var missingQuantity = recipeIngredient.Quantity - (inventoryItem?.Quantity ?? 0);
-
-                                missingIngredients.Add(new MissingIngredientDTO
+                                var inventoryItem = userInventory.FirstOrDefault(inv => inv.IngredientId == recipeIngredient.IngredientId);
+                                if (inventoryItem == null || inventoryItem.Quantity < recipeIngredient.Quantity)
                                 {
-                                    IngredientId = (int)recipeIngredient.IngredientId,
-                                    IngredientName = recipeIngredient.IngredientName,
-                                    MissingQuantity = missingQuantity,
-                                    Unit = recipeIngredient.Unit
-                                });
+                                    isEnoughIngredients = false;
+                                    var missingQuantity = recipeIngredient.Quantity - (inventoryItem?.Quantity ?? 0);
+
+                                    missingIngredients.Add(new MissingIngredientDTO
+                                    {
+                                        IngredientId = (int)recipeIngredient.IngredientId,
+                                        IngredientName = recipeIngredient.IngredientName,
+                                        MissingQuantity = missingQuantity,
+                                        Unit = recipeIngredient.Unit
+                                    });
+                                }
                             }
                         }
 
@@ -132,7 +132,8 @@ namespace RecipeCubeWebService.Controllers
                 }
 
                 var sortedRecipes = recommendedRecipes
-                    .Select(r => {
+                    .Select(r =>
+                    {
                         r.MatchRate = Math.Round(r.MatchRate, 3);
                         r.CoverRate = Math.Round(r.CoverRate, 3);
                         r.TotalScore = Math.Round(r.TotalScore, 3);
@@ -150,10 +151,10 @@ namespace RecipeCubeWebService.Controllers
             }
             catch (Exception ex)
             {
-                
                 return StatusCode(500, new { message = "發生伺服器錯誤", error = ex.Message });
             }
         }
+
         [HttpGet("RandomRecommend")]
         public async Task<ActionResult<RandomRecommendReciepDTO>> RandomRecommend(string? userId)
         {
