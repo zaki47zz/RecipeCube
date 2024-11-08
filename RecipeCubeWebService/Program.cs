@@ -68,7 +68,6 @@ app.UseStaticFiles(); // 使用靜態檔案
 app.UseCors("AllowAll"); // 使用 CORS 策略
 app.UseAuthentication(); // 啟用 JWT 驗證
 app.UseAuthorization(); // 啟用授權
-app.UseHealthChecks("/healthz");
 app.MapControllers(); // 映射控制器
 
 app.Run(); // 運行應用程式
