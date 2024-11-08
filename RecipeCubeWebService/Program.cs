@@ -62,7 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.Run("http://0.0.0.0:8080");
 app.UseHttpsRedirection(); // 使用 HTTPS 重新導向
 app.UseStaticFiles(); // 使用靜態檔案
 app.UseCors("AllowAll"); // 使用 CORS 策略
